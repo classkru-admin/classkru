@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ClassKru</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e8edf2;
+  --sh:0 1px 4px rgba(0,0,0,.06);--sh-md:0 4px 16px rgba(0,0,0,.10);--sh-lg:0 8px 28px rgba(0,0,0,.13);
+  --tr:all .18s cubic-bezier(.4,0,.2,1);
+  --sidebar-w:220px;
+}
+html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
+
+/* ══════════════════════════════════════
+   SHARED
+══════════════════════════════════════ */
+.btn{font-family:'Sarabun',sans-serif;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:var(--tr);border-radius:12px;}
+.btn:active{transform:scale(.96);}
+.btn-primary{background:var(--primary);color:#fff;font-size:15px;padding:10px 20px;}
+.btn-primary:hover{background:var(--pk);}
+
+/* toast */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:rgba(15,23,42,.88);color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:22px;white-space:nowrap;z-index:9999;transition:transform .25s cubic-bezier(.4,0,.2,1);pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ══════════════════════════════════════
+   NOTIFICATION PANEL
+══════════════════════════════════════ */
+.notif-ov{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:400;opacity:0;pointer-events:none;transition:opacity .2s;}
+.notif-ov.show{opacity:1;pointer-events:all;}
+.notif-panel{position:fixed;top:0;right:0;bottom:0;width:min(320px,100vw);background:#fff;box-shadow:var(--sh-lg);z-index:401;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;}
+.notif-panel.open{transform:translateX(0);}
+.notif-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.notif-head-title{font-size:16px;font-weight:800;}
+.notif-close{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.notif-list{flex:1;overflow-y:auto;padding:12px;}
+.ni{border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--tr);}
+.ni:active{opacity:.8;}
+.ni-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.ni-info{flex:1;} .ni-title{font-size:13px;font-weight:800;} .ni-sub{font-size:11px;margin-top:2px;}
+.ni-arrow{color:#94a3b8;font-size:16px;}
+.ni-yellow{background:#fffbeb;} .ni-yellow .ni-title{color:#92400e;} .ni-yellow .ni-sub{color:#b45309;} .ni-yellow .ni-ico{background:#fef3c7;}
+.ni-red{background:#fef2f2;} .ni-red .ni-title{color:#991b1b;} .ni-red .ni-sub{color:#dc2626;} .ni-red .ni-ico{background:#fee2e2;}
+.ni-blue{background:#eff6ff;} .ni-blue .ni-title{color:#1e3a5f;} .ni-blue .ni-sub{color:#1d4ed8;} .ni-blue .ni-ico{background:#dbeafe;}
+
+/* ══════════════════════════════════════
+   MOBILE  (< 768px)
+══════════════════════════════════════ */
+.m-wrap{display:flex;flex-direction:column;min-height:100dvh;max-width:480px;margin:0 auto;}
+
+/* mobile topbar */
+.m-topbar{background:#fff;border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;padding:0 16px;justify-content:space-between;flex-shrink:0;box-shadow:var(--sh);}
+.m-topbar-left{display:flex;align-items:center;gap:10px;}
+.m-notif-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:none;position:relative;}
+.m-notif-dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid #fff;}
+
+/* mobile scroll */
+.m-scroll{flex:1;overflow-y:auto;padding:16px 16px 80px;display:flex;flex-direction:column;gap:14px;}
+
+/* mobile bottom nav */
+.m-bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--border);height:60px;display:flex;z-index:100;box-shadow:0 -1px 0 rgba(0,0,0,.06);padding-bottom:env(safe-area-inset-bottom,0);}
+.m-bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:'Sarabun',sans-serif;padding:6px 0 4px;}
+.m-bn:active{opacity:.6;}
+.m-bn svg{width:24px;height:24px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.m-bn span{font-size:10px;font-weight:600;color:#9ca3af;}
+.m-bn.active svg{stroke:var(--primary);}
+.m-bn.active span{color:var(--primary);font-weight:700;}
+
+/* ══════════════════════════════════════
+   DESKTOP  (≥ 768px)
+══════════════════════════════════════ */
+.d-wrap{display:none;}
+
+@media(min-width:768px){
+  .m-wrap{display:none;}
+  .d-wrap{display:flex;height:100vh;overflow:hidden;}
+
+  /* sidebar */
+  .d-sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;}
+  .d-sb-logo{padding:18px 16px 16px;border-bottom:1px solid var(--border);}
+  .d-sb-class-wrap{padding:14px 16px 8px;}
+  .d-sb-class-lbl{font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+  .d-sb-class-box{background:var(--pbg);border:1.5px solid var(--pbd);border-radius:12px;padding:10px 12px;cursor:pointer;transition:var(--tr);}
+  .d-sb-class-box:hover{border-color:var(--primary);}
+  .d-sb-class-name{font-size:16px;font-weight:800;color:var(--primary);}
+  .d-sb-class-sub{font-size:11px;color:var(--pk);margin-top:1px;}
+  .d-sb-class-count{font-size:11px;font-weight:700;color:var(--primary);margin-top:4px;}
+  .d-sb-sec{padding:14px 16px 4px;font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;}
+  .d-sb-link{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);border-left:3px solid transparent;}
+  .d-sb-link:hover{background:#f8fafc;color:var(--text);}
+  .d-sb-link.active{background:var(--pbg);color:var(--primary);border-left-color:var(--primary);}
+  .d-sb-link svg{width:18px;height:18px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;transition:stroke .15s;}
+  .d-sb-link.active svg,.d-sb-link:hover svg{stroke:var(--primary);}
+  .d-sb-spacer{flex:1;}
+  .d-sb-date{padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600;}
+
+  /* desktop main */
+  .d-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .d-topbar{background:#fff;border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 28px;gap:12px;flex-shrink:0;box-shadow:var(--sh);}
+  .d-topbar-title{font-size:16px;font-weight:800;flex:1;}
+  .d-notif-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:none;font-size:20px;position:relative;}
+  .d-notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid #fff;}
+  .d-scroll{flex:1;overflow-y:auto;padding:28px 36px 40px;}
+  .d-content{max-width:680px;}
+}
+
+/* ══════════════════════════════════════
+   SHARED CONTENT COMPONENTS
+   (ใช้ทั้ง mobile และ desktop)
+══════════════════════════════════════ */
+
+/* date row */
+.date-row{display:flex;align-items:flex-end;justify-content:space-between;}
+.date-day{font-size:13px;font-weight:600;color:var(--muted);}
+.date-main{font-size:26px;font-weight:800;color:var(--text);line-height:1.1;margin-top:2px;}
+.date-year{font-size:12px;color:var(--muted);margin-top:2px;}
+.now-pill{background:var(--pbg);border:1.5px solid var(--pbd);border-radius:12px;padding:8px 14px;text-align:center;flex-shrink:0;}
+.now-pill-lbl{font-size:9px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.05em;}
+.now-pill-val{font-size:14px;font-weight:800;color:var(--pk);margin-top:2px;}
+
+/* next class card */
+.next-card{background:#fff;border-radius:20px;border:1.5px solid var(--border);overflow:hidden;box-shadow:var(--sh);}
+.next-card-lbl{font-size:11px;font-weight:700;color:var(--muted);padding:10px 16px 0;}
+.next-card-body{background:var(--pbg);border-radius:16px;margin:8px;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.next-info{display:flex;align-items:center;gap:12px;}
+.next-info-ico{font-size:28px;}
+.next-name{font-size:20px;font-weight:800;color:var(--text);}
+.next-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+.next-cta{width:100%;padding:14px;border-radius:14px;background:var(--primary);color:#fff;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:800;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:var(--tr);box-shadow:0 4px 12px rgba(29,158,117,.3);}
+.next-cta:active{transform:scale(.97);box-shadow:none;}
+.next-cta:hover{background:var(--pk);}
+.no-next{padding:16px;font-size:13px;color:var(--muted);text-align:center;}
+
+/* pending cards */
+.pending-list{display:flex;flex-direction:column;gap:8px;}
+.pi{border-radius:16px;border:1.5px solid transparent;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--tr);}
+.pi:active{transform:scale(.98);}
+.pi-orange{background:#fff7ed;border-color:#fed7aa;}
+.pi-orange .pi-title{color:#9a3412;} .pi-orange .pi-sub{color:#c2410c;} .pi-orange .pi-arrow{color:#ea580c;}
+.pi-orange .pi-ico{background:#ffedd5;}
+.pi-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pi-ico svg{width:26px;height:26px;}
+.pi-info{flex:1;min-width:0;}
+.pi-title{font-size:14px;font-weight:800;}
+.pi-sub{font-size:12px;margin-top:2px;}
+.pi-arrow{font-size:18px;font-weight:700;flex-shrink:0;}
+
+/* timetable */
+.tt-wrap{background:#fff;border-radius:18px;border:1.5px solid var(--border);overflow:hidden;box-shadow:var(--sh);}
+.tt-head{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-bottom:1px solid var(--border);}
+.tt-title{font-size:13px;font-weight:800;}
+.tt-tag{font-size:10px;font-weight:800;color:var(--primary);background:var(--pbg);padding:2px 9px;border-radius:20px;}
+.tt-row{display:flex;align-items:center;gap:10px;padding:10px 15px;border-bottom:1px solid #f8fafc;cursor:pointer;transition:var(--tr);}
+.tt-row:last-child{border:none;}
+.tt-row:hover,.tt-row:active{background:#f8fafc;}
+.tt-row.now{background:var(--pbg);}
+.tt-time{font-size:10px;font-weight:700;color:var(--muted);width:50px;flex-shrink:0;line-height:1.5;white-space:pre;}
+.tt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.tt-info{flex:1;min-width:0;}
+.tt-subject{font-size:13px;font-weight:800;}
+.tt-cls{font-size:10px;color:var(--muted);margin-top:1px;}
+.tt-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0;}
+.tt-done{background:var(--pbg);color:#15803d;}
+.tt-now{background:var(--primary);color:#fff;}
+.tt-go{color:#cbd5e0;font-size:15px;}
+.tt-empty{padding:14px 15px;font-size:12px;color:#94a3b8;font-style:italic;}
+
+/* my classes */
+.classes-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.classes-title{font-size:13px;font-weight:800;}
+.classes-see-all{font-size:12px;font-weight:700;color:var(--primary);background:none;border:none;cursor:pointer;font-family:'Sarabun',sans-serif;}
+.class-pills{display:flex;gap:10px;flex-wrap:wrap;}
+.class-pill{font-family:'Sarabun',sans-serif;font-size:15px;font-weight:700;padding:11px 22px;border-radius:22px;border:2px solid var(--border);background:#fff;color:var(--text);cursor:pointer;transition:var(--tr);min-height:44px;}
+.class-pill:hover{border-color:var(--primary);background:var(--pbg);color:var(--primary);}
+.class-pill:active{transform:scale(.96);}
+.class-pill.active{border-color:var(--border);background:#fff;color:var(--text);}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     MOBILE
+══════════════════════════════════════ -->
+<div class="m-wrap">
+
+  <div class="m-topbar">
+    <div class="m-topbar-left">
+      <img src="classkru-logo.png" alt="ClassKru" style="height:44px;width:auto;">
+    </div>
+    <button class="m-notif-btn" onclick="openNotif()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="m-notif-dot" id="m-notif-dot"></span>
+    </button>
+  </div>
+
+  <div class="m-scroll" id="m-content"></div>
+
+  <nav class="m-bottom-nav">
+    <button class="m-bn active" onclick="setMNav(this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+      <span>หน้าหลัก</span>
+    </button>
+    <button class="m-bn" onclick="setMNav(this);go('attendance.html')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M15.5 16.5l1.5 1.5 2.5-2.5"/></svg>
+      <span>เช็คชื่อ</span>
+    </button>
+    <button class="m-bn" onclick="setMNav(this);showToast('งานนักเรียน — กำลังพัฒนา')">
+      <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+      <span>งานนักเรียน</span>
+    </button>
+    <button class="m-bn" onclick="setMNav(this);showToast('คะแนน — กำลังพัฒนา')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/><path d="M15 13l2 2 4-4"/></svg>
+      <span>คะแนน</span>
+    </button>
+    <button class="m-bn" onclick="setMNav(this);showToast('เพิ่มเติม')">
+      <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+      <span>เพิ่มเติม</span>
+    </button>
+  </nav>
+
+</div><!-- /m-wrap -->
+
+<!-- ══════════════════════════════════════
+     DESKTOP
+══════════════════════════════════════ -->
+<div class="d-wrap">
+
+  <!-- Sidebar -->
+  <aside class="d-sidebar">
+    <div class="d-sb-logo">
+      <img src="classkru-logo.png" alt="ClassKru" style="height:56px;width:auto;">
+    </div>
+    <div class="d-sb-class-wrap">
+      <div class="d-sb-class-lbl">ห้องเรียนปัจจุบัน</div>
+      <div class="d-sb-class-box" id="d-class-box">
+        <div class="d-sb-class-name" id="d-cn">ม.3/1</div>
+        <div class="d-sb-class-sub" id="d-cs">วิทยาศาสตร์</div>
+        <div class="d-sb-class-count" id="d-cc">34 คน</div>
+      </div>
+    </div>
+    <div class="d-sb-sec">เมนู</div>
+    <div class="d-sb-link active">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>หน้าหลัก
+    </div>
+    <div class="d-sb-link" onclick="go('attendance.html')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M15.5 16.5l1.5 1.5 2.5-2.5"/></svg>เช็คชื่อ
+    </div>
+    <div class="d-sb-link" onclick="showToast('คะแนน — กำลังพัฒนา')">
+      <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>คะแนน
+    </div>
+    <div class="d-sb-link" onclick="showToast('งานที่มอบหมาย — กำลังพัฒนา')">
+      <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>งานที่มอบหมาย
+    </div>
+    <div class="d-sb-link" onclick="showToast('นักเรียน — กำลังพัฒนา')">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>นักเรียน
+    </div>
+    <div class="d-sb-sec">รายงาน</div>
+    <div class="d-sb-link" onclick="showToast('สรุปผล — กำลังพัฒนา')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>สรุปผล
+    </div>
+    <div class="d-sb-link" onclick="showToast('ตัดเกรด — กำลังพัฒนา')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M8 21l4-8 4 8M9.5 17h5"/></svg>ตัดเกรด
+    </div>
+    <div class="d-sb-link" onclick="showToast('Export — กำลังพัฒนา')">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export
+    </div>
+    <div class="d-sb-spacer"></div>
+    <div class="d-sb-date" id="d-date-sb"></div>
+  </aside>
+
+  <!-- Main -->
+  <div class="d-main">
+    <div class="d-topbar">
+      <div class="d-topbar-title">🏠 หน้าหลัก</div>
+      <button class="d-notif-btn" onclick="openNotif()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="d-notif-dot" id="d-notif-dot"></span>
+      </button>
+    </div>
+    <div class="d-scroll">
+      <div class="d-content" id="d-content"></div>
+    </div>
+  </div>
+
+</div><!-- /d-wrap -->
+
+<!-- ══ NOTIFICATION PANEL ══ -->
+<div class="notif-ov" id="notif-ov" onclick="closeNotif()"></div>
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-head">
+    <div class="notif-head-title">🔔 การแจ้งเตือน</div>
+    <button class="notif-close" onclick="closeNotif()">✕</button>
+  </div>
+  <div class="notif-list" id="notif-list"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast-el"></div>
+
+<script src="ck-data.js"></script>
+<script>
+/* ══ DATA ══════════════════════════════════════════ */
+const MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const DAYS_S=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+
+const CLASSES=CK.CLASSES;
+
+const TIMETABLE={
+  1:[
+    {s:[8,0],e:[9,0],subject:'วิทยาศาสตร์',cls:'ม.3/1',room:'ห้อง 301',id:'m31',dot:'#1d9e75'},
+    {s:[9,0],e:[10,0],subject:'วิทยาศาสตร์',cls:'ม.3/2',room:'ห้อง 302',id:'m32',dot:'#3b82f6'},
+    {s:[13,0],e:[14,0],subject:'วิทยาศาสตร์',cls:'ม.2/1',room:'ห้อง 201',id:'m21',dot:'#f59e0b'},
+    {s:[14,0],e:[15,0],subject:'วิทยาศาสตร์',cls:'ม.1/1',room:'ห้อง 101',id:'m11',dot:'#ec4899'},
+  ],
+  2:[
+    {s:[8,0],e:[9,0],subject:'วิทยาศาสตร์',cls:'ม.2/1',room:'ห้อง 201',id:'m21',dot:'#f59e0b'},
+    {s:[10,0],e:[11,0],subject:'วิทยาศาสตร์',cls:'ม.3/1',room:'ห้อง 301',id:'m31',dot:'#1d9e75'},
+    {s:[13,0],e:[14,0],subject:'วิทยาศาสตร์',cls:'ม.1/1',room:'ห้อง 101',id:'m11',dot:'#ec4899'},
+  ],
+  3:[
+    {s:[9,0],e:[10,0],subject:'วิทยาศาสตร์',cls:'ม.3/1',room:'ห้อง 301',id:'m31',dot:'#1d9e75'},
+    {s:[10,0],e:[11,0],subject:'วิทยาศาสตร์',cls:'ม.3/2',room:'ห้อง 302',id:'m32',dot:'#3b82f6'},
+    {s:[14,0],e:[15,0],subject:'วิทยาศาสตร์',cls:'ม.2/1',room:'ห้อง 201',id:'m21',dot:'#f59e0b'},
+  ],
+  4:[
+    {s:[8,0],e:[9,0],subject:'วิทยาศาสตร์',cls:'ม.1/1',room:'ห้อง 101',id:'m11',dot:'#ec4899'},
+    {s:[11,0],e:[12,0],subject:'วิทยาศาสตร์',cls:'ม.3/2',room:'ห้อง 302',id:'m32',dot:'#3b82f6'},
+    {s:[13,0],e:[14,0],subject:'วิทยาศาสตร์',cls:'ม.3/1',room:'ห้อง 301',id:'m31',dot:'#1d9e75'},
+  ],
+  5:[
+    {s:[9,0],e:[10,0],subject:'วิทยาศาสตร์',cls:'ม.2/1',room:'ห้อง 201',id:'m21',dot:'#f59e0b'},
+    {s:[10,0],e:[11,0],subject:'วิทยาศาสตร์',cls:'ม.1/1',room:'ห้อง 101',id:'m11',dot:'#ec4899'},
+    {s:[13,0],e:[14,0],subject:'วิทยาศาสตร์',cls:'ม.3/1',room:'ห้อง 301',id:'m31',dot:'#1d9e75'},
+    {s:[14,0],e:[15,0],subject:'วิทยาศาสตร์',cls:'ม.3/2',room:'ห้อง 302',id:'m32',dot:'#3b82f6'},
+  ],
+};
+
+// ห้องไหนเช็คชื่อครบแล้ววันนี้ (อ่านจาก localStorage จริง)
+function getCheckedToday(){
+  const todayKey=CK.fmtKey(new Date());
+  return CLASSES.filter(c=>{
+    const students=CK.getStudents(c.id);
+    return students.every(s=>s.history[todayKey]);
+  }).map(c=>c.id);
+}
+let CHECKED_TODAY=getCheckedToday();
+
+const NOTIFS=[
+  {type:'yellow',icon:'📋',title:'การบ้านรอตรวจ',sub:'8 ชิ้น',action:()=>showToast('📋 ดูการบ้าน')},
+  {type:'red',icon:'😟',title:'นักเรียนขาดเรียนบ่อย',sub:'3 คน',action:()=>showToast('🚨 ดูรายชื่อ')},
+  {type:'blue',icon:'📢',title:'ประกาศ/แจ้งเตือน',sub:'1 รายการใหม่',action:()=>showToast('📢 ดูประกาศ')},
+];
+
+/* ══ UTILS ══ */
+function now(){return new Date();}
+function hm(d){return d.getHours()*60+d.getMinutes();}
+function pad(n){return String(n).padStart(2,'0');}
+function getCurrentPeriod(ps){const t=hm(now());return ps.find(p=>t>=p.s[0]*60+p.s[1]&&t<p.e[0]*60+p.e[1])||null;}
+function getNextPeriod(ps){const t=hm(now());return ps.find(p=>p.s[0]*60+p.s[1]>t)||null;}
+function minsUntil(s){return s[0]*60+s[1]-hm(now());}
+function fmtThai(d){return `${DAYS_S[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()+543}`;}
+
+/* ══ BUILD HTML ══ */
+function buildContent(){
+  const d=now();
+  const dow=d.getDay();
+  const periods=TIMETABLE[dow]||[];
+  const current=getCurrentPeriod(periods);
+  const next=getNextPeriod(periods);
+  const dayLabel={1:'วันจันทร์',2:'วันอังคาร',3:'วันพุธ',4:'วันพฤหัสบดี',5:'วันศุกร์'};
+
+  // ── DATE ROW ──
+  let html=`<div class="date-row" style="margin-bottom:16px">
+    <div>
+      <div class="date-day">วัน${DAYS[dow]}</div>
+      <div class="date-main">${d.getDate()} ${MONTHS[d.getMonth()]}</div>
+      <div class="date-year">พ.ศ. ${d.getFullYear()+543}</div>
+    </div>
+    <div class="now-pill">
+      <div class="now-pill-lbl">คาบนี้</div>
+      <div class="now-pill-val">${current?current.cls:'ว่าง'}</div>
+    </div>
+  </div>`;
+
+  // ── NEXT CLASS ──
+  if(dow===0||dow===6){
+    html+=`<div class="next-card" style="margin-bottom:14px"><div class="no-next">🏖️ วันหยุด พักผ่อนได้เลย</div></div>`;
+  } else if(current){
+    const checked=CHECKED_TODAY.includes(current.id);
+    html+=`<div class="next-card" style="margin-bottom:14px">
+      <div class="next-card-lbl">⏰ คาบปัจจุบัน — กำลังสอนอยู่</div>
+      <div class="next-card-body">
+        <div class="next-info">
+          <span class="next-info-ico">👥</span>
+          <div><div class="next-name">${current.cls} ${current.subject}</div>
+          <div class="next-sub">นักเรียน ${CLASSES.find(c=>c.id===current.id)?.count||'—'} คน · ${current.room}</div></div>
+        </div>
+        ${checked
+          ?'<div style="text-align:center;font-size:13px;font-weight:700;color:var(--primary);padding:4px">✅ เช็คชื่อแล้ว</div>'
+          :`<button class="next-cta" onclick="go('attendance.html?class=${current.id}')">เช็คชื่อเลย ›</button>`}
+      </div></div>`;
+  } else if(next){
+    const mins=minsUntil(next.s);
+    const lbl=mins<=60?`อีก ${mins} นาที`:`${pad(next.s[0])}:${pad(next.s[1])} น.`;
+    html+=`<div class="next-card" style="margin-bottom:14px">
+      <div class="next-card-lbl">📍 คาบถัดไป (${lbl})</div>
+      <div class="next-card-body">
+        <div class="next-info">
+          <span class="next-info-ico">👥</span>
+          <div><div class="next-name">${next.cls} ${next.subject}</div>
+          <div class="next-sub">นักเรียน ${CLASSES.find(c=>c.id===next.id)?.count||'—'} คน · ${next.room}</div></div>
+        </div>
+        <button class="next-cta" onclick="go('attendance.html?class=${next.id}')">เช็คชื่อเลย ›</button>
+      </div></div>`;
+  } else if(periods.length>0){
+    html+=`<div class="next-card" style="margin-bottom:14px"><div class="no-next">✅ เสร็จสิ้นทุกคาบแล้ววันนี้</div></div>`;
+  }
+
+  // ── PENDING ──
+  const unchecked=[...new Set(periods.filter(p=>!CHECKED_TODAY.includes(p.id)).map(p=>p.id))];
+  if(unchecked.length>0){
+    html+=`<div class="pending-list" style="margin-bottom:14px">
+      <div class="pi pi-orange" id="pending-att">
+        <div class="pi-ico">
+          <svg viewBox="0 0 28 24" fill="#ea580c" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="7" r="4"/><path d="M2 21c0-4.418 3.582-8 8-8s8 3.582 8 8H2z"/>
+            <circle cx="21" cy="6" r="3"/><path d="M15.5 21c0-3.038 1.79-5.678 4.5-6.92A7.5 7.5 0 0128 21h-12.5z"/>
+          </svg>
+        </div>
+        <div class="pi-info">
+          <div class="pi-title">ยังไม่ได้เช็คชื่อ</div>
+          <div class="pi-sub">${unchecked.length} ห้อง รอการเช็คชื่อ</div>
+        </div>
+        <span class="pi-arrow">›</span>
+      </div>
+    </div>`;
+  }
+
+  // ── TIMETABLE ──
+  html+=`<div class="tt-wrap" style="margin-bottom:14px">
+    <div class="tt-head">
+      <div class="tt-title">📅 ตารางสอนวันนี้</div>
+      <div class="tt-tag">${dayLabel[dow]||'วันหยุด'}</div>
+    </div>`;
+  if(periods.length===0){
+    html+=`<div class="tt-empty">วันหยุด — ไม่มีคาบสอน</div>`;
+  } else {
+    html+=periods.map(p=>{
+      const isNow=current&&current.s[0]===p.s[0];
+      const done=CHECKED_TODAY.includes(p.id);
+      const timeStr=`${pad(p.s[0])}:${pad(p.s[1])}\n${pad(p.e[0])}:${pad(p.e[1])}`;
+      return `<div class="tt-row ${isNow?'now':''}" onclick="go('dashboard.html?class=${p.id}')">
+        <div class="tt-time">${timeStr}</div>
+        <div class="tt-dot" style="background:${p.dot}"></div>
+        <div class="tt-info">
+          <div class="tt-subject">${p.subject}</div>
+          <div class="tt-cls">${p.cls} · ${p.room}</div>
+        </div>
+        ${isNow?'<span class="tt-badge tt-now">กำลังสอน</span>':done?'<span class="tt-badge tt-done">✓ เช็คแล้ว</span>':'<span class="tt-go">›</span>'}
+      </div>`;
+    }).join('');
+  }
+  html+=`</div>`;
+
+  // ── MY CLASSES ──
+  html+=`<div>
+    <div class="classes-head">
+      <div class="classes-title">🏫 ห้องเรียนของฉัน</div>
+      <button class="classes-see-all" onclick="showToast('ดูห้องเรียนทั้งหมด')">ดูทั้งหมด</button>
+    </div>
+    <div class="class-pills">
+      ${CLASSES.map(c=>`<button class="class-pill" onclick="go('dashboard.html?class=${c.id}')">${c.name}</button>`).join('')}
+    </div>
+  </div>`;
+
+  return html;
+}
+
+/* ══ RENDER ══ */
+function render(){
+  const html=buildContent();
+  const mEl=document.getElementById('m-content');
+  const dEl=document.getElementById('d-content');
+  if(mEl) mEl.innerHTML=html;
+  if(dEl) dEl.innerHTML=html;
+
+  // re-attach pending onclick
+  document.querySelectorAll('#pending-att').forEach(el=>{
+    el.onclick=()=>go('attendance.html');
+  });
+
+  // date in sidebar
+  const d=now();
+  const sbDate=document.getElementById('d-date-sb');
+  if(sbDate) sbDate.textContent=fmtThai(d);
+
+  // notif dot
+  document.querySelectorAll('#m-notif-dot,#d-notif-dot').forEach(el=>{
+    if(el) el.style.display=NOTIFS.length?'block':'none';
+  });
+
+  // notifications
+  document.getElementById('notif-list').innerHTML=NOTIFS.map(n=>`
+    <div class="ni ni-${n.type}">
+      <div class="ni-ico">${n.icon}</div>
+      <div class="ni-info"><div class="ni-title">${n.title}</div><div class="ni-sub">${n.sub}</div></div>
+      <span class="ni-arrow">›</span>
+    </div>`).join('');
+  document.querySelectorAll('.ni').forEach((el,i)=>{el.onclick=NOTIFS[i].action;});
+}
+
+/* ══ ACTIONS ══ */
+function go(url){window.location.href=url;}
+function setMNav(el){document.querySelectorAll('.m-bn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function openNotif(){document.getElementById('notif-panel').classList.add('open');document.getElementById('notif-ov').classList.add('show');}
+function closeNotif(){document.getElementById('notif-panel').classList.remove('open');document.getElementById('notif-ov').classList.remove('show');}
+function showToast(msg){
+  const t=document.getElementById('toast-el');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+render();
+</script>
+</body>
+</html>

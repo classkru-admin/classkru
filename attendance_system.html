@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบเช็คชื่อ — ClassKru</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#1d9e75;--primary-hover:#0f6e56;
+  --bg:#f8fafc;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --sh-sm:0 1px 3px rgba(0,0,0,.08);--sh-md:0 4px 12px rgba(0,0,0,.1);--sh-lg:0 8px 24px rgba(0,0,0,.14);
+  --tr:all .2s cubic-bezier(.4,0,.2,1);
+  --present:#1d9e75;--present-bg:#f0fdf4;--present-border:#bbf7d0;
+  --late:#f59e0b;--late-bg:#fffbeb;--late-border:#fde68a;
+  --absent:#ef4444;--absent-bg:#fef2f2;--absent-border:#fecaca;
+  --leave:#6366f1;--leave-bg:#eef2ff;--leave-border:#c7d2fe;
+}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── NAV ── */
+nav{background:#fff;border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:var(--sh-sm);}
+.nav-logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;color:var(--text);}
+.nav-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#1d9e75,#0f6e56);border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.btn{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;padding:8px 18px;border-radius:12px;border:none;cursor:pointer;transition:var(--tr);display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--primary-hover);transform:translateY(-1px);box-shadow:var(--sh-md);}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text);}
+.btn-outline:hover{border-color:#94a3b8;background:#f8fafc;}
+.btn-danger{background:#fef2f2;border:1.5px solid #fecaca;color:#dc2626;}
+.btn-danger:hover{background:#fee2e2;}
+
+/* ── LAYOUT ── */
+.container{max-width:1100px;margin:0 auto;padding:24px 20px;}
+
+/* ── TOP BAR ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.top-bar-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.page-title{font-size:22px;font-weight:800;color:var(--text);}
+.class-selector{position:relative;}
+.class-selector select{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;padding:8px 36px 8px 14px;border-radius:12px;border:1.5px solid var(--border);background:#fff;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;}
+.class-selector::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);font-size:12px;}
+.date-nav{display:flex;align-items:center;gap:8px;}
+.date-nav button{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:var(--tr);}
+.date-nav button:hover{background:#f1f5f9;}
+.date-display{font-size:14px;font-weight:700;color:var(--text);background:#fff;border:1.5px solid var(--border);padding:6px 14px;border-radius:10px;min-width:160px;text-align:center;}
+
+/* ── STAT CARDS ── */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:var(--sh-sm);transition:var(--tr);}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md);}
+.stat-icon{font-size:22px;margin-bottom:6px;}
+.stat-val{font-size:28px;font-weight:800;line-height:1;}
+.stat-label{font-size:12px;font-weight:600;color:var(--muted);margin-top:3px;}
+.stat-card.s-total{border-color:#e2e8f0;}
+.stat-card.s-present{border-color:var(--present-border);background:var(--present-bg);}
+.stat-card.s-present .stat-val{color:var(--present);}
+.stat-card.s-late{border-color:var(--late-border);background:var(--late-bg);}
+.stat-card.s-late .stat-val{color:var(--late);}
+.stat-card.s-absent{border-color:var(--absent-border);background:var(--absent-bg);}
+.stat-card.s-absent .stat-val{color:var(--absent);}
+.stat-card.s-leave{border-color:var(--leave-border);background:var(--leave-bg);}
+.stat-card.s-leave .stat-val{color:var(--leave);}
+
+/* ── SEARCH & FILTER ── */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.search-box{position:relative;flex:1;min-width:200px;}
+.search-box input{width:100%;font-family:'Sarabun',sans-serif;font-size:14px;padding:9px 14px 9px 38px;border-radius:12px;border:1.5px solid var(--border);background:#fff;color:var(--text);transition:var(--tr);}
+.search-box input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(29,158,117,.12);}
+.search-box::before{content:'🔍';position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;}
+.filter-btns{display:flex;gap:6px;}
+.filter-btn{font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;padding:7px 14px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:var(--tr);}
+.filter-btn:hover{border-color:#94a3b8;}
+.filter-btn.active{border-color:var(--primary);background:var(--present-bg);color:var(--primary);}
+.filter-btn.f-present.active{border-color:var(--present);background:var(--present-bg);color:var(--present);}
+.filter-btn.f-late.active{border-color:var(--late);background:var(--late-bg);color:var(--late);}
+.filter-btn.f-absent.active{border-color:var(--absent);background:var(--absent-bg);color:var(--absent);}
+.filter-btn.f-leave.active{border-color:var(--leave);background:var(--leave-bg);color:var(--leave);}
+
+/* ── QUICK SET ALL ── */
+.quick-actions{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#fff;border:1.5px solid var(--border);border-radius:14px;margin-bottom:16px;}
+.quick-label{font-size:13px;font-weight:700;color:var(--muted);margin-right:4px;}
+.quick-btn{font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;border:none;cursor:pointer;transition:var(--tr);}
+.quick-btn:hover{transform:translateY(-1px);box-shadow:var(--sh-sm);}
+.qb-present{background:var(--present-bg);color:var(--present);border:1.5px solid var(--present-border);}
+.qb-late{background:var(--late-bg);color:var(--late);border:1.5px solid var(--late-border);}
+.qb-absent{background:var(--absent-bg);color:var(--absent);border:1.5px solid var(--absent-border);}
+.qb-leave{background:var(--leave-bg);color:var(--leave);border:1.5px solid var(--leave-border);}
+.quick-divider{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.save-notice{font-size:12px;color:var(--primary);font-weight:600;margin-left:auto;display:none;}
+.save-notice.show{display:block;}
+
+/* ── STUDENT TABLE ── */
+.table-wrap{background:#fff;border:1.5px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--sh-sm);}
+.table-head{display:grid;grid-template-columns:50px 48px 1fr 180px 160px 1fr;align-items:center;padding:10px 16px;background:#f8fafc;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--muted);gap:8px;}
+.student-row{display:grid;grid-template-columns:50px 48px 1fr 180px 160px 1fr;align-items:center;padding:10px 16px;border-bottom:1px solid #f1f5f9;transition:var(--tr);gap:8px;}
+.student-row:last-child{border-bottom:none;}
+.student-row:hover{background:#f8fafc;}
+.student-row.status-absent{background:#fff8f8;}
+.student-row.status-late{background:#fffdf0;}
+.student-row.status-leave{background:#f8f8ff;}
+
+/* Row cells */
+.cell-no{font-size:13px;font-weight:700;color:#94a3b8;}
+.cell-avatar{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.cell-name{display:flex;flex-direction:column;}
+.cell-name-main{font-size:14px;font-weight:700;color:var(--text);}
+.cell-name-sub{font-size:11px;color:var(--muted);}
+
+/* Status toggle buttons */
+.status-btns{display:flex;gap:5px;}
+.status-btn{font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1.5px solid transparent;cursor:pointer;transition:var(--tr);background:transparent;color:var(--muted);border-color:var(--border);}
+.status-btn:hover{transform:translateY(-1px);}
+.status-btn.active-present{background:var(--present-bg);color:var(--present);border-color:var(--present-border);}
+.status-btn.active-late{background:var(--late-bg);color:var(--late);border-color:var(--late-border);}
+.status-btn.active-absent{background:var(--absent-bg);color:var(--absent);border-color:var(--absent-border);}
+.status-btn.active-leave{background:var(--leave-bg);color:var(--leave);border-color:var(--leave-border);}
+
+/* Absence counter */
+.absence-counter{display:flex;align-items:center;gap:8px;}
+.absence-bar-wrap{flex:1;height:6px;background:#f1f5f9;border-radius:99px;overflow:hidden;}
+.absence-bar{height:100%;border-radius:99px;transition:width .4s;}
+.absence-text{font-size:11px;font-weight:700;min-width:72px;text-align:right;}
+.absence-ok{color:#15803d;}
+.absence-warn{color:#b45309;}
+.absence-danger{color:#dc2626;}
+
+/* Note input */
+.note-input{width:100%;font-family:'Sarabun',sans-serif;font-size:12px;padding:5px 10px;border-radius:8px;border:1.5px solid var(--border);color:var(--text);background:#f8fafc;transition:var(--tr);}
+.note-input:focus{outline:none;border-color:var(--primary);background:#fff;}
+
+/* ── HISTORY MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:24px;padding:28px;width:90%;max-width:560px;box-shadow:var(--sh-lg);transform:translateY(20px);transition:transform .2s;}
+.modal-overlay.show .modal{transform:translateY(0);}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-size:18px;font-weight:800;color:var(--text);}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:var(--tr);}
+.modal-close:hover{background:#f1f5f9;}
+.history-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.his-card{border-radius:12px;padding:10px 12px;text-align:center;}
+.his-val{font-size:22px;font-weight:800;}
+.his-label{font-size:11px;font-weight:600;margin-top:2px;}
+.history-list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;}
+.history-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:#f8fafc;}
+.history-date{font-size:13px;color:var(--muted);flex:1;}
+.history-chip{font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;}
+.history-note{font-size:12px;color:var(--muted);font-style:italic;}
+
+/* ── SAVE BAR ── */
+.save-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 -4px 20px rgba(0,0,0,.08);z-index:50;transform:translateY(100%);transition:transform .3s;}
+.save-bar.show{transform:translateY(0);}
+.save-bar-info{font-size:14px;font-weight:600;color:var(--muted);}
+.save-bar-info span{color:var(--text);font-weight:800;}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:20px;right:20px;background:var(--text);color:#fff;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;padding:12px 20px;border-radius:14px;box-shadow:var(--sh-lg);z-index:999;transform:translateX(120%);transition:transform .3s;display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateX(0);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .stats{grid-template-columns:repeat(3,1fr);}
+  .table-head,.student-row{grid-template-columns:40px 40px 1fr 160px;}
+  .cell-absence,.cell-note{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">🏫</div>
+    ClassKru
+  </div>
+  <div class="nav-right">
+    <div class="class-selector">
+      <select id="classSelect" onchange="changeClass()">
+        <option value="m31">ม.3/1 วิทยาศาสตร์</option>
+        <option value="m32">ม.3/2 วิทยาศาสตร์</option>
+        <option value="m21">ม.2/1 วิทยาศาสตร์</option>
+      </select>
+    </div>
+    <button class="btn btn-outline" onclick="exportCSV()">📤 Export</button>
+    <button class="btn btn-primary" onclick="saveAttendance()">💾 บันทึกวันนี้</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="page-title">📅 เช็คชื่อ</div>
+      <div class="date-nav">
+        <button onclick="changeDate(-1)">◀</button>
+        <div class="date-display" id="dateDisplay"></div>
+        <button onclick="changeDate(1)">▶</button>
+      </div>
+    </div>
+    <button class="btn btn-outline" onclick="goToday()">📍 วันนี้</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats" id="statsBar">
+    <div class="stat-card s-total">
+      <div class="stat-icon">👨‍🎓</div>
+      <div class="stat-val" id="statTotal">0</div>
+      <div class="stat-label">นักเรียนทั้งหมด</div>
+    </div>
+    <div class="stat-card s-present">
+      <div class="stat-icon">✅</div>
+      <div class="stat-val" id="statPresent">0</div>
+      <div class="stat-label">มาเรียน</div>
+    </div>
+    <div class="stat-card s-late">
+      <div class="stat-icon">⏰</div>
+      <div class="stat-val" id="statLate">0</div>
+      <div class="stat-label">มาสาย</div>
+    </div>
+    <div class="stat-card s-absent">
+      <div class="stat-icon">❌</div>
+      <div class="stat-val" id="statAbsent">0</div>
+      <div class="stat-label">ขาดเรียน</div>
+    </div>
+    <div class="stat-card s-leave">
+      <div class="stat-icon">📄</div>
+      <div class="stat-val" id="statLeave">0</div>
+      <div class="stat-label">ลา</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="ค้นหาชื่อนักเรียน..." oninput="filterStudents()">
+    </div>
+    <div class="filter-btns">
+      <button class="filter-btn active" onclick="setFilter('all',this)">ทั้งหมด</button>
+      <button class="filter-btn f-present" onclick="setFilter('present',this)">✅ มา</button>
+      <button class="filter-btn f-late" onclick="setFilter('late',this)">⏰ สาย</button>
+      <button class="filter-btn f-absent" onclick="setFilter('absent',this)">❌ ขาด</button>
+      <button class="filter-btn f-leave" onclick="setFilter('leave',this)">📄 ลา</button>
+    </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="quick-actions">
+    <span class="quick-label">ตั้งค่าทั้งหมด:</span>
+    <button class="quick-btn qb-present" onclick="setAll('present')">✅ มาทุกคน</button>
+    <button class="quick-btn qb-late" onclick="setAll('late')">⏰ สายทุกคน</button>
+    <button class="quick-btn qb-absent" onclick="setAll('absent')">❌ ขาดทุกคน</button>
+    <button class="quick-btn qb-leave" onclick="setAll('leave')">📄 ลาทุกคน</button>
+    <div class="quick-divider"></div>
+    <span class="save-notice" id="saveNotice">● มีการเปลี่ยนแปลง</span>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <div class="table-head">
+      <div>เลขที่</div>
+      <div></div>
+      <div>ชื่อ-นามสกุล</div>
+      <div>สถานะวันนี้</div>
+      <div>ขาด/ลา สะสม</div>
+      <div>หมายเหตุ</div>
+    </div>
+    <div id="studentList"></div>
+  </div>
+
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar" id="saveBar">
+  <div class="save-bar-info">มีการเปลี่ยนแปลง <span id="changedCount">0</span> รายการ</div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn btn-outline" onclick="cancelChanges()">ยกเลิก</button>
+    <button class="btn btn-primary" onclick="saveAttendance()">💾 บันทึก</button>
+  </div>
+</div>
+
+<!-- MODAL: ประวัติการเข้าเรียน -->
+<div class="modal-overlay" id="historyModal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">ประวัติการเข้าเรียน</div>
+      <button class="modal-close" onclick="document.getElementById('historyModal').classList.remove('show')">✕</button>
+    </div>
+    <div class="history-summary" id="modalSummary"></div>
+    <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;">ประวัติ 30 วันล่าสุด</div>
+    <div class="history-list" id="modalHistory"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────
+const MAX_ABSENT = 8; // ขาดได้สูงสุด (20% ของ 40 วัน)
+
+const CLASSES = {
+  m31: { name:'ม.3/1 วิทยาศาสตร์', students: generateStudents('m31', 34) },
+  m32: { name:'ม.3/2 วิทยาศาสตร์', students: generateStudents('m32', 32) },
+  m21: { name:'ม.2/1 วิทยาศาสตร์', students: generateStudents('m21', 30) },
+};
+
+const THAI_NAMES = [
+  ['กฤษณะ','เจริญสุข'],['ขวัญชัย','มีสุข'],['คณิตา','รักเรียน'],
+  ['งามนิตย์','ใจดี'],['จันทร์เพ็ญ','สว่างจิต'],['ฉันทนา','บุญมา'],
+  ['ชนาภา','ทองดี'],['ญาณิศา','ศรีสุข'],['ฐิติรัตน์','พงษ์ไทย'],
+  ['ณัฐพล','วงษ์สวรรค์'],['ดวงหทัย','เพชรงาม'],['ตะวัน','โชติมา'],
+  ['ทิพย์วรรณ','สมบัติ'],['ธนภัทร','ชัยชนะ'],['นภาพร','แสงทอง'],
+  ['บุษบา','พิมพ์ดี'],['ปิยะนุช','ขยันเรียน'],['ผกามาศ','ดีงาม'],
+  ['พลอยไพลิน','รุ่งเรือง'],['ภัทรพล','ศิริมงคล'],['มนัสนันท์','วิชาดี'],
+  ['ยุพา','แก้วใส'],['รัตนา','ทองพูล'],['ลลิตา','สุขสันต์'],
+  ['วริศรา','ประเสริฐ'],['ศิริพร','เด่นดวง'],['สมหมาย','ใจงาม'],
+  ['อนุชา','สมาธิ'],['อรอุมา','มั่นคง'],['อัจฉรา','เก่งกล้า'],
+  ['อานนท์','สุขใจ'],['อิสรา','ผลดี'],['อุไรวรรณ','ดาวดี'],['เอมอร','หมั่นเพียร']
+];
+
+const COLORS = [
+  {bg:'#f0fdf4',color:'#15803d'},{bg:'#eff6ff',color:'#1d4ed8'},
+  {bg:'#fffbeb',color:'#b45309'},{bg:'#fdf2f8',color:'#be185d'},
+  {bg:'#f5f3ff',color:'#6d28d9'},{bg:'#fff7ed',color:'#c2410c'},
+  {bg:'#f0f9ff',color:'#0369a1'},{bg:'#ecfdf5',color:'#065f46'},
+];
+
+function generateStudents(classId, count) {
+  const students = [];
+  // Generate some past history
+  const today = new Date();
+  for (let i = 0; i < count; i++) {
+    const nameIdx = i % THAI_NAMES.length;
+    const colorIdx = i % COLORS.length;
+    const history = {};
+    // Random history for last 30 days
+    for (let d = 29; d >= 1; d--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - d);
+      // Skip weekends
+      if (date.getDay() === 0 || date.getDay() === 6) continue;
+      const dateStr = formatDateKey(date);
+      const r = Math.random();
+      if (r < 0.82) history[dateStr] = { status:'present', note:'' };
+      else if (r < 0.89) history[dateStr] = { status:'late', note:'สาย' };
+      else if (r < 0.95) history[dateStr] = { status:'absent', note:'' };
+      else history[dateStr] = { status:'leave', note:'ลาป่วย' };
+    }
+    students.push({
+      id: i+1,
+      no: i+1,
+      firstName: THAI_NAMES[nameIdx][0],
+      lastName: THAI_NAMES[nameIdx][1],
+      color: COLORS[colorIdx],
+      history
+    });
+  }
+  return students;
+}
+
+function formatDateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function formatDateThai(d) {
+  const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const days = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+  return `${days[d.getDay()]}ที่ ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()+543}`;
+}
+
+// ── STATE ─────────────────────────────────────────────
+let currentClass = 'm31';
+let currentDate = new Date();
+let filterStatus = 'all';
+let hasChanges = false;
+let originalData = {};
+
+// ── INIT ─────────────────────────────────────────────
+function init() {
+  updateDateDisplay();
+  renderStudents();
+  updateStats();
+}
+
+function updateDateDisplay() {
+  document.getElementById('dateDisplay').textContent = formatDateThai(currentDate);
+}
+
+function changeDate(delta) {
+  currentDate.setDate(currentDate.getDate() + delta);
+  // skip weekends
+  while (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+    currentDate.setDate(currentDate.getDate() + delta);
+  }
+  updateDateDisplay();
+  renderStudents();
+  updateStats();
+}
+
+function goToday() {
+  currentDate = new Date();
+  updateDateDisplay();
+  renderStudents();
+  updateStats();
+}
+
+function changeClass() {
+  currentClass = document.getElementById('classSelect').value;
+  renderStudents();
+  updateStats();
+}
+
+// ── RENDER ────────────────────────────────────────────
+function renderStudents() {
+  const students = CLASSES[currentClass].students;
+  const dateKey = formatDateKey(currentDate);
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const list = document.getElementById('studentList');
+  list.innerHTML = '';
+
+  let shown = 0;
+  students.forEach(s => {
+    const fullName = `${s.firstName} ${s.lastName}`;
+    if (query && !fullName.toLowerCase().includes(query) && !String(s.no).includes(query)) return;
+
+    const rec = s.history[dateKey] || { status:'present', note:'' };
+    if (filterStatus !== 'all' && rec.status !== filterStatus) return;
+
+    const absStats = getAbsenceStats(s);
+    shown++;
+
+    const row = document.createElement('div');
+    row.className = `student-row status-${rec.status}`;
+    row.id = `row-${s.id}`;
+
+    const initials = s.firstName[0] + s.lastName[0];
+    const canMissMore = MAX_ABSENT - absStats.absent - absStats.leave;
+    const pct = Math.min(100, ((absStats.absent + absStats.leave) / MAX_ABSENT) * 100);
+    const barColor = pct >= 100 ? '#ef4444' : pct >= 75 ? '#f59e0b' : '#1d9e75';
+    const textClass = pct >= 100 ? 'absence-danger' : pct >= 75 ? 'absence-warn' : 'absence-ok';
+    const leftText = canMissMore <= 0 ? '⚠️ เกินแล้ว!' : `ขาดได้อีก ${canMissMore} ครั้ง`;
+
+    row.innerHTML = `
+      <div class="cell-no">${s.no}</div>
+      <div class="cell-avatar" style="background:${s.color.bg};color:${s.color.color};cursor:pointer"
+           onclick="showHistory(${s.id})" title="ดูประวัติ">${initials}</div>
+      <div class="cell-name">
+        <span class="cell-name-main" style="cursor:pointer" onclick="showHistory(${s.id})">${fullName}</span>
+        <span class="cell-name-sub">คลิกเพื่อดูประวัติ</span>
+      </div>
+      <div class="status-btns" id="btns-${s.id}">
+        <button class="status-btn ${rec.status==='present'?'active-present':''}" onclick="setStatus(${s.id},'present')">✅ มา</button>
+        <button class="status-btn ${rec.status==='late'?'active-late':''}" onclick="setStatus(${s.id},'late')">⏰ สาย</button>
+        <button class="status-btn ${rec.status==='absent'?'active-absent':''}" onclick="setStatus(${s.id},'absent')">❌ ขาด</button>
+        <button class="status-btn ${rec.status==='leave'?'active-leave':''}" onclick="setStatus(${s.id},'leave')">📄 ลา</button>
+      </div>
+      <div class="absence-counter cell-absence">
+        <div class="absence-bar-wrap">
+          <div class="absence-bar" style="width:${pct}%;background:${barColor}"></div>
+        </div>
+        <div class="absence-text ${textClass}">${leftText}</div>
+      </div>
+      <div class="cell-note">
+        <input class="note-input" type="text" placeholder="หมายเหตุ..."
+               value="${rec.note||''}"
+               onchange="setNote(${s.id}, this.value)">
+      </div>
+    `;
+    list.appendChild(row);
+  });
+
+  if (shown === 0) {
+    list.innerHTML = `<div style="padding:32px;text-align:center;color:var(--muted);font-size:14px;">ไม่พบนักเรียน</div>`;
+  }
+}
+
+function getAbsenceStats(student) {
+  const counts = { present:0, late:0, absent:0, leave:0 };
+  Object.values(student.history).forEach(r => { if (counts[r.status] !== undefined) counts[r.status]++; });
+  return counts;
+}
+
+// ── ACTIONS ───────────────────────────────────────────
+function setStatus(studentId, status) {
+  const dateKey = formatDateKey(currentDate);
+  const student = CLASSES[currentClass].students.find(s => s.id === studentId);
+  if (!student.history[dateKey]) student.history[dateKey] = { status:'present', note:'' };
+  student.history[dateKey].status = status;
+
+  // Update button active states
+  const btns = document.getElementById(`btns-${studentId}`);
+  btns.querySelectorAll('.status-btn').forEach(b => {
+    b.className = 'status-btn';
+    if (b.textContent.includes('มา') && status==='present') b.classList.add('active-present');
+    if (b.textContent.includes('สาย') && status==='late') b.classList.add('active-late');
+    if (b.textContent.includes('ขาด') && status==='absent') b.classList.add('active-absent');
+    if (b.textContent.includes('ลา') && status==='leave') b.classList.add('active-leave');
+  });
+
+  // Update row background
+  const row = document.getElementById(`row-${studentId}`);
+  row.className = `student-row status-${status}`;
+
+  // Refresh absence bar for this student
+  const absStats = getAbsenceStats(student);
+  const canMissMore = MAX_ABSENT - absStats.absent - absStats.leave;
+  const pct = Math.min(100, ((absStats.absent + absStats.leave) / MAX_ABSENT) * 100);
+  const barColor = pct >= 100 ? '#ef4444' : pct >= 75 ? '#f59e0b' : '#1d9e75';
+  const textClass = pct >= 100 ? 'absence-danger' : pct >= 75 ? 'absence-warn' : 'absence-ok';
+  const leftText = canMissMore <= 0 ? '⚠️ เกินแล้ว!' : `ขาดได้อีก ${canMissMore} ครั้ง`;
+  const absCell = row.querySelector('.absence-counter');
+  if (absCell) {
+    absCell.querySelector('.absence-bar').style.width = pct+'%';
+    absCell.querySelector('.absence-bar').style.background = barColor;
+    absCell.querySelector('.absence-text').className = `absence-text ${textClass}`;
+    absCell.querySelector('.absence-text').textContent = leftText;
+  }
+
+  markChanged();
+  updateStats();
+}
+
+function setNote(studentId, note) {
+  const dateKey = formatDateKey(currentDate);
+  const student = CLASSES[currentClass].students.find(s => s.id === studentId);
+  if (!student.history[dateKey]) student.history[dateKey] = { status:'present', note:'' };
+  student.history[dateKey].note = note;
+  markChanged();
+}
+
+function setAll(status) {
+  const students = CLASSES[currentClass].students;
+  const dateKey = formatDateKey(currentDate);
+  students.forEach(s => {
+    if (!s.history[dateKey]) s.history[dateKey] = { status:'present', note:'' };
+    s.history[dateKey].status = status;
+  });
+  renderStudents();
+  updateStats();
+  markChanged();
+}
+
+function markChanged() {
+  hasChanges = true;
+  document.getElementById('saveBar').classList.add('show');
+  document.getElementById('saveNotice').classList.add('show');
+}
+
+function cancelChanges() {
+  hasChanges = false;
+  document.getElementById('saveBar').classList.remove('show');
+  document.getElementById('saveNotice').classList.remove('show');
+}
+
+function saveAttendance() {
+  hasChanges = false;
+  document.getElementById('saveBar').classList.remove('show');
+  document.getElementById('saveNotice').classList.remove('show');
+  showToast('✅ บันทึกการเช็คชื่อเรียบร้อยแล้ว');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── STATS ─────────────────────────────────────────────
+function updateStats() {
+  const students = CLASSES[currentClass].students;
+  const dateKey = formatDateKey(currentDate);
+  let p=0,l=0,a=0,lv=0;
+  students.forEach(s => {
+    const r = s.history[dateKey];
+    if (!r || r.status==='present') p++;
+    else if (r.status==='late') l++;
+    else if (r.status==='absent') a++;
+    else if (r.status==='leave') lv++;
+  });
+  document.getElementById('statTotal').textContent = students.length;
+  document.getElementById('statPresent').textContent = p;
+  document.getElementById('statLate').textContent = l;
+  document.getElementById('statAbsent').textContent = a;
+  document.getElementById('statLeave').textContent = lv;
+}
+
+// ── FILTER ────────────────────────────────────────────
+function setFilter(status, btn) {
+  filterStatus = status;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStudents();
+}
+
+function filterStudents() { renderStudents(); }
+
+// ── HISTORY MODAL ─────────────────────────────────────
+function showHistory(studentId) {
+  const student = CLASSES[currentClass].students.find(s => s.id === studentId);
+  const counts = getAbsenceStats(student);
+  const canMiss = MAX_ABSENT - counts.absent - counts.leave;
+
+  document.getElementById('modalTitle').textContent = `${student.firstName} ${student.lastName} — ประวัติการเข้าเรียน`;
+
+  const sumColors = [
+    {label:'มาเรียน',val:counts.present,bg:'#f0fdf4',color:'#15803d'},
+    {label:'มาสาย',val:counts.late,bg:'#fffbeb',color:'#b45309'},
+    {label:'ขาดเรียน',val:counts.absent,bg:'#fef2f2',color:'#dc2626'},
+    {label:'ลา',val:counts.leave,bg:'#eef2ff',color:'#4338ca'},
+  ];
+  document.getElementById('modalSummary').innerHTML = sumColors.map(c=>
+    `<div class="his-card" style="background:${c.bg}">
+      <div class="his-val" style="color:${c.color}">${c.val}</div>
+      <div class="his-label" style="color:${c.color}">${c.label}</div>
+    </div>`
+  ).join('');
+
+  const CHIP = {
+    present:{bg:'#f0fdf4',color:'#15803d',label:'มาเรียน'},
+    late:{bg:'#fffbeb',color:'#b45309',label:'มาสาย'},
+    absent:{bg:'#fef2f2',color:'#dc2626',label:'ขาดเรียน'},
+    leave:{bg:'#eef2ff',color:'#4338ca',label:'ลา'},
+  };
+
+  const sorted = Object.entries(student.history).sort((a,b)=>b[0].localeCompare(a[0]));
+  document.getElementById('modalHistory').innerHTML = sorted.slice(0,30).map(([date,rec])=>{
+    const d = new Date(date);
+    const chip = CHIP[rec.status];
+    return `<div class="history-row">
+      <div class="history-date">${formatDateThai(d)}</div>
+      <span class="history-chip" style="background:${chip.bg};color:${chip.color}">${chip.label}</span>
+      ${rec.note ? `<span class="history-note">${rec.note}</span>` : ''}
+    </div>`;
+  }).join('');
+
+  document.getElementById('historyModal').classList.add('show');
+}
+
+function closeModal(e) {
+  if (e.target.id === 'historyModal') document.getElementById('historyModal').classList.remove('show');
+}
+
+// ── EXPORT ────────────────────────────────────────────
+function exportCSV() {
+  const students = CLASSES[currentClass].students;
+  const dateKey = formatDateKey(currentDate);
+  const STATUS_LABEL = { present:'มาเรียน', late:'มาสาย', absent:'ขาดเรียน', leave:'ลา' };
+  let csv = 'เลขที่,ชื่อ,นามสกุล,สถานะ,หมายเหตุ\n';
+  students.forEach(s => {
+    const rec = s.history[dateKey] || { status:'present', note:'' };
+    csv += `${s.no},${s.firstName},${s.lastName},${STATUS_LABEL[rec.status]},${rec.note||''}\n`;
+  });
+  const blob = new Blob(['﻿'+csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `เช็คชื่อ_${currentClass}_${dateKey}.csv`;
+  a.click();
+  showToast('📤 Export เรียบร้อยแล้ว');
+}
+
+// ── START ─────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ClassKru — หน้าหลัก</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
+  --late:#f59e0b;--lbg:#fffbeb;--lbd:#fcd34d;
+  --absent:#ef4444;--abg:#fef2f2;--abd:#fca5a5;
+  --leave:#6366f1;--vbg:#eef2ff;--vbd:#a5b4fc;
+  --bg:#f0f4f8;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --sh:0 1px 4px rgba(0,0,0,.07);--sh-md:0 4px 14px rgba(0,0,0,.10);
+  --tr:all .18s cubic-bezier(.4,0,.2,1);
+  --sidebar:210px;
+}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ══ SHARED ══ */
+.btn{font-family:'Sarabun',sans-serif;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:var(--tr);border-radius:12px;}
+.btn:active{transform:scale(.96);}
+.btn-primary{background:var(--primary);color:#fff;font-size:14px;padding:9px 18px;}
+.btn-primary:hover{background:var(--pk);box-shadow:var(--sh-md);}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text);font-size:13px;padding:7px 14px;}
+.btn-outline:hover{border-color:#94a3b8;}
+.btn-sm{font-size:12px;padding:5px 12px;border-radius:10px;}
+.btn-ghost{background:none;border:none;color:var(--primary);font-size:12px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;padding:3px 6px;}
+
+.chip{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;}
+.chip-p{background:var(--pbg);color:#15803d;}
+.chip-l{background:var(--lbg);color:#b45309;}
+.chip-a{background:var(--abg);color:#dc2626;}
+.chip-v{background:var(--vbg);color:#4338ca;}
+
+/* ══ LAYOUT ══ */
+.app{display:flex;min-height:100vh;}
+
+/* ══ SIDEBAR ══ */
+.sidebar{
+  width:var(--sidebar);background:var(--card);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:100;
+  box-shadow:var(--sh);
+}
+.sb-logo{display:flex;align-items:center;gap:9px;padding:16px 16px 14px;border-bottom:1px solid var(--border);}
+.sb-logo-box{width:34px;height:34px;background:linear-gradient(135deg,var(--primary),var(--pk));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.sb-logo-text{font-size:16px;font-weight:800;}
+.sb-back{display:flex;align-items:center;gap:7px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:1px solid var(--border);transition:var(--tr);}
+.sb-back:hover{color:var(--text);background:#f8fafc;}
+.sb-class-section{padding:12px 14px 8px;}
+.sb-class-label{font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.sb-class-current{background:var(--pbg);border:1.5px solid var(--pbd);border-radius:12px;padding:10px 12px;}
+.sb-class-name{font-size:16px;font-weight:800;color:var(--primary);}
+.sb-class-sub{font-size:11px;color:var(--pk);margin-top:1px;}
+.sb-class-count{font-size:11px;font-weight:700;color:var(--primary);margin-top:4px;}
+.sb-nav-section{padding:14px 14px 4px;font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;}
+.sb-link{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);border-left:3px solid transparent;}
+.sb-link:hover{background:#f8fafc;color:var(--text);}
+.sb-link.active{background:var(--pbg);color:var(--primary);border-left-color:var(--primary);}
+.sb-link .ico{width:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-link .ico svg{width:18px;height:18px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s;}
+.sb-link.active .ico svg{stroke:var(--primary);}
+.sb-link:hover .ico svg{stroke:var(--text);}
+.sb-badge{margin-left:auto;font-size:10px;font-weight:800;background:var(--abg);color:#dc2626;padding:1px 7px;border-radius:20px;}
+.sb-spacer{flex:1;}
+.sb-date{padding:12px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600;}
+
+/* ══ MAIN ══ */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+
+/* top bar */
+.topbar{background:var(--card);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:50;box-shadow:var(--sh);}
+.topbar-title{font-size:16px;font-weight:800;flex:1;}
+.topbar-sub{font-size:12px;color:var(--muted);}
+
+/* content */
+.content{padding:22px 24px;display:flex;flex-direction:column;gap:18px;}
+
+/* stat cards */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.stat-card{background:var(--card);border-radius:16px;padding:14px 16px;border:1.5px solid var(--border);box-shadow:var(--sh);cursor:pointer;transition:var(--tr);}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md);}
+.stat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;}
+.stat-val{font-size:28px;font-weight:800;line-height:1;color:var(--text);}
+.stat-label{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600;}
+.stat-pill{display:inline-flex;font-size:11px;font-weight:800;padding:2px 9px;border-radius:20px;margin-top:6px;}
+
+/* panels */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-3{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:14px;}
+.panel{background:var(--card);border-radius:18px;border:1.5px solid var(--border);box-shadow:var(--sh);overflow:hidden;}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #f1f5f9;}
+.panel-title{font-size:13px;font-weight:800;display:flex;align-items:center;gap:7px;}
+.panel-dot{width:8px;height:8px;border-radius:50%;}
+.panel-body{padding:12px 16px;}
+
+/* attendance */
+.att-summary{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.stu-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f8fafc;}
+.stu-row:last-child{border:none;}
+.stu-no{font-size:11px;color:#94a3b8;font-weight:700;width:22px;}
+.av{border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
+.stu-name{font-size:13px;font-weight:700;flex:1;}
+.sc-present{background:var(--pbg);color:#15803d;}
+.sc-late{background:var(--lbg);color:#b45309;}
+.sc-absent{background:var(--abg);color:#dc2626;}
+
+/* chart */
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:110px;padding-top:16px;}
+.bar-group{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;}
+.bar-val{font-size:10px;font-weight:800;color:var(--text);}
+.bar-wrap{width:100%;display:flex;flex-direction:column;justify-content:flex-end;position:relative;flex:1;}
+.bar-target{position:absolute;bottom:0;left:0;right:0;border-radius:4px 4px 0 0;background:#bbf7d0;}
+.bar-actual{position:absolute;bottom:0;left:2px;right:2px;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#1d9e75,#0f6e56);}
+.bar-label{font-size:10px;color:var(--muted);font-weight:600;}
+
+/* score table */
+.score-tbl{width:100%;border-collapse:collapse;}
+.score-tbl th{font-size:10px;font-weight:800;color:var(--muted);padding:7px 10px;background:#f8fafc;text-align:center;border-bottom:1px solid var(--border);}
+.score-tbl th:first-child{text-align:left;}
+.score-tbl td{font-size:12px;font-weight:600;padding:8px 10px;border-bottom:1px solid #f8fafc;text-align:center;color:var(--text);}
+.score-tbl td:first-child{text-align:left;font-weight:700;}
+.score-tbl tr:hover td{background:#f8fafc;}
+.score-tbl tr:last-child td{border:none;}
+.grade-pill{font-size:10px;font-weight:800;padding:2px 9px;border-radius:20px;}
+.gA{background:var(--pbg);color:#15803d;}
+.gBp{background:#eff6ff;color:#1d4ed8;}
+.gC{background:var(--lbg);color:#b45309;}
+
+/* risk */
+.risk-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid #f8fafc;}
+.risk-row:last-child{border:none;}
+.risk-info{flex:1;min-width:0;}
+.risk-name{font-size:12px;font-weight:700;}
+.risk-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.risk-bar-wrap{width:60px;}
+.risk-track{height:4px;background:#f1f5f9;border-radius:99px;overflow:hidden;}
+.risk-fill{height:100%;border-radius:99px;}
+.risk-txt{font-size:10px;font-weight:800;text-align:right;margin-top:2px;}
+
+/* assign */
+.assign-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid #f8fafc;}
+.assign-row:last-child{border:none;}
+.assign-ico{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.assign-info{flex:1;min-width:0;}
+.assign-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.assign-due{font-size:10px;color:var(--muted);}
+.assign-prog-wrap{width:55px;}
+.assign-prog-track{height:4px;background:#f1f5f9;border-radius:99px;overflow:hidden;}
+.assign-prog-fill{height:100%;border-radius:99px;}
+.assign-prog-txt{font-size:10px;font-weight:800;text-align:right;margin-top:2px;}
+.overdue{font-size:9px;font-weight:800;padding:1px 6px;border-radius:20px;background:var(--abg);color:#dc2626;margin-left:4px;}
+
+/* toast */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-60px);background:rgba(15,23,42,.88);color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:22px;white-space:nowrap;z-index:9999;transition:transform .25s cubic-bezier(.4,0,.2,1);pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ══ MOBILE ══ */
+.mobile-ui{display:none;}
+@media(max-width:767px){
+  .app{flex-direction:column;}
+  .sidebar{display:none;}
+  .main{margin-left:0;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .grid-2,.grid-3{grid-template-columns:1fr;}
+  .content{padding:14px 14px 80px;}
+  .m-topbar-back{display:flex;}
+}
+
+/* ══ BOTTOM NAV ══ */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:1px solid #e8edf2;
+  height:60px;display:flex;z-index:200;
+  box-shadow:0 -1px 0 rgba(0,0,0,.06);
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:'Sarabun',sans-serif;padding:6px 0 4px;-webkit-tap-highlight-color:transparent;}
+.bn-item:active{opacity:.6;}
+.bn-ico svg{width:24px;height:24px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s;}
+.bn-lbl{font-size:10px;font-weight:600;color:#9ca3af;transition:color .15s;}
+.bn-item.active .bn-ico svg{stroke:var(--primary);}
+.bn-item.active .bn-lbl{color:var(--primary);font-weight:700;}
+/* desktop: sidebar อยู่แล้ว ซ่อน bottom nav */
+@media(min-width:768px){.bottom-nav{display:none;}.content{padding-bottom:22px;}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <img src="classkru-logo.png" alt="ClassKru" style="height:56px;width:auto;display:block;">
+    </div>
+    <div class="sb-back" onclick="window.location.href='index.html'">
+      ← กลับหน้าหลัก
+    </div>
+    <div class="sb-class-section">
+      <div class="sb-class-label">ห้องเรียนปัจจุบัน</div>
+      <div class="sb-class-current">
+        <div class="sb-class-name" id="sb-class-name">ม.3/1</div>
+        <div class="sb-class-sub" id="sb-class-sub">วิทยาศาสตร์</div>
+        <div class="sb-class-count" id="sb-class-count">34 คน</div>
+      </div>
+    </div>
+    <div class="sb-nav-section">เมนู</div>
+    <div class="sb-link" onclick="window.location.href='index.html'">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>หน้าหลัก
+    </div>
+    <div class="sb-link active" onclick="setNav(this)">
+      <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>ภาพรวมห้องเรียน
+    </div>
+    <div class="sb-link" onclick="setNav(this);window.location.href='attendance.html'">
+      <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M15.5 16.5l1.5 1.5 2.5-2.5"/></svg></span>เช็คชื่อ
+    </div>
+    <div class="sb-link" onclick="setNav(this);toast('คะแนน — กำลังพัฒนา')">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></span>คะแนน
+    </div>
+    <div class="sb-link" onclick="setNav(this);toast('งานที่มอบหมาย — กำลังพัฒนา')">
+      <span class="ico"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg></span>งานที่มอบหมาย
+    </div>
+    <div class="sb-link" onclick="setNav(this);toast('นักเรียน — กำลังพัฒนา')">
+      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></span>นักเรียน
+    </div>
+    <div class="sb-nav-section">รายงาน</div>
+    <div class="sb-link" onclick="setNav(this);toast('สรุปผล — กำลังพัฒนา')">
+      <span class="ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>สรุปผล
+    </div>
+    <div class="sb-link" onclick="setNav(this);toast('ตัดเกรด — กำลังพัฒนา')">
+      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M8 21l4-8 4 8"/><path d="M9.5 17h5"/></svg></span>ตัดเกรด
+    </div>
+    <div class="sb-link" onclick="setNav(this);toast('Export — กำลังพัฒนา')">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>Export
+    </div>
+    <div class="sb-spacer"></div>
+    <div class="sb-date" id="sb-date"></div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+
+    <!-- topbar -->
+    <div class="topbar">
+      <!-- mobile back (hidden on desktop) -->
+      <button class="btn btn-outline btn-sm" onclick="window.location.href='index.html'" style="display:none" id="mobile-back">← หน้าหลัก</button>
+      <div>
+        <div class="topbar-title" id="topbar-title">🏠 หน้าหลัก</div>
+        <div class="topbar-sub" id="topbar-sub"></div>
+      </div>
+      <div style="flex:1"></div>
+      <button class="btn btn-primary btn-sm" onclick="window.location.href='attendance.html'">✅ เช็คชื่อ</button>
+      <button class="btn btn-outline btn-sm" onclick="toast('📤 Export')">📤 Export</button>
+    </div>
+
+    <!-- content -->
+    <div class="content">
+
+      <!-- STAT CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#f0fdf4">👨‍🎓</div>
+          <div class="stat-val" id="sc-total">34</div>
+          <div class="stat-label">นักเรียนทั้งหมด</div>
+          <div class="stat-pill" style="background:#f0fdf4;color:#15803d" id="sc-class-pill">ม.3/1</div>
+        </div>
+        <div class="stat-card" onclick="window.location.href='attendance.html'" style="cursor:pointer">
+          <div class="stat-icon" style="background:#eff6ff">✅</div>
+          <div class="stat-val" id="sc-present">—</div>
+          <div class="stat-label">มาเรียนวันนี้</div>
+          <div class="stat-pill" id="sc-present-pill" style="background:#eff6ff;color:#1d4ed8">ยังไม่ได้เช็ค</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fffbeb">⭐</div>
+          <div class="stat-val">73.4</div>
+          <div class="stat-label">คะแนนเฉลี่ย</div>
+          <div class="stat-pill" style="background:#fffbeb;color:#b45309">↓ ลดลง</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fdf2f8">📋</div>
+          <div class="stat-val">28</div>
+          <div class="stat-label">ส่งงานครบ</div>
+          <div class="stat-pill" style="background:#fdf2f8;color:#be185d">82.4%</div>
+        </div>
+      </div>
+
+      <!-- ROW 2: Attendance + Chart -->
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title"><span class="panel-dot" style="background:#1d9e75"></span>การเข้าเรียนวันนี้</div>
+            <button class="btn-ghost" onclick="window.location.href='attendance.html'">ดูทั้งหมด →</button>
+          </div>
+          <div class="panel-body">
+            <div class="att-summary">
+              <span class="chip chip-p" id="att-present-chip">มา —</span>
+              <span class="chip chip-a" id="att-absent-chip">ขาด —</span>
+              <span class="chip chip-l" id="att-late-chip">สาย —</span>
+            </div>
+            <div id="att-list"></div>
+            <div style="text-align:center;margin-top:8px">
+              <button class="btn btn-primary btn-sm" onclick="window.location.href='attendance.html'" style="width:100%;justify-content:center">✅ เช็คชื่อเลย</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title"><span class="panel-dot" style="background:#6366f1"></span>คะแนนรายเดือน</div>
+          </div>
+          <div class="panel-body">
+            <div style="display:flex;gap:12px;margin-bottom:6px;">
+              <span style="font-size:11px;font-weight:700;color:#1d9e75;display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#1d9e75;display:inline-block"></span>คะแนนจริง</span>
+              <span style="font-size:11px;font-weight:700;color:#94a3b8;display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#bbf7d0;display:inline-block"></span>เป้าหมาย 75</span>
+            </div>
+            <div class="bar-chart" id="bar-chart"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 3: Score + Assignments + Risk -->
+      <div class="grid-3">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title"><span class="panel-dot" style="background:#f59e0b"></span>คะแนนล่าสุด</div>
+            <button class="btn-ghost" onclick="toast('📝 คะแนนทั้งหมด')">ดูทั้งหมด →</button>
+          </div>
+          <div class="panel-body" style="padding:0">
+            <table class="score-tbl">
+              <thead><tr><th>ชื่อ</th><th>สอบ</th><th>งาน</th><th>รวม</th><th>เกรด</th></tr></thead>
+              <tbody id="score-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title"><span class="panel-dot" style="background:#ec4899"></span>งานที่มอบหมาย</div>
+            <button class="btn-ghost" onclick="toast('📂 งานทั้งหมด')">ทั้งหมด →</button>
+          </div>
+          <div class="panel-body" id="assign-list"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title"><span class="panel-dot" style="background:#ef4444"></span>นักเรียนเสี่ยง</div>
+            <button class="btn-ghost" onclick="toast('🚨 ดูทั้งหมด')">ทั้งหมด →</button>
+          </div>
+          <div class="panel-body" id="risk-list"></div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<nav class="bottom-nav">
+  <button class="bn-item active" onclick="window.location.href='index.html'">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>
+    <span class="bn-lbl">หน้าหลัก</span>
+  </button>
+  <button class="bn-item" onclick="window.location.href='attendance.html'">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/><path d="M15.5 16.5l1.5 1.5 2.5-2.5"/></svg></span>
+    <span class="bn-lbl">เช็คชื่อ</span>
+  </button>
+  <button class="bn-item" onclick="toast('งานนักเรียน — กำลังพัฒนา')">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg></span>
+    <span class="bn-lbl">งานนักเรียน</span>
+  </button>
+  <button class="bn-item" onclick="toast('คะแนน — กำลังพัฒนา')">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/><path d="M15 13l2 2 4-4"/></svg></span>
+    <span class="bn-lbl">คะแนน</span>
+  </button>
+  <button class="bn-item" onclick="toast('เพิ่มเติม')">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></span>
+    <span class="bn-lbl">เพิ่มเติม</span>
+  </button>
+</nav>
+
+<div class="toast" id="toast-el"></div>
+
+<script src="ck-data.js"></script>
+<script>
+/* ══ DATA (จาก shared layer) ══ */
+const MAX_ABSENT=8;
+const CLASSES=CK.CLASSES;
+const CHART_DATA=[
+  {m:'ม.ค.',v:68},{m:'ก.พ.',v:72},{m:'มี.ค.',v:70},
+  {m:'เม.ย.',v:75},{m:'พ.ค.',v:73},{m:'มิ.ย.',v:73},
+];
+const ASSIGNS=[
+  {name:'ใบงานที่ 1',due:'15 มิ.ย.',submitted:28,total:34,color:'#f0fdf4',icon:'📗',overdue:false},
+  {name:'Quiz บทที่ 3',due:'18 มิ.ย.',submitted:21,total:34,color:'#eff6ff',icon:'📘',overdue:false},
+  {name:'โปรเจกต์หน่วย 2',due:'10 มิ.ย.',submitted:12,total:34,color:'#fffbeb',icon:'📙',overdue:true},
+  {name:'รายงานการทดลอง',due:'5 มิ.ย.',submitted:8,total:34,color:'#fdf2f8',icon:'📕',overdue:true},
+];
+const SCORE_MOCK=[
+  {exam:54,hw:18,total:89,grade:'A'},{exam:43,hw:15,total:74,grade:'B+'},
+  {exam:35,hw:12,total:61,grade:'C'},{exam:49,hw:17,total:83,grade:'A'},
+  {exam:38,hw:14,total:67,grade:'B'},{exam:30,hw:10,total:54,grade:'C+'},
+];
+
+/* ── STATE ── */
+const params=new URLSearchParams(window.location.search);
+let currentClass=params.get('class')||'m31';
+if(!CLASSES.find(c=>c.id===currentClass)) currentClass='m31';
+
+// อ่านนักเรียนจาก shared localStorage
+function getStudents(){ return CK.getStudents(currentClass); }
+
+function fmtKey(d){return CK.fmtKey(d);}
+function fmtDateThai(d){
+  const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const D=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+  return `วัน${D[d.getDay()]}ที่ ${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()+543}`;
+}
+
+/* ── RENDER ── */
+function render(){
+  const cls=CLASSES.find(c=>c.id===currentClass);
+  const students=getStudents(); // อ่านจาก localStorage
+  const todayKey=fmtKey(new Date());
+  const today=new Date();
+
+  // sidebar + topbar
+  document.getElementById('sb-class-name').textContent=cls.name;
+  document.getElementById('sb-class-sub').textContent=cls.subject;
+  document.getElementById('sb-class-count').textContent=cls.count+' คน';
+  document.getElementById('sb-date').textContent=fmtDateThai(today);
+  document.getElementById('topbar-title').textContent='🏠 หน้าหลัก';
+  document.getElementById('topbar-sub').textContent=`${cls.name} ${cls.subject}`;
+  document.getElementById('sc-class-pill').textContent=cls.name;
+  document.getElementById('sc-total').textContent=cls.count;
+
+  // today attendance
+  let p=0,l=0,a=0,v=0;
+  students.forEach(s=>{
+    const r=s.history[todayKey];
+    if(!r)return;
+    if(r.status==='present')p++;else if(r.status==='late')l++;
+    else if(r.status==='absent')a++;else v++;
+  });
+  const checked=p+l+a+v;
+  document.getElementById('sc-present').textContent=checked>0?p:'—';
+  document.getElementById('sc-present-pill').textContent=checked===0?'ยังไม่ได้เช็ค':Math.round(p/cls.count*100)+'%';
+  document.getElementById('att-present-chip').textContent=`มา ${p}`;
+  document.getElementById('att-absent-chip').textContent=`ขาด ${a}`;
+  document.getElementById('att-late-chip').textContent=`สาย ${l}`;
+
+  // attendance list (5 คน)
+  const sample=students.slice(0,5);
+  document.getElementById('att-list').innerHTML=sample.map(s=>{
+    const r=s.history[todayKey];
+    const st=r?r.status:'present';
+    const chipClass=st==='present'?'sc-present':st==='late'?'sc-late':'sc-absent';
+    const chipLabel=st==='present'?'มาเรียน':st==='late'?'สาย':st==='absent'?'ขาดเรียน':'ลา';
+    return `<div class="stu-row">
+      <span class="stu-no">${s.no}</span>
+      <div class="av" style="width:30px;height:30px;background:${s.col.bg};color:${s.col.c}">${s.fn[0]}${s.ln[0]}</div>
+      <span class="stu-name">${s.fn} ${s.ln}</span>
+      <span class="chip ${chipClass}" style="font-size:10px">${chipLabel}</span>
+    </div>`;
+  }).join('');
+
+  // chart
+  const maxH=80,maxV=80;
+  document.getElementById('bar-chart').innerHTML=CHART_DATA.map(d=>{
+    const tH=Math.round((75/maxV)*maxH);
+    const aH=Math.round((d.v/maxV)*maxH);
+    return `<div class="bar-group">
+      <div class="bar-val">${d.v}</div>
+      <div class="bar-wrap">
+        <div class="bar-target" style="height:${tH}px"></div>
+        <div class="bar-actual" style="height:${aH}px"></div>
+      </div>
+      <div class="bar-label">${d.m}</div>
+    </div>`;
+  }).join('');
+
+  // score table
+  document.getElementById('score-tbody').innerHTML=students.slice(0,6).map((s,i)=>{
+    const sc=SCORE_MOCK[i%SCORE_MOCK.length];
+    const gCls=sc.grade==='A'?'gA':sc.grade.startsWith('B')?'gBp':'gC';
+    return `<tr>
+      <td>${s.fn} ${s.ln.slice(0,3)}</td>
+      <td>${sc.exam}</td><td>${sc.hw}</td>
+      <td style="font-weight:800;color:var(--primary)">${sc.total}</td>
+      <td><span class="grade-pill ${gCls}">${sc.grade}</span></td>
+    </tr>`;
+  }).join('');
+
+  // assignments
+  document.getElementById('assign-list').innerHTML=ASSIGNS.map(a=>{
+    const pct=Math.round(a.submitted/a.total*100);
+    const bar=pct>=80?'#1d9e75':pct>=50?'#f59e0b':'#ef4444';
+    const tc=pct>=80?'#15803d':pct>=50?'#b45309':'#dc2626';
+    return `<div class="assign-row">
+      <div class="assign-ico" style="background:${a.color}">${a.icon}</div>
+      <div class="assign-info">
+        <div class="assign-name">${a.name}${a.overdue?'<span class="overdue">เกิน</span>':''}</div>
+        <div class="assign-due">ครบ ${a.due}</div>
+      </div>
+      <div class="assign-prog-wrap">
+        <div class="assign-prog-track"><div class="assign-prog-fill" style="width:${pct}%;background:${bar}"></div></div>
+        <div class="assign-prog-txt" style="color:${tc}">${a.submitted}/${a.total}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // risk
+  const risks=students.map(s=>{
+    let miss=0,late=0;
+    Object.values(s.history).forEach(r=>{if(r.status==='absent'||r.status==='leave')miss++;if(r.status==='late')late++;});
+    return{...s,miss,late};
+  }).filter(s=>s.miss>=3).sort((a,b)=>b.miss-a.miss).slice(0,4);
+
+  document.getElementById('risk-list').innerHTML=risks.length===0
+    ?'<div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">🎉 ไม่มีนักเรียนเสี่ยง</div>'
+    :risks.map(s=>{
+      const pct=Math.min(100,Math.round(s.miss/MAX_ABSENT*100));
+      const bar=pct>=100?'#ef4444':pct>=75?'#f59e0b':'#1d9e75';
+      const tc=pct>=100?'#dc2626':pct>=75?'#b45309':'#15803d';
+      return `<div class="risk-row">
+        <div class="av" style="width:30px;height:30px;background:${s.col.bg};color:${s.col.c};font-size:10px">${s.fn[0]}${s.ln[0]}</div>
+        <div class="risk-info">
+          <div class="risk-name">${s.fn} ${s.ln}</div>
+          <div class="risk-sub">ขาด ${s.miss} · สาย ${s.late}</div>
+        </div>
+        <div class="risk-bar-wrap">
+          <div class="risk-track"><div class="risk-fill" style="width:${pct}%;background:${bar}"></div></div>
+          <div class="risk-txt" style="color:${tc}">${Math.max(0,MAX_ABSENT-s.miss)===0?'⚠️':'เหลือ '+(MAX_ABSENT-s.miss)}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+  // mobile back button
+  if(window.innerWidth<768) document.getElementById('mobile-back').style.display='flex';
+}
+
+function setNav(el){
+  document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toast(msg){
+  const t=document.getElementById('toast-el');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+render();
+</script>
+</body>
+</html>

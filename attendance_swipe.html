@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>เช็คชื่อ — ClassKru</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --primary:#1d9e75;--primary-dark:#0f6e56;
+  --present:#1d9e75;--present-bg:#f0fdf4;--present-border:#86efac;
+  --late:#f59e0b;--late-bg:#fffbeb;--late-border:#fcd34d;
+  --absent:#ef4444;--absent-bg:#fef2f2;--absent-border:#fca5a5;
+  --leave:#6366f1;--leave-bg:#eef2ff;--leave-border:#a5b4fc;
+  --bg:#f0f4f8;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --sh:0 4px 20px rgba(0,0,0,.10);--sh-lg:0 8px 32px rgba(0,0,0,.15);
+  --tr:all .2s cubic-bezier(.4,0,.2,1);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;}
+
+/* ── TOP BAR ───────────────────────────────────────── */
+.topbar{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:12px 16px;display:flex;align-items:center;gap:12px;
+  flex-shrink:0;position:relative;z-index:10;
+}
+.logo{width:36px;height:36px;background:linear-gradient(135deg,#1d9e75,#0f6e56);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.topbar-info{flex:1;min-width:0;}
+.topbar-title{font-size:16px;font-weight:800;color:var(--text);}
+.topbar-sub{font-size:12px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topbar-save{padding:8px 16px;border-radius:20px;background:var(--primary);color:#fff;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;border:none;cursor:pointer;flex-shrink:0;transition:var(--tr);}
+.topbar-save:active{transform:scale(.95);}
+
+/* ── DATE ROW ──────────────────────────────────────── */
+.date-row{background:#fff;border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.date-nav-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:var(--tr);}
+.date-nav-btn:active{background:#f1f5f9;transform:scale(.92);}
+.date-center{text-align:center;}
+.date-main{font-size:14px;font-weight:800;color:var(--text);}
+.date-sub{font-size:11px;color:var(--muted);}
+
+/* ── STAT ROW ──────────────────────────────────────── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px;flex-shrink:0;}
+.stat-chip{border-radius:14px;padding:8px 4px;text-align:center;cursor:pointer;transition:var(--tr);}
+.stat-chip:active{transform:scale(.95);}
+.stat-chip .sv{font-size:22px;font-weight:800;line-height:1;}
+.stat-chip .sl{font-size:10px;font-weight:700;margin-top:2px;}
+.sc-p{background:var(--present-bg);border:1.5px solid var(--present-border);}
+.sc-p .sv,.sc-p .sl{color:var(--present);}
+.sc-l{background:var(--late-bg);border:1.5px solid var(--late-border);}
+.sc-l .sv,.sc-l .sl{color:var(--late);}
+.sc-a{background:var(--absent-bg);border:1.5px solid var(--absent-border);}
+.sc-a .sv,.sc-a .sl{color:var(--absent);}
+.sc-v{background:var(--leave-bg);border:1.5px solid var(--leave-border);}
+.sc-v .sv,.sc-v .sl{color:var(--leave);}
+
+/* ── HINT BANNER ───────────────────────────────────── */
+.hint-banner{
+  background:linear-gradient(135deg,#f0fdf4,#e0f2fe);
+  border:1.5px solid #bbf7d0;border-radius:14px;
+  margin:0 14px 10px;padding:10px 14px;
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+  font-size:12px;font-weight:600;color:#0f6e56;
+}
+.hint-banner.hidden{display:none;}
+.hint-icons{display:flex;gap:4px;font-size:16px;}
+.hint-close{margin-left:auto;font-size:16px;cursor:pointer;color:#94a3b8;}
+
+/* ── PROGRESS BAR ──────────────────────────────────── */
+.progress-row{padding:0 14px 10px;flex-shrink:0;}
+.progress-track{height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#1d9e75,#0f6e56);transition:width .4s;}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--muted);margin-top:4px;}
+
+/* ── CARD STACK ────────────────────────────────────── */
+.card-area{flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 14px 8px;}
+
+/* Background hint labels */
+.bg-hint{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;font-weight:800;opacity:0;pointer-events:none;transition:opacity .15s;display:flex;align-items:center;gap:8px;}
+.bg-hint.left{left:20px;color:var(--late);flex-direction:row;}
+.bg-hint.right{right:20px;color:var(--absent);flex-direction:row-reverse;}
+
+/* The swipeable card */
+.swipe-card{
+  width:100%;max-width:380px;
+  background:#fff;border-radius:24px;
+  box-shadow:var(--sh-lg);
+  padding:24px 20px;
+  position:relative;
+  cursor:grab;
+  user-select:none;touch-action:pan-y;
+  transition:transform .25s cubic-bezier(.4,0,.2,1), box-shadow .2s, opacity .2s;
+  will-change:transform;
+}
+.swipe-card.dragging{transition:none;cursor:grabbing;}
+.swipe-card.fly-left{transform:translateX(-120%) rotate(-15deg)!important;opacity:0;transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .32s;}
+.swipe-card.fly-right{transform:translateX(120%) rotate(15deg)!important;opacity:0;transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .32s;}
+.swipe-card.fly-up{transform:translateY(-120%)!important;opacity:0;transition:transform .32s,opacity .32s;}
+
+/* Card status overlay */
+.card-status-label{
+  position:absolute;top:16px;right:16px;
+  font-size:12px;font-weight:800;padding:4px 12px;border-radius:20px;
+  opacity:0;transition:opacity .15s;
+  pointer-events:none;
+}
+
+/* Card content */
+.card-no{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px;}
+.card-avatar{
+  width:80px;height:80px;border-radius:24px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:800;margin:0 auto 16px;
+  transition:var(--tr);
+}
+.card-name{font-size:22px;font-weight:800;text-align:center;color:var(--text);line-height:1.2;}
+.card-absences{display:flex;justify-content:center;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.abs-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.card-history{display:flex;justify-content:center;gap:5px;margin-top:12px;flex-wrap:wrap;}
+.hist-dot{width:10px;height:10px;border-radius:50%;cursor:default;}
+.hist-dot[title]{cursor:default;}
+
+/* ── ACTION BUTTONS ────────────────────────────────── */
+.action-row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-shrink:0;padding:0 14px 8px;}
+.action-btn{
+  flex:1;max-width:80px;height:64px;border-radius:18px;border:2px solid transparent;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font-family:'Sarabun',sans-serif;font-size:11px;font-weight:800;
+  cursor:pointer;transition:var(--tr);
+  background:#fff;border-color:var(--border);color:var(--muted);
+}
+.action-btn:active{transform:scale(.90);}
+.action-btn .aico{font-size:22px;line-height:1;}
+.ab-present{background:var(--present-bg);border-color:var(--present-border);color:var(--present);}
+.ab-late{background:var(--late-bg);border-color:var(--late-border);color:var(--late);}
+.ab-absent{background:var(--absent-bg);border-color:var(--absent-border);color:var(--absent);}
+.ab-leave{background:var(--leave-bg);border-color:var(--leave-border);color:var(--leave);}
+.ab-undo{background:#f8fafc;border-color:var(--border);color:var(--muted);}
+
+/* ── DONE SCREEN ───────────────────────────────────── */
+.done-screen{
+  position:absolute;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;gap:16px;
+  opacity:0;pointer-events:none;transition:opacity .4s;
+}
+.done-screen.show{opacity:1;pointer-events:all;}
+.done-emoji{font-size:64px;animation:bounce 1s ease infinite alternate;}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-12px)}}
+.done-title{font-size:24px;font-weight:800;color:var(--text);}
+.done-sub{font-size:14px;color:var(--muted);text-align:center;}
+.done-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:300px;}
+.done-chip{border-radius:16px;padding:12px;text-align:center;}
+.done-chip .dv{font-size:28px;font-weight:800;}
+.done-chip .dl{font-size:12px;font-weight:700;margin-top:2px;}
+.done-btn{padding:14px 32px;border-radius:16px;background:var(--primary);color:#fff;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:800;border:none;cursor:pointer;transition:var(--tr);box-shadow:var(--sh);}
+.done-btn:active{transform:scale(.97);}
+.done-btn-outline{padding:12px 24px;border-radius:16px;background:#fff;border:2px solid var(--border);color:var(--text);font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:var(--tr);}
+
+/* ── CLASS PICKER SHEET ────────────────────────────── */
+.sheet-overlay{position:absolute;inset:0;background:rgba(15,23,42,.4);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s;}
+.sheet-overlay.show{opacity:1;pointer-events:all;}
+.sheet{position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:20px 20px calc(20px + var(--safe-bottom));transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+.sheet-overlay.show .sheet{transform:translateY(0);}
+.sheet-handle{width:40px;height:4px;background:#e2e8f0;border-radius:99px;margin:0 auto 16px;}
+.sheet-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:14px;}
+.sheet-option{padding:13px 16px;border-radius:14px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;transition:var(--tr);display:flex;align-items:center;gap:10px;}
+.sheet-option:active{background:#f1f5f9;}
+.sheet-option.active{background:var(--present-bg);color:var(--present);}
+.sheet-option .check{margin-left:auto;font-size:18px;}
+
+/* ── TOAST ─────────────────────────────────────────── */
+.toast{
+  position:absolute;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);
+  background:rgba(15,23,42,.9);color:#fff;
+  font-size:13px;font-weight:700;
+  padding:10px 20px;border-radius:20px;
+  white-space:nowrap;z-index:300;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* Desktop hint */
+.desktop-hint{display:none;}
+@media(min-width:500px){
+  body{border-left:1px solid var(--border);border-right:1px solid var(--border);box-shadow:0 0 40px rgba(0,0,0,.08);}
+  .desktop-hint{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--muted);padding:4px 0;flex-shrink:0;background:var(--bg);}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">🏫</div>
+  <div class="topbar-info">
+    <div class="topbar-title">เช็คชื่อ</div>
+    <div class="topbar-sub" id="classLabel">ม.3/1 วิทยาศาสตร์ · 34 คน</div>
+  </div>
+  <button class="topbar-save" onclick="showClassPicker()">🏫 เปลี่ยน</button>
+  <button class="topbar-save" style="margin-left:6px;background:var(--primary)" onclick="saveAndFinish()">💾 บันทึก</button>
+</div>
+
+<!-- DATE ROW -->
+<div class="date-row">
+  <button class="date-nav-btn" onclick="changeDay(-1)">◀</button>
+  <div class="date-center">
+    <div class="date-main" id="dateMain"></div>
+    <div class="date-sub" id="dateSub"></div>
+  </div>
+  <button class="date-nav-btn" onclick="changeDay(1)">▶</button>
+</div>
+
+<!-- STATS -->
+<div class="stat-row">
+  <div class="stat-chip sc-p" onclick="jumpToStatus('present')">
+    <div class="sv" id="cnt-p">0</div><div class="sl">✅ มา</div>
+  </div>
+  <div class="stat-chip sc-l" onclick="jumpToStatus('late')">
+    <div class="sv" id="cnt-l">0</div><div class="sl">⏰ สาย</div>
+  </div>
+  <div class="stat-chip sc-a" onclick="jumpToStatus('absent')">
+    <div class="sv" id="cnt-a">0</div><div class="sl">❌ ขาด</div>
+  </div>
+  <div class="stat-chip sc-v" onclick="jumpToStatus('leave')">
+    <div class="sv" id="cnt-v">0</div><div class="sl">📄 ลา</div>
+  </div>
+</div>
+
+<!-- HINT BANNER -->
+<div class="hint-banner" id="hintBanner">
+  <div class="hint-icons">👈 <span style="color:var(--late)">สาย</span> &nbsp;|&nbsp; <span style="color:var(--absent)">ขาด</span> 👉</div>
+  <div>แตะ = มา &nbsp;|&nbsp; ปัดซ้าย = สาย &nbsp;|&nbsp; ปัดขวา = ขาด</div>
+  <span class="hint-close" onclick="document.getElementById('hintBanner').classList.add('hidden')">✕</span>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-row">
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="progress-label">
+    <span id="progressDone">เช็คแล้ว 0 คน</span>
+    <span id="progressLeft">เหลือ 0 คน</span>
+  </div>
+</div>
+
+<!-- CARD AREA -->
+<div class="card-area" id="cardArea">
+  <div class="bg-hint left" id="bgLeft">⏰ สาย</div>
+  <div class="bg-hint right" id="bgRight">ขาด ❌</div>
+  <div class="swipe-card" id="swipeCard">
+    <div class="card-status-label" id="cardStatusLabel"></div>
+    <div class="card-no" id="cardNo"></div>
+    <div class="card-avatar" id="cardAvatar"></div>
+    <div class="card-name" id="cardName"></div>
+    <div class="card-absences" id="cardAbsences"></div>
+    <div class="card-history" id="cardHistory"></div>
+  </div>
+  <div class="done-screen" id="doneScreen">
+    <div class="done-emoji">🎉</div>
+    <div class="done-title">เช็คชื่อเสร็จแล้ว!</div>
+    <div class="done-sub" id="doneSub"></div>
+    <div class="done-summary" id="doneSummary"></div>
+    <button class="done-btn" onclick="saveAndFinish()">💾 บันทึกการเช็คชื่อ</button>
+    <button class="done-btn-outline" onclick="reviewAll()">📋 ทบทวนรายชื่อ</button>
+  </div>
+</div>
+
+<!-- DESKTOP HINT -->
+<div class="desktop-hint">⌨️ กด A = มา &nbsp;·&nbsp; ← = สาย &nbsp;·&nbsp; → = ขาด &nbsp;·&nbsp; L = ลา &nbsp;·&nbsp; Z = ย้อน</div>
+
+<!-- ACTION BUTTONS -->
+<div class="action-row" id="actionRow">
+  <button class="action-btn ab-late" onclick="swipeCard('late')"><div class="aico">⏰</div>สาย</button>
+  <button class="action-btn ab-absent" onclick="swipeCard('absent')"><div class="aico">❌</div>ขาด</button>
+  <button class="action-btn ab-present" onclick="swipeCard('present')"><div class="aico">✅</div>มา</button>
+  <button class="action-btn ab-leave" onclick="swipeCard('leave')"><div class="aico">📄</div>ลา</button>
+  <button class="action-btn ab-undo" onclick="undoLast()"><div class="aico">↩️</div>ย้อน</button>
+</div>
+
+<!-- CLASS PICKER SHEET -->
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">เลือกห้องเรียน</div>
+    <div id="sheetOptions"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toastEl"></div>
+
+<script>
+// ── DATA ────────────────────────────────────────────
+const NAMES=[
+  ['กฤษณะ','เจริญสุข'],['ขวัญชัย','มีสุข'],['คณิตา','รักเรียน'],
+  ['งามนิตย์','ใจดี'],['จันทร์เพ็ญ','สว่างจิต'],['ฉันทนา','บุญมา'],
+  ['ชนาภา','ทองดี'],['ญาณิศา','ศรีสุข'],['ฐิติรัตน์','พงษ์ไทย'],
+  ['ณัฐพล','วงษ์สวรรค์'],['ดวงหทัย','เพชรงาม'],['ตะวัน','โชติมา'],
+  ['ทิพย์วรรณ','สมบัติ'],['ธนภัทร','ชัยชนะ'],['นภาพร','แสงทอง'],
+  ['บุษบา','พิมพ์ดี'],['ปิยะนุช','ขยันเรียน'],['ผกามาศ','ดีงาม'],
+  ['พลอยไพลิน','รุ่งเรือง'],['ภัทรพล','ศิริมงคล'],['มนัสนันท์','วิชาดี'],
+  ['ยุพา','แก้วใส'],['รัตนา','ทองพูล'],['ลลิตา','สุขสันต์'],
+  ['วริศรา','ประเสริฐ'],['ศิริพร','เด่นดวง'],['สมหมาย','ใจงาม'],
+  ['อนุชา','สมาธิ'],['อรอุมา','มั่นคง'],['อัจฉรา','เก่งกล้า'],
+  ['อานนท์','สุขใจ'],['อิสรา','ผลดี'],['อุไรวรรณ','ดาวดี'],['เอมอร','หมั่นเพียร']
+];
+const COLS=[
+  {bg:'#f0fdf4',c:'#15803d'},{bg:'#eff6ff',c:'#1d4ed8'},
+  {bg:'#fffbeb',c:'#b45309'},{bg:'#fdf2f8',c:'#be185d'},
+  {bg:'#f5f3ff',c:'#6d28d9'},{bg:'#fff7ed',c:'#c2410c'},
+  {bg:'#f0f9ff',c:'#0369a1'},{bg:'#ecfdf5',c:'#065f46'},
+];
+const MAX_ABSENT=8;
+
+const CLASSES=[
+  {id:'m31',name:'ม.3/1',subject:'วิทยาศาสตร์',count:34},
+  {id:'m32',name:'ม.3/2',subject:'วิทยาศาสตร์',count:32},
+  {id:'m21',name:'ม.2/1',subject:'วิทยาศาสตร์',count:30},
+  {id:'m11',name:'ม.1/1',subject:'วิทยาศาสตร์',count:36},
+];
+
+function buildStudents(count){
+  return Array.from({length:count},(_,i)=>{
+    const n=NAMES[i%NAMES.length];
+    const col=COLS[i%COLS.length];
+    const hist={};
+    const today=new Date();
+    for(let d=29;d>=1;d--){
+      const dt=new Date(today); dt.setDate(today.getDate()-d);
+      if(dt.getDay()===0||dt.getDay()===6) continue;
+      const r=Math.random();
+      hist[fmtKey(dt)]={status:r<.82?'present':r<.89?'late':r<.95?'absent':'leave'};
+    }
+    return {id:i,no:i+1,fn:n[0],ln:n[1],col,history:hist};
+  });
+}
+
+const classData={};
+CLASSES.forEach(c=>{ classData[c.id]=buildStudents(c.count); });
+
+// ── STATE ────────────────────────────────────────────
+let currentClassId='m31';
+let currentDate=new Date();
+let queue=[];       // indices of students to check today
+let queuePos=0;     // current position in queue
+let todayKey='';
+let undoStack=[];
+let isDone=false;
+
+function fmtKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function fmtDateMain(d){
+  const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return `${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()+543}`;
+}
+function fmtDateSub(d){
+  const D=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+  return `วัน${D[d.getDay()]}`;
+}
+
+// ── INIT ─────────────────────────────────────────────
+function init(){
+  todayKey=fmtKey(currentDate);
+  document.getElementById('dateMain').textContent=fmtDateMain(currentDate);
+  document.getElementById('dateSub').textContent=fmtDateSub(currentDate);
+  buildQueue();
+  renderCard();
+  updateStats();
+  setupSwipe();
+  setupKeyboard();
+}
+
+function buildQueue(){
+  const students=classData[currentClassId];
+  const cls=CLASSES.find(c=>c.id===currentClassId);
+  document.getElementById('classLabel').textContent=`${cls.name} ${cls.subject} · ${students.length} คน`;
+  queue=students.map(s=>s.id);
+  // students already checked today go to back
+  const checked=queue.filter(id=>classData[currentClassId][id].history[todayKey]);
+  const unchecked=queue.filter(id=>!classData[currentClassId][id].history[todayKey]);
+  queue=[...unchecked,...checked];
+  queuePos=unchecked.length>0?0:0;
+  isDone=unchecked.length===0;
+  undoStack=[];
+  if(isDone) showDone();
+}
+
+// ── CARD RENDER ───────────────────────────────────────
+function renderCard(){
+  if(isDone){showDone();return;}
+  const student=classData[currentClassId][queue[queuePos]];
+  if(!student){showDone();return;}
+
+  const card=document.getElementById('swipeCard');
+  card.classList.remove('fly-left','fly-right','fly-up','dragging');
+  card.style.transform='';card.style.opacity='';
+
+  document.getElementById('cardNo').textContent=`เลขที่ ${student.no} / ${classData[currentClassId].length}`;
+  const av=document.getElementById('cardAvatar');
+  av.style.background=student.col.bg;
+  av.style.color=student.col.c;
+  av.textContent=student.fn[0]+student.ln[0];
+
+  document.getElementById('cardName').textContent=`${student.fn} ${student.ln}`;
+
+  // Absence stats
+  const counts={present:0,late:0,absent:0,leave:0};
+  Object.values(student.history).forEach(r=>{if(counts[r.status]!==undefined)counts[r.status]++;});
+  const totalMiss=counts.absent+counts.leave;
+  const left=Math.max(0,MAX_ABSENT-totalMiss);
+  const el=document.getElementById('cardAbsences');
+  const colA=totalMiss>=MAX_ABSENT?'background:#fef2f2;color:#dc2626':totalMiss>=MAX_ABSENT*.75?'background:#fffbeb;color:#b45309':'background:#f0fdf4;color:#15803d';
+  el.innerHTML=`
+    <span class="abs-badge" style="background:#f0fdf4;color:#15803d">มา ${counts.present} ครั้ง</span>
+    <span class="abs-badge" style="background:#fffbeb;color:#b45309">สาย ${counts.late} ครั้ง</span>
+    <span class="abs-badge" style="${colA}">${totalMiss>=MAX_ABSENT?'⚠️ เกินแล้ว!':'ขาดได้อีก '+left+' ครั้ง'}</span>
+  `;
+
+  // History dots (last 20 school days)
+  const histEntries=Object.entries(student.history).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,20);
+  const dotColors={present:'#1d9e75',late:'#f59e0b',absent:'#ef4444',leave:'#6366f1'};
+  document.getElementById('cardHistory').innerHTML=histEntries.map(([date,r])=>`
+    <div class="hist-dot" style="background:${dotColors[r.status]}" title="${date}: ${r.status}"></div>
+  `).join('');
+
+  // Current status indicator
+  const existing=student.history[todayKey];
+  const lbl=document.getElementById('cardStatusLabel');
+  if(existing){
+    const statusInfo={present:{bg:'#f0fdf4',c:'#15803d',t:'✅ มาแล้ว'},late:{bg:'#fffbeb',c:'#b45309',t:'⏰ สายแล้ว'},absent:{bg:'#fef2f2',c:'#dc2626',t:'❌ ขาดแล้ว'},leave:{bg:'#eef2ff',c:'#4338ca',t:'📄 ลาแล้ว'}};
+    const si=statusInfo[existing.status];
+    lbl.style.cssText=`opacity:1;background:${si.bg};color:${si.c};`;
+    lbl.textContent=si.t;
+  } else { lbl.style.opacity='0'; }
+
+  updateProgress();
+}
+
+function updateProgress(){
+  const students=classData[currentClassId];
+  const checked=students.filter(s=>s.history[todayKey]).length;
+  const total=students.length;
+  const pct=Math.round((checked/total)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressDone').textContent=`เช็คแล้ว ${checked} คน`;
+  document.getElementById('progressLeft').textContent=`เหลือ ${total-checked} คน`;
+}
+
+function updateStats(){
+  const students=classData[currentClassId];
+  let p=0,l=0,a=0,v=0;
+  students.forEach(s=>{
+    const r=s.history[todayKey];
+    if(!r) return;
+    if(r.status==='present') p++;
+    else if(r.status==='late') l++;
+    else if(r.status==='absent') a++;
+    else v++;
+  });
+  document.getElementById('cnt-p').textContent=p;
+  document.getElementById('cnt-l').textContent=l;
+  document.getElementById('cnt-a').textContent=a;
+  document.getElementById('cnt-v').textContent=v;
+}
+
+// ── SWIPE ACTION ──────────────────────────────────────
+function swipeCard(status){
+  if(isDone) return;
+  const student=classData[currentClassId][queue[queuePos]];
+  if(!student) return;
+
+  undoStack.push({studentId:student.id,prev:student.history[todayKey]||null,pos:queuePos});
+  student.history[todayKey]={status};
+
+  const card=document.getElementById('swipeCard');
+  if(status==='late') card.classList.add('fly-left');
+  else if(status==='absent') card.classList.add('fly-right');
+  else if(status==='leave') card.classList.add('fly-up');
+  else card.classList.add('fly-up'); // present
+
+  const statusLabels={present:'✅ มาเรียน',late:'⏰ สาย',absent:'❌ ขาดเรียน',leave:'📄 ลา'};
+  showToast(statusLabels[status]);
+
+  updateStats();
+
+  setTimeout(()=>{
+    queuePos++;
+    if(queuePos>=queue.length){
+      isDone=true;
+      showDone();
+    } else {
+      renderCard();
+    }
+  },280);
+}
+
+function undoLast(){
+  if(!undoStack.length){showToast('ไม่มีการเช็คชื่อให้ย้อน');return;}
+  const last=undoStack.pop();
+  const student=classData[currentClassId][last.studentId];
+  if(last.prev) student.history[todayKey]=last.prev;
+  else delete student.history[todayKey];
+  queuePos=last.pos;
+  isDone=false;
+  document.getElementById('doneScreen').classList.remove('show');
+  document.getElementById('swipeCard').style.display='';
+  document.getElementById('actionRow').style.display='';
+  renderCard();
+  updateStats();
+  showToast('↩️ ย้อนกลับแล้ว');
+}
+
+function jumpToStatus(status){
+  // Find first student in queue with this status or unchecked
+  const idx=queue.findIndex((id,i)=>i>=queuePos&&classData[currentClassId][id].history[todayKey]?.status===status);
+  if(idx>=0){queuePos=idx;isDone=false;document.getElementById('doneScreen').classList.remove('show');renderCard();}
+  else showToast('ไม่พบนักเรียนสถานะนี้');
+}
+
+// ── DONE SCREEN ───────────────────────────────────────
+function showDone(){
+  const students=classData[currentClassId];
+  let p=0,l=0,a=0,v=0;
+  students.forEach(s=>{
+    const r=s.history[todayKey];
+    if(!r){p++;return;}
+    if(r.status==='present') p++;
+    else if(r.status==='late') l++;
+    else if(r.status==='absent') a++;
+    else v++;
+  });
+  document.getElementById('doneSub').textContent=`${fmtDateMain(currentDate)} · ${CLASSES.find(c=>c.id===currentClassId).name}`;
+  document.getElementById('doneSummary').innerHTML=`
+    <div class="done-chip" style="background:#f0fdf4"><div class="dv" style="color:#15803d">${p}</div><div class="dl" style="color:#15803d">✅ มาเรียน</div></div>
+    <div class="done-chip" style="background:#fffbeb"><div class="dv" style="color:#b45309">${l}</div><div class="dl" style="color:#b45309">⏰ มาสาย</div></div>
+    <div class="done-chip" style="background:#fef2f2"><div class="dv" style="color:#dc2626">${a}</div><div class="dl" style="color:#dc2626">❌ ขาดเรียน</div></div>
+    <div class="done-chip" style="background:#eef2ff"><div class="dv" style="color:#4338ca">${v}</div><div class="dl" style="color:#4338ca">📄 ลา</div></div>
+  `;
+  document.getElementById('doneScreen').classList.add('show');
+}
+
+function reviewAll(){
+  // Reset to first student
+  queuePos=0; isDone=false;
+  document.getElementById('doneScreen').classList.remove('show');
+  renderCard();
+}
+
+function saveAndFinish(){
+  showToast('💾 บันทึกเรียบร้อยแล้ว');
+  setTimeout(()=>showToast('📤 ส่งข้อมูลสำเร็จ'),1000);
+}
+
+// ── DATE CHANGE ───────────────────────────────────────
+function changeDay(delta){
+  currentDate.setDate(currentDate.getDate()+delta);
+  while(currentDate.getDay()===0||currentDate.getDay()===6){
+    currentDate.setDate(currentDate.getDate()+delta);
+  }
+  todayKey=fmtKey(currentDate);
+  document.getElementById('dateMain').textContent=fmtDateMain(currentDate);
+  document.getElementById('dateSub').textContent=fmtDateSub(currentDate);
+  buildQueue();
+  renderCard();
+  updateStats();
+}
+
+// ── CLASS PICKER ──────────────────────────────────────
+function showClassPicker(){
+  const opts=document.getElementById('sheetOptions');
+  opts.innerHTML=CLASSES.map(c=>`
+    <div class="sheet-option ${c.id===currentClassId?'active':''}" onclick="switchClass('${c.id}')">
+      <span style="font-size:18px">🏫</span>
+      <div><div style="font-size:15px;font-weight:800">${c.name} ${c.subject}</div>
+      <div style="font-size:12px;color:var(--muted)">${c.count} คน</div></div>
+      ${c.id===currentClassId?'<span class="check">✓</span>':''}
+    </div>
+  `).join('');
+  document.getElementById('sheetOverlay').classList.add('show');
+}
+function switchClass(id){
+  currentClassId=id;
+  document.getElementById('sheetOverlay').classList.remove('show');
+  buildQueue();
+  renderCard();
+  updateStats();
+}
+function closeSheet(e){
+  if(e.target.id==='sheetOverlay') document.getElementById('sheetOverlay').classList.remove('show');
+}
+
+// ── TOAST ─────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toastEl');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._to);
+  t._to=setTimeout(()=>t.classList.remove('show'),1600);
+}
+
+// ── TOUCH / MOUSE SWIPE ───────────────────────────────
+function setupSwipe(){
+  const card=document.getElementById('swipeCard');
+  let startX=0,startY=0,curX=0,dragging=false,startTime=0;
+  const SWIPE_THRESH=80, TAP_THRESH=10, TAP_TIME=300;
+
+  function onStart(x,y){
+    if(isDone) return;
+    startX=x; startY=y; curX=x; dragging=true; startTime=Date.now();
+    card.classList.add('dragging');
+    document.getElementById('bgLeft').style.opacity='0';
+    document.getElementById('bgRight').style.opacity='0';
+  }
+  function onMove(x,y){
+    if(!dragging) return;
+    curX=x;
+    const dx=x-startX, dy=y-startY;
+    if(Math.abs(dx)<Math.abs(dy)*0.5&&Math.abs(dy)>15){dragging=false;card.style.transform='';return;}
+    const rot=dx*0.08;
+    card.style.transform=`translateX(${dx}px) rotate(${rot}deg)`;
+    // Show bg hints
+    const pct=Math.min(1,Math.abs(dx)/SWIPE_THRESH);
+    if(dx<-20){
+      document.getElementById('bgLeft').style.opacity=pct;
+      document.getElementById('bgRight').style.opacity=0;
+    } else if(dx>20){
+      document.getElementById('bgRight').style.opacity=pct;
+      document.getElementById('bgLeft').style.opacity=0;
+    } else {
+      document.getElementById('bgLeft').style.opacity=0;
+      document.getElementById('bgRight').style.opacity=0;
+    }
+  }
+  function onEnd(){
+    if(!dragging) return;
+    dragging=false;
+    card.classList.remove('dragging');
+    document.getElementById('bgLeft').style.opacity=0;
+    document.getElementById('bgRight').style.opacity=0;
+    const dx=curX-startX;
+    const elapsed=Date.now()-startTime;
+    // Tap
+    if(Math.abs(dx)<TAP_THRESH&&elapsed<TAP_TIME){ card.style.transform=''; swipeCard('present'); return; }
+    // Swipe
+    if(dx<-SWIPE_THRESH){ swipeCard('late'); }
+    else if(dx>SWIPE_THRESH){ swipeCard('absent'); }
+    else { card.style.transform=''; } // snap back
+  }
+
+  // Touch
+  card.addEventListener('touchstart',e=>{onStart(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
+  card.addEventListener('touchmove',e=>{onMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
+  card.addEventListener('touchend',onEnd);
+  // Mouse
+  card.addEventListener('mousedown',e=>{onStart(e.clientX,e.clientY);});
+  document.addEventListener('mousemove',e=>{if(dragging)onMove(e.clientX,e.clientY);});
+  document.addEventListener('mouseup',onEnd);
+}
+
+// ── KEYBOARD ──────────────────────────────────────────
+function setupKeyboard(){
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT') return;
+    if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A') swipeCard('late');
+    else if(e.key==='ArrowRight'||e.key==='d'||e.key==='D') swipeCard('absent');
+    else if(e.key==='ArrowUp'||e.key==='Enter'||e.key==' ') swipeCard('present');
+    else if(e.key==='l'||e.key==='L') swipeCard('leave');
+    else if(e.key==='z'||e.key==='Z') undoLast();
+  });
+}
+
+// ── START ─────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
