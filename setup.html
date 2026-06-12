@@ -759,11 +759,10 @@ function updateManualNextBtn(){
 }
 
 // Override goToMapping ให้รับ manual mode ด้วย
-const _origGoToMapping = goToMapping;
 function goToMapping(){
+  // ── Manual mode ──
   if(currentMode === 'manual'){
     if(!_manualSections.length){ showAlert('msg-s2','กรุณาเพิ่มวิชาอย่างน้อย 1 วิชา','error'); return; }
-    // แปลง _manualSections → _parsedData format
     const DAY_NUM_TO_TH = {1:'จันทร์',2:'อังคาร',3:'พุธ',4:'พฤหัสบดี',5:'ศุกร์'};
     _parsedData.schedules = [];
     _parsedData.students  = [];
@@ -776,13 +775,8 @@ function goToMapping(){
           year: String(new Date().getFullYear()+543), semester:'1',
         });
       });
-      // ถ้าไม่มีตาราง ก็ยังต้อง create section
       if(!sec.schedules.length){
-        _parsedData.schedules.push({
-          subject: sec.subject, grade: sec.grade, room: sec.room,
-          day:'', start:'', end:'',
-          year: String(new Date().getFullYear()+543), semester:'1',
-        });
+        _parsedData.schedules.push({ subject:sec.subject, grade:sec.grade, room:sec.room, day:'', start:'', end:'', year:String(new Date().getFullYear()+543), semester:'1' });
       }
       sec.students.forEach(s=>{
         _parsedData.students.push({ subject:sec.subject, grade:sec.grade, room:sec.room, ...s });
@@ -792,7 +786,27 @@ function goToMapping(){
     goStep(3);
     return;
   }
-  _origGoToMapping();
+
+  // ── Excel/Template mode — มีข้อมูลแล้ว ข้ามไป preview ──
+  const hasData = (_parsedData.schedules.length > 0) || (_parsedData.students.length > 0);
+  if(hasData){
+    buildPreview();
+    goStep(3);
+    return;
+  }
+
+  // ── Generic sheet — ตรวจว่าต้อง mapping ไหม ──
+  const hasScheduleFields = ['subject','grade','room','day','start'].every(f=>_colMap[f]!==undefined);
+  const hasStudentFields  = (['subject','first','last'].every(f=>_colMap[f]!==undefined)) ||
+                            (['first','last'].every(f=>_colMap[f]!==undefined));
+  if(hasScheduleFields || hasStudentFields){
+    buildParsedData();
+    buildPreview();
+    goStep(3);
+  } else {
+    buildMappingUI();
+    goStep('2b');
+  }
 }
 
 // ════════════════════════════════════════
@@ -995,29 +1009,6 @@ function parseGenericSheet(rows, fileName, wb, allSheets){
   }
 }
 
-function goToMapping(){
-  // ถ้า parseClassKruTemplate ทำงานแล้ว → _parsedData มีข้อมูลแล้ว ข้ามไป preview เลย
-  const hasData = (_parsedData.schedules.length > 0) || (_parsedData.students.length > 0);
-  if(hasData){
-    buildPreview();
-    goStep(3);
-    return;
-  }
-
-  // generic sheet — ตรวจว่าต้องแสดง mapping UI ไหม
-  const hasScheduleFields = ['subject','grade','room','day','start'].every(f=>_colMap[f]!==undefined);
-  const hasStudentFields  = (['subject','first','last'].every(f=>_colMap[f]!==undefined)) ||
-                            (['first','last'].every(f=>_colMap[f]!==undefined));
-
-  if(hasScheduleFields || hasStudentFields){
-    buildParsedData();
-    buildPreview();
-    goStep(3);
-  } else {
-    buildMappingUI();
-    goStep('2b');
-  }
-}
 
 function buildMappingUI(){
   document.getElementById('mapping-sub').textContent =
