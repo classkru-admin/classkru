@@ -153,6 +153,11 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
     <img src="classkru-logo.png" alt="ClassKru" onerror="this.style.display='none'">
     <h1>ตั้งค่าบัญชีครู</h1>
     <p>ทำแค่ครั้งเดียว ใช้ได้ตลอด</p>
+    <div id="back-to-home" style="display:none;margin-top:14px;">
+      <button class="btn btn-ghost" style="font-size:13px;padding:8px 18px;" onclick="location.href='index.html'">
+        ← กลับหน้าหลัก
+      </button>
+    </div>
   </div>
 
   <!-- Step bar -->
@@ -476,8 +481,12 @@ const COL_HINTS = {
   if(!_user) return;
   const meta = _user.user_metadata || {};
   if(meta.display_name) document.getElementById('s1-name').value = meta.display_name;
+
+  // ถ้ามาจาก settings (มี sections แล้ว) → แสดงปุ่มกลับหน้าหลัก
   const existing = await CKService.loadSections();
-  if(existing && existing.length > 0) location.href = 'index.html';
+  if(existing && existing.length > 0){
+    document.getElementById('back-to-home').style.display = '';
+  }
 })();
 
 // ════════════════════════════════════════
