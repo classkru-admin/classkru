@@ -323,13 +323,13 @@ function closeNotif(){document.getElementById('notif-panel').classList.remove('o
 
 function minsUntil(s){return s[0]*60+s[1]-hm(now());}
 
-function buildContent(overrideDate){
+function buildContent(overrideDate, overridePeriods, overrideChecked){
   const d=overrideDate||now();
   const isToday=CK.fmtKey(d)===CK.fmtKey(now());
   const dow=d.getDay();
   const dateKey=CK.fmtKey(d);
-  const periods=CK.getTodayPeriods(dow);
-  const checkedIds=CK.getCheckedPeriods(dow,dateKey);
+  const periods=overridePeriods||_periods||[];
+  const checkedIds=overrideChecked||_checkedIds||[];
   // current/next ใช้ได้เฉพาะวันนี้เท่านั้น
   const t=isToday?hm(now()):-1;
   const current=isToday?periods.find(p=>t>=p.s[0]*60+p.s[1]&&t<p.e[0]*60+p.e[1])||null:null;
@@ -364,7 +364,7 @@ function buildContent(overrideDate){
     // วันหยุด — ไม่แสดง card
   } else if(current){
     const checked=checkedIds.includes(current.periodId);
-    const cls=CK.CLASSES.find(c=>c.id===current.classId);
+    const cls=_sections.find(c=>c.id===current.classId)||CK.CLASSES?.find(c=>c.id===current.classId);
     html+=`<div class="next-card" style="margin-bottom:14px">
       <div class="next-card-lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-1px;margin-right:4px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>คาบปัจจุบัน — กำลังสอนอยู่</div>
       <div class="next-card-body">
@@ -385,7 +385,7 @@ function buildContent(overrideDate){
   } else if(next){
     const mins=minsUntil(next.s);
     const lbl=mins<=60?`อีก ${mins} นาที`:`${pad(next.s[0])}:${pad(next.s[1])} น.`;
-    const cls=CK.CLASSES.find(c=>c.id===next.classId);
+    const cls=_sections.find(c=>c.id===next.classId)||CK.CLASSES?.find(c=>c.id===next.classId);
     html+=`<div class="next-card" style="margin-bottom:14px">
       <div class="next-card-lbl">คาบถัดไป (${lbl})</div>
       <div class="next-card-body">
@@ -434,8 +434,8 @@ function buildContent(overrideDate){
     html+=periods.map(p=>{
       const isNow=current&&current.periodId===p.periodId;
       const done=checkedIds.includes(p.periodId);
-      const _cls=CK.CLASSES.find(c=>c.id===p.classId);
-      const _lc=CK.LEVEL_COLORS[_cls?.level||'junior'];
+      const _cls=_sections.find(c=>c.id===p.classId)||CK.CLASSES?.find(c=>c.id===p.classId);
+      const _lc=CK.LEVEL_COLORS[_cls?.level||gradeLevel(_cls?.grade||'')||'junior'];
       return `<div class="tt-row${isNow?' now':''}" onclick="go('attendance.html?period=${p.periodId}')">
         <div class="tt-time">${pad(p.s[0])}:${pad(p.s[1])}\n${pad(p.e[0])}:${pad(p.e[1])}</div>
         <div class="tt-dot" style="background:${_lc.icon}"></div>
@@ -452,8 +452,16 @@ function buildContent(overrideDate){
   return html;
 }
 
-function renderForDate(date){
-  const html=buildContent(date);
+async function renderForDate(date){
+  const dow = date.getDay();
+  const dateKey = CK.fmtKey(date);
+  const periods = await CKService.getTodayPeriods(dow);
+  const checkedIds = [];
+  for(const p of periods){
+    const checked = await CKService.isPeriodChecked(p.classId, dateKey);
+    if(checked) checkedIds.push(p.periodId);
+  }
+  const html=buildContent(date, periods, checkedIds);
   document.getElementById('m-content').innerHTML=html;
   document.getElementById('d-content').innerHTML=html;
   const sb=document.getElementById('d-date-sb');
@@ -483,18 +491,14 @@ function render(){
 
 /* unchecked sheet */
 function openUncheckedSheet(){
-  const d=now();const dow=d.getDay();
-  const dateKey=CK.fmtKey(d);
-  const periods=CK.getTodayPeriods(dow);
-  const checkedIds=CK.getCheckedPeriods(dow,dateKey);
-  const unchecked=periods.filter(p=>!checkedIds.includes(p.periodId));
+  const unchecked=(_periods||[]).filter(p=>!(_checkedIds||[]).includes(p.periodId));
   const list=document.getElementById('uc-list');
   if(!unchecked.length){
     list.innerHTML=`<div style="padding:20px;text-align:center;font-size:14px;font-weight:700;color:#15803d;">เช็คชื่อครบทุกคาบแล้ว ✓</div>`;
   } else {
     list.innerHTML=unchecked.map(p=>{
-      const cls=CK.CLASSES.find(c=>c.id===p.classId);
-      const lc=CK.LEVEL_COLORS[cls?.level||'junior'];
+      const cls=_sections.find(c=>c.id===p.classId)||CK.CLASSES?.find(c=>c.id===p.classId);
+      const lc=CK.LEVEL_COLORS[cls?.level||gradeLevel(cls?.grade||'')||'junior'];
       return `<div class="bs-item" onclick="closeUncheckedSheet();go('attendance.html?period=${p.periodId}')">
         <div class="bs-item-dot" style="background:${lc.icon}"></div>
         <div class="bs-item-info">
@@ -537,9 +541,49 @@ function renderCal(){
   document.getElementById('cal-grid').innerHTML=html;
 }
 
-// ── Auth Guard ──
+// ── State (loaded from Supabase) ──
+let _periods = [];    // today's schedule from DB
+let _sections = [];   // all course_sections
+let _checkedIds = []; // checked period ids today
+
+function gradeLevel(grade){
+  if(!grade) return 'junior';
+  if(grade.startsWith('ป.')) return 'primary';
+  const n = parseInt((grade||'').replace('ม.',''));
+  if(n <= 3) return 'junior';
+  return 'senior';
+}
+
+function getLevelColors(level){
+  return CK.LEVEL_COLORS[level] || CK.LEVEL_COLORS['junior'];
+}
+
+// ── Auth Guard + Load Data ──
 (async function(){
   await CKService.requireAuth();
+
+  // โหลดข้อมูลจาก Supabase
+  const dow = now().getDay();
+  const dateKey = CK.fmtKey(now());
+
+  // load schedules + sections
+  await CKService.loadSchedules();
+  _sections = await CKService.loadSections();
+  _periods = await CKService.getTodayPeriods(dow);
+
+  // ตรวจ checked periods จาก attendance_sessions
+  _checkedIds = [];
+  for(const p of _periods){
+    const checked = await CKService.isPeriodChecked(p.classId, dateKey);
+    if(checked) _checkedIds.push(p.periodId);
+  }
+
+  // ถ้าไม่มีข้อมูล → ใช้ mock จาก ck-data.js (backward compat)
+  if(!_periods.length && CK.getTodayPeriods){
+    _periods = CK.getTodayPeriods(dow) || [];
+    _checkedIds = CK.getCheckedPeriods(dow, dateKey) || [];
+  }
+
   render();
 })();
 </script>
