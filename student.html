@@ -202,12 +202,16 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
   </button>
 </nav>
 
+<script src="ck-service.js"></script>
 <script src="ck-data.js"></script>
 <script>
 const params = new URLSearchParams(window.location.search);
-let currentClass = params.get('class')||'m31';
+let currentClass = params.get('class')||null;
 let currentId = parseInt(params.get('id')||'0');
-if(!CK.CLASSES.find(c=>c.id===currentClass)) currentClass='m31';
+
+// Supabase state
+let _students = [];
+let _attendanceByDate = {}; // { dateKey: {studentId: {status,note}} }
 
 const MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
@@ -217,27 +221,56 @@ const STATUS_LABEL={present:'มาเรียน',late:'สาย',absent:'ข
 function go(url){ window.location.href=url; }
 
 function prevStudent(){
-  const students=CK.getStudents(currentClass);
   currentId=Math.max(0,currentId-1);
   render();
 }
 function nextStudent(){
-  const students=CK.getStudents(currentClass);
-  currentId=Math.min(students.length-1,currentId+1);
+  currentId=Math.min(_students.length-1,currentId+1);
   render();
 }
 
-function render(){
-  const students=CK.getStudents(currentClass);
-  const s=students[currentId];
-  if(!s){ document.getElementById('content').innerHTML='<p>ไม่พบข้อมูลนักเรียน</p>'; return; }
+function calcAttendStats(studentId){
+  const MAX = CK.MAX_ABSENT || 8;
+  let present=0, late=0, absent=0, leave=0;
+  Object.values(_attendanceByDate).forEach(dayRec=>{
+    const r = dayRec[studentId];
+    if(!r) return;
+    if(r.status==='present') present++;
+    else if(r.status==='late') late++;
+    else if(r.status==='absent') absent++;
+    else if(r.status==='leave') leave++;
+  });
+  const miss = absent + leave;
+  const total = present + late + absent + leave;
+  const remaining = Math.max(0, MAX - miss);
+  const riskLevel = miss >= MAX ? 'danger' : miss >= MAX * 0.75 ? 'warning' : 'ok';
+  return { present, late, absent, leave, miss, total, remaining, riskLevel };
+}
 
-  const cls=CK.CLASSES.find(c=>c.id===currentClass);
-  const stats=CK.getStudentAttendStats(s);
-  const gradeData=CK.calcGrade(currentClass,s.id);
-  const scores=CK.getStudentScores(currentClass,s.id);
-  const assignments=CK.getAssignments(currentClass);
-  const recent=CK.getRecentAttendance(s,60);
+function getRecentDots(studentId, days=60){
+  const result = [];
+  const today = new Date();
+  for(let i=0; i<days; i++){
+    const d = new Date(today);
+    d.setDate(today.getDate()-i);
+    if(d.getDay()===0||d.getDay()===6) continue;
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const rec = _attendanceByDate[key]?.[studentId];
+    if(rec) result.push({ date: key, status: rec.status });
+  }
+  return result;
+}
+
+function render(){
+  const students = _students;
+  const s = students[currentId];
+  if(!s){ document.getElementById('content').innerHTML='<div style="padding:32px;text-align:center;color:var(--muted);">ไม่พบข้อมูลนักเรียน</div>'; return; }
+
+  const stats = calcAttendStats(s.id);
+  const recent = getRecentDots(s.id, 60);
+  const gradeData = { pct: stats.total>0 ? Math.round(stats.present/stats.total*100) : 0 };
+  const scores = {};
+  const assignments = [];
 
   // nav label
   document.getElementById('nav-label').textContent=`${currentId+1}/${students.length}`;
@@ -312,7 +345,7 @@ function render(){
     <!-- HERO -->
     <div class="student-hero">
       <div class="hero-top">
-        <div class="hero-av" style="background:${s.col.bg};color:${s.col.c}">${s.fn[0]}</div>
+        <div class="hero-av" style="background:${s.col?.bg||'#f0fdf4'};color:${s.col?.c||'#15803d'}">${(s.fn||s.first_name||'?')[0]}</div>
         <div>
           <div class="hero-name">${s.fn} ${s.ln}</div>
           <div class="hero-sub">เลขที่ ${s.no} · ${cls.name}</div>
@@ -397,13 +430,41 @@ function render(){
     </div>`;
 }
 
-function init(){
+async function init(){
   const now=new Date();
   const sbDate=document.getElementById('sb-date');
   if(sbDate) sbDate.textContent=`วัน${DAYS[now.getDay()]}ที่ ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()+543}`;
+
+  // โหลดจาก Supabase
+  if(currentClass){
+    _students = await CKService.getStudents(currentClass);
+    // โหลด attendance ย้อนหลัง 60 วัน
+    const today = new Date();
+    for(let i=0; i<60; i++){
+      const d = new Date(today);
+      d.setDate(today.getDate()-i);
+      if(d.getDay()===0||d.getDay()===6) continue;
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const records = await CKService.getAttendance(currentClass, key);
+      if(records && Object.keys(records).length > 0){
+        _attendanceByDate[key] = records;
+      }
+    }
+  }
+
+  // fallback mock ถ้าไม่มีข้อมูลจาก Supabase
+  if(!_students.length && currentClass){
+    _students = CK.getStudents(currentClass) || [];
+  }
+
   render();
 }
-init();
+
+// Auth Guard + init
+(async function(){
+  await CKService.requireAuth();
+  init();
+})();
 </script>
 </body>
 </html>
