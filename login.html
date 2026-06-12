@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>เข้าสู่ระบบ — ClassKru</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --sh:0 1px 4px rgba(0,0,0,.07);--radius:16px;
+}
+html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
+
+.page{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;}
+
+.logo-wrap{text-align:center;margin-bottom:32px;}
+.logo-wrap img{height:72px;width:auto;margin-bottom:12px;}
+.logo-title{font-size:24px;font-weight:800;color:var(--text);}
+.logo-sub{font-size:14px;color:var(--muted);margin-top:4px;}
+
+.card{background:var(--card);border-radius:20px;padding:28px 24px;width:100%;max-width:400px;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid var(--border);}
+
+.tab-row{display:flex;gap:6px;margin-bottom:24px;background:#f1f5f9;padding:4px;border-radius:12px;}
+.tab-btn{flex:1;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;padding:8px;border:none;border-radius:9px;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);}
+.tab-btn.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+
+.form-group{margin-bottom:16px;}
+.form-label{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;display:block;}
+.form-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:500;color:var(--text);background:#fff;outline:none;transition:border-color .15s;}
+.form-input:focus{border-color:var(--primary);}
+.form-input::placeholder{color:#94a3b8;}
+
+.btn-primary{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:14px;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:all .15s;margin-top:8px;}
+.btn-primary:hover{background:var(--pk);}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;}
+
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:12px;font-weight:600;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.msg{font-size:13px;font-weight:600;padding:10px 14px;border-radius:10px;margin-top:12px;display:none;}
+.msg.error{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;}
+.msg.success{background:#f0fdf4;color:#15803d;border:1px solid #86efac;}
+
+.forgot-link{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
+.forgot-link a{color:var(--primary);font-weight:700;text-decoration:none;}
+
+.loading{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-4px;margin-right:8px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Reset password panel */
+.reset-panel{display:none;}
+.reset-panel.show{display:block;}
+.back-link{font-size:13px;color:var(--primary);font-weight:700;cursor:pointer;margin-bottom:20px;display:inline-flex;align-items:center;gap:4px;}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="logo-wrap">
+    <img src="classkru-logo.png" alt="ClassKru" onerror="this.style.display='none'">
+    <div class="logo-title">ClassKru</div>
+    <div class="logo-sub">ระบบเช็คชื่อสำหรับครูไทย</div>
+  </div>
+
+  <!-- Main auth card -->
+  <div class="card" id="auth-card">
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">เข้าสู่ระบบ</button>
+      <button class="tab-btn" id="tab-register" onclick="switchTab('register')">สมัครสมาชิก</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <div class="form-group">
+        <label class="form-label">อีเมล</label>
+        <input type="email" class="form-input" id="login-email" placeholder="teacher@gmail.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">รหัสผ่าน</label>
+        <input type="password" class="form-input" id="login-password" placeholder="รหัสผ่าน" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" id="btn-login" onclick="doLogin()">เข้าสู่ระบบ</button>
+      <div class="msg" id="msg-login"></div>
+      <div class="forgot-link"><a onclick="showReset()">ลืมรหัสผ่าน?</a></div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="form-register" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">ชื่อครู</label>
+        <input type="text" class="form-input" id="reg-name" placeholder="ชื่อ-นามสกุล" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">อีเมล</label>
+        <input type="email" class="form-input" id="reg-email" placeholder="teacher@gmail.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">รหัสผ่าน (อย่างน้อย 6 ตัว)</label>
+        <input type="password" class="form-input" id="reg-password" placeholder="รหัสผ่าน" autocomplete="new-password">
+      </div>
+      <button class="btn-primary" id="btn-register" onclick="doRegister()">สมัครสมาชิก</button>
+      <div class="msg" id="msg-register"></div>
+    </div>
+
+    <!-- RESET PASSWORD PANEL -->
+    <div class="reset-panel" id="reset-panel">
+      <div class="back-link" onclick="hideReset()">← กลับ</div>
+      <div class="form-group">
+        <label class="form-label">อีเมลที่ใช้สมัคร</label>
+        <input type="email" class="form-input" id="reset-email" placeholder="teacher@gmail.com">
+      </div>
+      <button class="btn-primary" id="btn-reset" onclick="doReset()">ส่งลิงก์รีเซ็ตรหัสผ่าน</button>
+      <div class="msg" id="msg-reset"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG — เปลี่ยนค่าเหล่านี้หลัง run schema ──
+const SUPABASE_URL  = 'https://pxjomsfyczfdbmjhaffq.supabase.co';
+const SUPABASE_KEY  = 'sb_publishable_Pjn4kk9obTsNjnavnOBm3Q_d_vlf3z2';
+const REDIRECT_URL  = location.origin + location.pathname.replace('login.html','index.html');
+
+let sb = null;
+
+// โหลด supabase-js
+(function(){
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  s.onload = () => {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    checkSession();
+  };
+  s.onerror = () => showMsg('msg-login','โหลด Supabase ไม่ได้ — ตรวจสอบการเชื่อมต่อ','error');
+  document.head.appendChild(s);
+})();
+
+// ── Check existing session ──
+async function checkSession(){
+  if(!sb) return;
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session) redirectToApp();
+}
+
+async function redirectToApp(){
+  // ถ้ายังไม่มี course_sections → ไป setup ก่อน
+  try {
+    const { data } = await sb
+      .from('course_sections')
+      .select('id')
+      .limit(1);
+    location.href = (data && data.length > 0) ? 'index.html' : 'setup.html';
+  } catch(e) {
+    location.href = 'index.html';
+  }
+}
+
+// ── Tab switch ──
+function switchTab(tab){
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+  document.getElementById('form-login').style.display = tab==='login'?'':'none';
+  document.getElementById('form-register').style.display = tab==='register'?'':'none';
+  document.getElementById('reset-panel').classList.remove('show');
+  clearMsgs();
+}
+
+// ── Login ──
+async function doLogin(){
+  if(!sb){showMsg('msg-login','ยังโหลดไม่เสร็จ กรุณารอ','error');return;}
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-password').value;
+  if(!email||!pass){showMsg('msg-login','กรุณากรอกอีเมลและรหัสผ่าน','error');return;}
+
+  setLoading('btn-login',true);
+  const {error} = await sb.auth.signInWithPassword({email, password:pass});
+  setLoading('btn-login',false);
+
+  if(error){
+    const msg = error.message.includes('Invalid') ? 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' : error.message;
+    showMsg('msg-login', msg, 'error');
+  } else {
+    redirectToApp();
+  }
+}
+
+// ── Register ──
+async function doRegister(){
+  if(!sb){showMsg('msg-register','ยังโหลดไม่เสร็จ กรุณารอ','error');return;}
+  const name  = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass  = document.getElementById('reg-password').value;
+
+  if(!name||!email||!pass){showMsg('msg-register','กรุณากรอกข้อมูลให้ครบ','error');return;}
+  if(pass.length<6){showMsg('msg-register','รหัสผ่านต้องมีอย่างน้อย 6 ตัว','error');return;}
+
+  setLoading('btn-register',true);
+  const {error} = await sb.auth.signUp({
+    email, password: pass,
+    options: { data: { display_name: name } }
+  });
+  setLoading('btn-register',false);
+
+  if(error){
+    showMsg('msg-register', error.message, 'error');
+  } else {
+    showMsg('msg-register','สมัครสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยัน','success');
+  }
+}
+
+// ── Reset password ──
+function showReset(){
+  document.getElementById('form-login').style.display='none';
+  document.getElementById('reset-panel').classList.add('show');
+}
+function hideReset(){
+  document.getElementById('reset-panel').classList.remove('show');
+  document.getElementById('form-login').style.display='';
+}
+async function doReset(){
+  if(!sb) return;
+  const email = document.getElementById('reset-email').value.trim();
+  if(!email){showMsg('msg-reset','กรุณากรอกอีเมล','error');return;}
+
+  setLoading('btn-reset',true);
+  const {error} = await sb.auth.resetPasswordForEmail(email, {redirectTo: REDIRECT_URL});
+  setLoading('btn-reset',false);
+
+  if(error){showMsg('msg-reset',error.message,'error');}
+  else{showMsg('msg-reset','ส่งลิงก์รีเซ็ตไปที่อีเมลแล้ว','success');}
+}
+
+// ── Enter key ──
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Enter') return;
+  const active=document.querySelector('.tab-btn.active')?.id;
+  if(active==='tab-login') doLogin();
+  else if(active==='tab-register') doRegister();
+});
+
+// ── Utils ──
+function showMsg(id, text, type){
+  const el=document.getElementById(id);
+  el.textContent=text; el.className='msg '+type; el.style.display='block';
+}
+function clearMsgs(){
+  document.querySelectorAll('.msg').forEach(el=>{el.style.display='none';});
+}
+function setLoading(btnId, loading){
+  const btn=document.getElementById(btnId);
+  if(loading){
+    btn.disabled=true;
+    btn.innerHTML=`<span class="loading"></span>กำลังดำเนินการ...`;
+  } else {
+    btn.disabled=false;
+    const labels={
+      'btn-login':'เข้าสู่ระบบ',
+      'btn-register':'สมัครสมาชิก',
+      'btn-reset':'ส่งลิงก์รีเซ็ตรหัสผ่าน'
+    };
+    btn.textContent = labels[btnId]||'ดำเนินการ';
+  }
+}
+</script>
+</body>
+</html>

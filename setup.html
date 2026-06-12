@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ตั้งค่าครั้งแรก — ClassKru</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --sh:0 1px 4px rgba(0,0,0,.07);--sh-md:0 4px 20px rgba(0,0,0,.10);
+}
+html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
+
+/* ── Layout ── */
+.page{display:flex;flex-direction:column;align-items:center;padding:40px 16px 80px;min-height:100dvh;}
+.header{text-align:center;margin-bottom:40px;}
+.header img{height:52px;margin-bottom:10px;}
+.header h1{font-size:22px;font-weight:800;}
+.header p{font-size:14px;color:var(--muted);margin-top:4px;}
+
+/* ── Card ── */
+.card{background:#fff;border-radius:20px;border:1px solid var(--border);box-shadow:var(--sh-md);width:100%;max-width:620px;}
+.card-head{padding:28px 32px 0;}
+.card-body{padding:24px 32px 32px;}
+.card-title{font-size:19px;font-weight:800;margin-bottom:4px;}
+.card-sub{font-size:13px;color:var(--muted);}
+
+/* ── Step indicator ── */
+.step-bar{display:flex;align-items:center;width:100%;max-width:620px;margin-bottom:28px;}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;}
+.step-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;border:2px solid var(--border);background:#fff;color:var(--muted);transition:all .2s;}
+.step-dot.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.step-dot.done{background:#dcfce7;border-color:#86efac;color:var(--primary);}
+.step-lbl{font-size:11px;font-weight:700;color:var(--muted);text-align:center;}
+.step-lbl.active{color:var(--primary);}
+.step-line{flex:1;height:2px;background:var(--border);margin-bottom:18px;transition:background .2s;}
+.step-line.done{background:var(--primary);}
+
+/* ── Form ── */
+.form-group{margin-bottom:16px;}
+.form-label{font-size:13px;font-weight:700;display:block;margin-bottom:5px;}
+.form-label span{color:var(--muted);font-weight:500;}
+.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:500;color:var(--text);background:#fff;outline:none;transition:border-color .15s;}
+.form-input:focus{border-color:var(--primary);}
+.form-input::placeholder{color:#94a3b8;}
+
+/* ── Buttons ── */
+.btn{font-family:'Sarabun',sans-serif;font-weight:700;border:none;cursor:pointer;border-radius:12px;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--primary);color:#fff;font-size:15px;padding:12px 24px;}
+.btn-primary:hover{background:var(--pk);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-ghost{background:transparent;color:var(--muted);font-size:14px;padding:12px 20px;border:1.5px solid var(--border);}
+.btn-ghost:hover{border-color:#94a3b8;color:var(--text);}
+.btn-outline{background:transparent;color:var(--primary);font-size:14px;padding:10px 18px;border:1.5px solid var(--primary);}
+.btn-outline:hover{background:var(--pbg);}
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px;}
+
+/* ── Drop zone ── */
+.drop-zone{border:2px dashed var(--border);border-radius:16px;padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbfc;}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--primary);background:var(--pbg);}
+.drop-zone-icon{font-size:44px;margin-bottom:14px;line-height:1;}
+.drop-zone-title{font-size:16px;font-weight:800;margin-bottom:6px;}
+.drop-zone-sub{font-size:13px;color:var(--muted);line-height:1.6;}
+.drop-zone-badge{display:inline-flex;gap:6px;margin-top:12px;}
+.badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#f1f5f9;color:var(--muted);}
+
+/* ── Mode tabs ── */
+.mode-tabs{display:flex;gap:8px;margin-bottom:24px;background:#f1f5f9;padding:4px;border-radius:14px;}
+.mode-tab{flex:1;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;padding:9px 6px;border:none;border-radius:11px;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);text-align:center;}
+.mode-tab.active{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.10);}
+
+/* ── Column mapping ── */
+.col-map-grid{display:grid;grid-template-columns:1fr 20px 1fr;align-items:center;gap:8px;margin-bottom:10px;}
+.col-map-label{font-size:13px;font-weight:600;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.col-map-arrow{text-align:center;color:var(--muted);font-size:14px;}
+.col-map-select{width:100%;}
+.map-section-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px;}
+
+/* ── Preview table ── */
+.preview-wrap{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:16px 0;}
+.preview-head{background:#f8fafc;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--muted);}
+.preview-table{width:100%;border-collapse:collapse;font-size:12px;}
+.preview-table th{background:#f8fafc;padding:8px 12px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}
+.preview-table td{padding:7px 12px;border-bottom:1px solid #f1f5f9;color:var(--text);}
+.preview-table tr:last-child td{border-bottom:none;}
+
+/* ── Summary cards ── */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;}
+.summary-card{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.summary-num{font-size:28px;font-weight:800;color:var(--primary);}
+.summary-lbl{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* ── Confirm list ── */
+.confirm-list{display:flex;flex-direction:column;gap:6px;margin:16px 0;}
+.confirm-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f8fafc;border-radius:10px;border:1px solid var(--border);}
+.confirm-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.confirm-name{font-size:13px;font-weight:700;flex:1;}
+.confirm-meta{font-size:11px;color:var(--muted);}
+
+/* ── Progress ── */
+.progress-wrap{margin:20px 0;}
+.progress-bar-bg{background:#e2e8f0;border-radius:99px;height:8px;overflow:hidden;}
+.progress-bar{background:var(--primary);height:100%;border-radius:99px;transition:width .3s ease;}
+.progress-label{font-size:12px;color:var(--muted);margin-top:6px;text-align:center;}
+
+/* ── Alert ── */
+.alert{padding:12px 16px;border-radius:12px;font-size:13px;font-weight:600;margin:12px 0;display:flex;align-items:flex-start;gap:10px;}
+.alert-icon{flex-shrink:0;font-size:16px;margin-top:1px;}
+.alert-error{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;}
+.alert-success{background:#f0fdf4;color:#15803d;border:1px solid #86efac;}
+.alert-info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
+.alert-warn{background:#fffbeb;color:#92400e;border:1px solid #fde68a;}
+
+/* ── Template download box ── */
+.template-box{background:linear-gradient(135deg,#f0fdf4 0%,#e8f5f0 100%);border:1.5px solid var(--pbd);border-radius:14px;padding:20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .15s;}
+.template-box:hover{border-color:var(--primary);box-shadow:0 2px 8px rgba(29,158,117,.15);}
+.template-box-icon{font-size:32px;flex-shrink:0;}
+.template-box-text{flex:1;}
+.template-box-title{font-size:14px;font-weight:800;color:var(--pk);}
+.template-box-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.template-box-btn{font-size:12px;font-weight:700;color:var(--primary);white-space:nowrap;}
+
+/* ── Skip ── */
+.skip-link{text-align:center;margin-top:18px;font-size:13px;color:var(--muted);}
+.skip-link a{color:var(--primary);font-weight:700;text-decoration:none;cursor:pointer;}
+
+/* ── Loading ── */
+.spinner{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-3px;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Done ── */
+.done-wrap{text-align:center;padding:24px 0 8px;}
+.done-icon{font-size:72px;margin-bottom:16px;}
+.done-title{font-size:22px;font-weight:800;margin-bottom:8px;}
+.done-sub{font-size:14px;color:var(--muted);margin-bottom:32px;line-height:1.7;}
+
+/* ── Responsive ── */
+@media(max-width:480px){
+  .card-head,.card-body{padding:20px 20px;}
+  .card-body{padding:16px 20px 24px;}
+  .summary-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="header">
+    <img src="classkru-logo.png" alt="ClassKru" onerror="this.style.display='none'">
+    <h1>ตั้งค่าบัญชีครู</h1>
+    <p>ทำแค่ครั้งเดียว ใช้ได้ตลอด</p>
+  </div>
+
+  <!-- Step bar -->
+  <div class="step-bar" id="step-bar">
+    <div class="step-item">
+      <div class="step-dot active" id="sd-1">1</div>
+      <div class="step-lbl active" id="sl-1">ข้อมูลครู</div>
+    </div>
+    <div class="step-line" id="sline-1"></div>
+    <div class="step-item">
+      <div class="step-dot" id="sd-2">2</div>
+      <div class="step-lbl" id="sl-2">นำเข้าข้อมูล</div>
+    </div>
+    <div class="step-line" id="sline-2"></div>
+    <div class="step-item">
+      <div class="step-dot" id="sd-3">3</div>
+      <div class="step-lbl" id="sl-3">ยืนยัน</div>
+    </div>
+  </div>
+
+  <!-- ── STEP 1: ข้อมูลครู ── -->
+  <div class="card" id="step-1">
+    <div class="card-head">
+      <div class="card-title">ข้อมูลของคุณ</div>
+      <div class="card-sub">ใช้แสดงในระบบ</div>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-label">ชื่อ-นามสกุลครู</label>
+        <input type="text" class="form-input" id="s1-name" placeholder="ครูสมชาย ใจดี">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ชื่อโรงเรียน <span>(ไม่บังคับ)</span></label>
+        <input type="text" class="form-input" id="s1-school" placeholder="โรงเรียนสาธิตมหาวิทยาลัย...">
+      </div>
+      <div id="msg-s1"></div>
+      <div class="btn-row" style="justify-content:flex-end;">
+        <button class="btn btn-primary" id="btn-s1" onclick="saveStep1()">ถัดไป →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: Import ── -->
+  <div class="card" id="step-2" style="display:none;">
+    <div class="card-head">
+      <div class="card-title">นำเข้าข้อมูลห้องเรียน</div>
+      <div class="card-sub">อัพโหลดไฟล์ Excel/CSV หรือรูปภาพรายชื่อนักเรียน</div>
+    </div>
+    <div class="card-body">
+
+      <!-- Mode tabs -->
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="tab-excel" onclick="switchMode('excel')">📊 Excel / CSV</button>
+        <button class="mode-tab" id="tab-image" onclick="switchMode('image')">📷 รูปภาพ / PDF</button>
+        <button class="mode-tab" id="tab-template" onclick="switchMode('template')">📋 Template</button>
+      </div>
+
+      <!-- MODE: Excel/CSV -->
+      <div id="mode-excel">
+        <input type="file" id="file-excel" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleExcelFile(event)">
+        <div class="drop-zone" id="dz-excel"
+          onclick="document.getElementById('file-excel').click()"
+          ondragover="dzOver(event,'dz-excel')" ondragleave="dzLeave('dz-excel')" ondrop="dzDrop(event,'excel')">
+          <div class="drop-zone-icon">📊</div>
+          <div class="drop-zone-title">วางหรือคลิกเพื่อเลือกไฟล์</div>
+          <div class="drop-zone-sub">รองรับ Excel (.xlsx) และ CSV<br>ไม่ต้องใช้ format เฉพาะ — ระบบจะช่วย map ให้</div>
+          <div class="drop-zone-badge">
+            <span class="badge">.xlsx</span>
+            <span class="badge">.csv</span>
+          </div>
+        </div>
+        <div id="excel-status"></div>
+      </div>
+
+      <!-- MODE: Image/PDF -->
+      <div id="mode-image" style="display:none;">
+        <input type="file" id="file-image" accept="image/*,.pdf" style="display:none;" onchange="handleImageFile(event)">
+        <div class="drop-zone" id="dz-image"
+          onclick="document.getElementById('file-image').click()"
+          ondragover="dzOver(event,'dz-image')" ondragleave="dzLeave('dz-image')" ondrop="dzDrop(event,'image')">
+          <div class="drop-zone-icon">📷</div>
+          <div class="drop-zone-title">วางหรือคลิกเพื่อเลือกรูปภาพ</div>
+          <div class="drop-zone-sub">รูปถ่ายกระดาษรายชื่อนักเรียน<br>ระบบจะอ่านข้อมูลจากรูปให้อัตโนมัติ</div>
+          <div class="drop-zone-badge">
+            <span class="badge">JPG</span><span class="badge">PNG</span><span class="badge">PDF</span>
+          </div>
+        </div>
+        <div id="image-status"></div>
+        <!-- Image preview + confirm form -->
+        <div id="image-form" style="display:none;">
+          <div class="alert alert-info" style="margin-top:16px;">
+            <div class="alert-icon">ℹ️</div>
+            <div>ระบบอ่านข้อมูลจากรูปแล้ว — ตรวจสอบและกรอกข้อมูลที่ขาดด้านล่าง</div>
+          </div>
+          <div class="form-group" style="margin-top:14px;">
+            <label class="form-label">วิชาที่สอน</label>
+            <input type="text" class="form-input" id="img-subject" placeholder="สุขศึกษา">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label class="form-label">ระดับชั้น</label>
+              <input type="text" class="form-input" id="img-grade" placeholder="ป.1 หรือ ม.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ห้อง</label>
+              <input type="text" class="form-input" id="img-room" placeholder="1">
+            </div>
+          </div>
+          <div id="img-student-preview"></div>
+        </div>
+      </div>
+
+      <!-- MODE: Template -->
+      <div id="mode-template" style="display:none;">
+        <div class="template-box" onclick="downloadTemplate()">
+          <div class="template-box-icon">📥</div>
+          <div class="template-box-text">
+            <div class="template-box-title">โหลด ClassKru Template</div>
+            <div class="template-box-sub">Excel 2 sheets: ตารางสอน + รายชื่อนักเรียน พร้อมตัวอย่าง</div>
+          </div>
+          <div class="template-box-btn">ดาวน์โหลด ↓</div>
+        </div>
+        <div class="alert alert-info" style="margin-top:16px;">
+          <div class="alert-icon">💡</div>
+          <div>กรอกข้อมูลใน template แล้วกลับมาอัพโหลดที่แท็บ "Excel / CSV"</div>
+        </div>
+        <div style="margin-top:20px;">
+          <div class="card-title" style="font-size:15px;margin-bottom:12px;">รูปแบบ Template</div>
+          <div style="background:#f8fafc;border-radius:12px;overflow:hidden;border:1px solid var(--border);">
+            <div style="padding:10px 14px;background:#1d9e75;color:#fff;font-size:12px;font-weight:800;">Sheet 1 — ตารางสอน</div>
+            <div style="overflow-x:auto;">
+              <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead><tr style="background:#f1f5f9;">
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">วิชา</th>
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">ระดับชั้น</th>
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">ห้อง</th>
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">วัน</th>
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">เวลาเริ่ม</th>
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">เวลาสิ้นสุด</th>
+                </tr></thead>
+                <tbody>
+                  <tr><td style="padding:7px 12px;color:#475569;">สุขศึกษา</td><td style="padding:7px 12px;color:#475569;">ม.1</td><td style="padding:7px 12px;color:#475569;">1</td><td style="padding:7px 12px;color:#475569;">จันทร์</td><td style="padding:7px 12px;color:#475569;">08:30</td><td style="padding:7px 12px;color:#475569;">09:30</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="padding:10px 14px;background:#1d9e75;color:#fff;font-size:12px;font-weight:800;border-top:1px solid #0f6e56;">Sheet 2 — รายชื่อนักเรียน</div>
+            <div style="overflow-x:auto;">
+              <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead><tr style="background:#f1f5f9;">
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">วิชา</th>
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">ระดับชั้น</th>
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">ห้อง</th>
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">เลขที่</th>
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">ชื่อ</th>
+                  <th style="padding:7px 12px;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);">นามสกุล</th>
+                </tr></thead>
+                <tbody>
+                  <tr><td style="padding:7px 12px;color:#475569;">สุขศึกษา</td><td style="padding:7px 12px;color:#475569;">ม.1</td><td style="padding:7px 12px;color:#475569;">1</td><td style="padding:7px 12px;color:#475569;">1</td><td style="padding:7px 12px;color:#475569;">สมชาย</td><td style="padding:7px 12px;color:#475569;">ใจดี</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="msg-s2"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(1)">← ย้อนกลับ</button>
+        <button class="btn btn-primary" id="btn-s2" onclick="goToMapping()" style="display:none;">วิเคราะห์ข้อมูล →</button>
+      </div>
+      <div class="skip-link"><a onclick="skipImport()">ข้ามก่อน ตั้งค่าทีหลัง</a></div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2b: Column Mapping ── -->
+  <div class="card" id="step-2b" style="display:none;">
+    <div class="card-head">
+      <div class="card-title">ระบุความหมายคอลัมน์</div>
+      <div class="card-sub" id="mapping-sub">ระบบพบ X คอลัมน์ — บอกว่าแต่ละอันคืออะไร</div>
+    </div>
+    <div class="card-body">
+      <div id="mapping-ui"></div>
+      <div id="msg-map"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(2)">← แก้ไขไฟล์</button>
+        <button class="btn btn-primary" onclick="applyMapping()">วิเคราะห์ข้อมูล →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: Preview & Confirm ── -->
+  <div class="card" id="step-3" style="display:none;">
+    <div class="card-head">
+      <div class="card-title">ตรวจสอบข้อมูล</div>
+      <div class="card-sub">ยืนยันก่อนนำเข้าระบบ</div>
+    </div>
+    <div class="card-body">
+      <!-- Summary -->
+      <div class="summary-grid" id="preview-summary"></div>
+      <!-- Sections list -->
+      <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 10px;">วิชาที่พบ</div>
+      <div class="confirm-list" id="preview-sections"></div>
+      <!-- Students sample -->
+      <div id="preview-students-wrap" style="display:none;">
+        <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 10px;">ตัวอย่างรายชื่อ (5 คนแรก)</div>
+        <div class="preview-wrap">
+          <table class="preview-table" id="preview-students-table"></table>
+        </div>
+      </div>
+      <div id="msg-s3"></div>
+      <!-- Import progress -->
+      <div id="import-progress" style="display:none;">
+        <div class="progress-wrap">
+          <div class="progress-bar-bg"><div class="progress-bar" id="prog-bar" style="width:0%"></div></div>
+          <div class="progress-label" id="prog-label">กำลังนำเข้า...</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(2)">← แก้ไข</button>
+        <button class="btn btn-primary" id="btn-s3" onclick="doImport()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          นำเข้าระบบ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Done ── -->
+  <div class="card" id="step-done" style="display:none;">
+    <div class="card-body">
+      <div class="done-wrap">
+        <div class="done-icon">🎉</div>
+        <div class="done-title">ตั้งค่าเสร็จแล้ว!</div>
+        <div class="done-sub" id="done-summary">นำเข้าข้อมูลสำเร็จ<br>พร้อมใช้ ClassKru แล้ว</div>
+        <button class="btn btn-primary" style="width:100%;font-size:16px;padding:14px;" onclick="location.href='index.html'">
+          เข้าสู่ระบบ →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SheetJS for Excel parsing -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="ck-service.js"></script>
+<script>
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let currentStep = 1;
+let currentMode = 'excel';
+let _user = null;
+let _rawRows = [];          // parsed rows from file
+let _rawHeaders = [];       // column headers
+let _colMap = {};           // { fieldKey: colIndex }
+let _parsedData = {         // final data to import
+  schedules: [],            // [{subject,grade,room,day,start,end}]
+  students: [],             // [{subject,grade,room,no,first,last,studentId}]
+};
+let _imageStudents = [];    // students parsed from image
+
+const FIELD_OPTS_SCHEDULE = [
+  {val:'subject',   label:'วิชา'},
+  {val:'grade',     label:'ระดับชั้น'},
+  {val:'room',      label:'ห้อง'},
+  {val:'day',       label:'วัน'},
+  {val:'start',     label:'เวลาเริ่ม'},
+  {val:'end',       label:'เวลาสิ้นสุด'},
+  {val:'year',      label:'ปีการศึกษา'},
+  {val:'semester',  label:'ภาคเรียน'},
+  {val:'ignore',    label:'— ไม่ใช้ —'},
+];
+const FIELD_OPTS_STUDENT = [
+  {val:'subject',   label:'วิชา'},
+  {val:'grade',     label:'ระดับชั้น'},
+  {val:'room',      label:'ห้อง'},
+  {val:'no',        label:'เลขที่'},
+  {val:'first',     label:'ชื่อ'},
+  {val:'last',      label:'นามสกุล'},
+  {val:'fullname',  label:'ชื่อ-นามสกุล (รวม)'},
+  {val:'studentId', label:'รหัสนักเรียน'},
+  {val:'nickname',  label:'ชื่อเล่น'},
+  {val:'religion',  label:'ศาสนา'},
+  {val:'ignore',    label:'— ไม่ใช้ —'},
+];
+
+// Keywords สำหรับ auto-detect
+const COL_HINTS = {
+  subject:   ['วิชา','รายวิชา','subject','course'],
+  grade:     ['ชั้น','ระดับ','ปีที่','grade','class','level','ป.','ม.'],
+  room:      ['ห้อง','room','section','กลุ่ม'],
+  day:       ['วัน','day','weekday'],
+  start:     ['เริ่ม','เวลาเริ่ม','start','begin','คาบเริ่ม'],
+  end:       ['สิ้นสุด','จบ','end','finish','คาบสิ้นสุด'],
+  no:        ['เลขที่','ที่','no','number','ลำดับ'],
+  first:     ['ชื่อ','name','firstname','first'],
+  last:      ['นามสกุล','สกุล','lastname','last','surname'],
+  fullname:  ['ชื่อ-นามสกุล','ชื่อนามสกุล','fullname','ชื่อ - นามสกุล'],
+  studentId: ['รหัส','id','student_id','เลขประจำตัว'],
+  year:      ['ปีการศึกษา','year','ปี'],
+  semester:  ['ภาค','ภาคเรียน','semester','term'],
+};
+
+// ════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════
+(async function(){
+  _user = await CKService.requireAuth();
+  if(!_user) return;
+  const meta = _user.user_metadata || {};
+  if(meta.display_name) document.getElementById('s1-name').value = meta.display_name;
+  const existing = await CKService.loadSections();
+  if(existing && existing.length > 0) location.href = 'index.html';
+})();
+
+// ════════════════════════════════════════
+// STEP NAVIGATION
+// ════════════════════════════════════════
+function goStep(n){
+  ['step-1','step-2','step-2b','step-3','step-done'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
+  const ids = {1:'step-1',2:'step-2','2b':'step-2b',3:'step-3','done':'step-done'};
+  const el = document.getElementById(ids[n] || 'step-'+n);
+  if(el) el.style.display = '';
+  currentStep = typeof n === 'number' ? n : (n==='done'?4:3);
+  updateStepBar();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateStepBar(){
+  const step = currentStep;
+  for(let i=1;i<=3;i++){
+    const dot = document.getElementById('sd-'+i);
+    const lbl = document.getElementById('sl-'+i);
+    const line = document.getElementById('sline-'+i);
+    if(i < step){
+      dot.className = 'step-dot done';
+      dot.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+      lbl.className = 'step-lbl';
+      if(line) line.className = 'step-line done';
+    } else if(i === step){
+      dot.className = 'step-dot active';
+      dot.textContent = i;
+      lbl.className = 'step-lbl active';
+      if(line) line.className = 'step-line';
+    } else {
+      dot.className = 'step-dot';
+      dot.textContent = i;
+      lbl.className = 'step-lbl';
+      if(line) line.className = 'step-line';
+    }
+  }
+}
+
+// ════════════════════════════════════════
+// STEP 1 — ข้อมูลครู
+// ════════════════════════════════════════
+async function saveStep1(){
+  const name   = document.getElementById('s1-name').value.trim();
+  const school = document.getElementById('s1-school').value.trim();
+  if(!name){ showAlert('msg-s1','กรุณากรอกชื่อครู','error'); return; }
+  setLoading('btn-s1', true, 'กำลังบันทึก...');
+  const ok = await CKService.updateUserProfile({ display_name: name, school_name: school });
+  setLoading('btn-s1', false, 'ถัดไป →');
+  if(!ok){ showAlert('msg-s1','บันทึกไม่ได้ กรุณาลองใหม่','error'); return; }
+  goStep(2);
+}
+
+// ════════════════════════════════════════
+// STEP 2 — Mode tabs
+// ════════════════════════════════════════
+function switchMode(mode){
+  currentMode = mode;
+  ['excel','image','template'].forEach(m=>{
+    document.getElementById('tab-'+m).classList.toggle('active', m===mode);
+    document.getElementById('mode-'+m).style.display = m===mode ? '' : 'none';
+  });
+  document.getElementById('btn-s2').style.display = 'none';
+}
+
+// ════════════════════════════════════════
+// DROP ZONE
+// ════════════════════════════════════════
+function dzOver(e, id){ e.preventDefault(); document.getElementById(id).classList.add('drag'); }
+function dzLeave(id){ document.getElementById(id).classList.remove('drag'); }
+function dzDrop(e, type){
+  e.preventDefault();
+  const dzId = type==='excel' ? 'dz-excel' : 'dz-image';
+  document.getElementById(dzId).classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if(!file) return;
+  if(type==='excel') processExcelFile(file);
+  else processImageFile(file);
+}
+
+// ════════════════════════════════════════
+// EXCEL/CSV PARSING
+// ════════════════════════════════════════
+function handleExcelFile(e){ const f = e.target.files[0]; if(f) processExcelFile(f); }
+
+function processExcelFile(file){
+  const status = document.getElementById('excel-status');
+  status.innerHTML = `<div class="alert alert-info" style="margin-top:16px;"><div class="alert-icon">⏳</div><div>กำลังอ่านไฟล์ <strong>${file.name}</strong>...</div></div>`;
+
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try {
+      const data = e.target.result;
+      const wb = XLSX.read(data, {type:'array'});
+      const sheets = wb.SheetNames;
+
+      // ตรวจว่าเป็น ClassKru template (มี sheet ตารางสอน + รายชื่อ)
+      const isTemplate = sheets.some(s=>s.includes('ตารางสอน')) && sheets.some(s=>s.includes('รายชื่อ'));
+
+      if(isTemplate){
+        parseClassKruTemplate(wb);
+      } else {
+        // Parse sheet แรกก่อน
+        const ws = wb.Sheets[sheets[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+        parseGenericSheet(rows, file.name, sheets.length > 1 ? wb : null, sheets);
+      }
+    } catch(err){
+      status.innerHTML = `<div class="alert alert-error" style="margin-top:16px;"><div class="alert-icon">❌</div><div>อ่านไฟล์ไม่ได้: ${err.message}</div></div>`;
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function parseClassKruTemplate(wb){
+  // Parse ตารางสอน sheet
+  const wsSchedule = wb.Sheets[wb.SheetNames.find(s=>s.includes('ตารางสอน'))];
+  const schedRows = XLSX.utils.sheet_to_json(wsSchedule, {header:1, defval:''});
+
+  // หา header row (row ที่มี 'วิชา')
+  let headerRow = -1;
+  for(let i=0;i<schedRows.length;i++){
+    if(schedRows[i].some(c=>String(c).includes('วิชา'))){ headerRow = i; break; }
+  }
+
+  const schedules = [];
+  if(headerRow >= 0){
+    const hdr = schedRows[headerRow].map(c=>String(c).trim());
+    const iSubject = hdr.findIndex(h=>h.includes('วิชา'));
+    const iGrade   = hdr.findIndex(h=>h.includes('ชั้น')||h.includes('ระดับ'));
+    const iRoom    = hdr.findIndex(h=>h.includes('ห้อง'));
+    const iDay     = hdr.findIndex(h=>h.includes('วัน'));
+    const iStart   = hdr.findIndex(h=>h.includes('เริ่ม'));
+    const iEnd     = hdr.findIndex(h=>h.includes('สิ้น')||h.includes('จบ'));
+
+    for(let r=headerRow+1;r<schedRows.length;r++){
+      const row = schedRows[r];
+      const subject = String(row[iSubject]||'').trim();
+      if(!subject) continue;
+      schedules.push({
+        subject, grade: String(row[iGrade]||'').trim(),
+        room: String(row[iRoom]||'').trim(),
+        day: String(row[iDay]||'').trim(),
+        start: String(row[iStart]||'').trim(),
+        end: String(row[iEnd]||'').trim(),
+      });
+    }
+  }
+
+  // Parse รายชื่อนักเรียน sheet
+  const wsStudents = wb.Sheets[wb.SheetNames.find(s=>s.includes('รายชื่อ'))];
+  const stuRows = XLSX.utils.sheet_to_json(wsStudents, {header:1, defval:''});
+  let stuHeader = -1;
+  for(let i=0;i<stuRows.length;i++){
+    if(stuRows[i].some(c=>String(c).includes('เลขที่'))){ stuHeader = i; break; }
+  }
+  const students = [];
+  if(stuHeader >= 0){
+    const hdr = stuRows[stuHeader].map(c=>String(c).trim());
+    const iSubject = hdr.findIndex(h=>h.includes('วิชา'));
+    const iGrade   = hdr.findIndex(h=>h.includes('ชั้น')||h.includes('ระดับ'));
+    const iRoom    = hdr.findIndex(h=>h.includes('ห้อง'));
+    const iNo      = hdr.findIndex(h=>h.includes('เลขที่')||h==='ที่');
+    const iFirst   = hdr.findIndex(h=>h.includes('ชื่อ')&&!h.includes('นามสกุล'));
+    const iLast    = hdr.findIndex(h=>h.includes('นามสกุล')||h.includes('สกุล'));
+    const iId      = hdr.findIndex(h=>h.includes('รหัส'));
+
+    for(let r=stuHeader+1;r<stuRows.length;r++){
+      const row = stuRows[r];
+      const first = String(row[iFirst]||'').trim();
+      if(!first) continue;
+      students.push({
+        subject: String(row[iSubject]||'').trim(),
+        grade: String(row[iGrade]||'').trim(),
+        room: String(row[iRoom]||'').trim(),
+        no: parseInt(row[iNo])||0,
+        first, last: String(row[iLast]||'').trim(),
+        studentId: String(row[iId]||'').trim(),
+      });
+    }
+  }
+
+  _parsedData = { schedules, students };
+  showImportReady(schedules.length + ' คาบสอน + ' + students.length + ' นักเรียน จาก ClassKru Template');
+}
+
+function parseGenericSheet(rows, fileName, wb, allSheets){
+  // กรอง rows ว่าง
+  const nonEmpty = rows.filter(r=>r.some(c=>String(c).trim()));
+  if(!nonEmpty.length){
+    showAlert('excel-status','ไฟล์ว่างเปล่าหรืออ่านไม่ได้','error'); return;
+  }
+
+  // หา header row = row แรกที่มีข้อความอย่างน้อย 2 cell
+  let headerIdx = 0;
+  for(let i=0;i<Math.min(10,nonEmpty.length);i++){
+    const textCells = nonEmpty[i].filter(c=>isNaN(Number(c))&&String(c).trim().length>0);
+    if(textCells.length >= 2){ headerIdx = i; break; }
+  }
+
+  _rawHeaders = nonEmpty[headerIdx].map(c=>String(c).trim());
+  _rawRows = nonEmpty.slice(headerIdx+1).filter(r=>r.some(c=>String(c).trim()));
+
+  // Auto-detect columns
+  _colMap = {};
+  _rawHeaders.forEach((h,i)=>{
+    const hl = h.toLowerCase();
+    for(const [field, hints] of Object.entries(COL_HINTS)){
+      if(hints.some(hint=>hl.includes(hint.toLowerCase()))){
+        if(!_colMap[field]) _colMap[field] = i;
+      }
+    }
+  });
+
+  // ถ้า detect ได้ครบสำหรับ schedule หรือ student → ข้ามการ map
+  const hasScheduleFields = ['subject','grade','room','day','start'].every(f=>_colMap[f]!==undefined);
+  const hasStudentFields  = (['subject','first','last'].every(f=>_colMap[f]!==undefined)) ||
+                            (['first','last'].every(f=>_colMap[f]!==undefined));
+
+  if(hasScheduleFields || hasStudentFields){
+    document.getElementById('excel-status').innerHTML =
+      `<div class="alert alert-success" style="margin-top:16px;"><div class="alert-icon">✅</div><div>พบ <strong>${_rawRows.length}</strong> แถว — ระบบ detect คอลัมน์อัตโนมัติได้แล้ว</div></div>`;
+    document.getElementById('btn-s2').style.display = '';
+  } else {
+    // ต้อง manual map
+    document.getElementById('excel-status').innerHTML =
+      `<div class="alert alert-warn" style="margin-top:16px;"><div class="alert-icon">⚠️</div><div>พบ <strong>${_rawRows.length}</strong> แถว — ระบบ detect คอลัมน์บางส่วนไม่ได้ กรุณาระบุเพิ่มเติม</div></div>`;
+    document.getElementById('btn-s2').style.display = '';
+  }
+}
+
+function goToMapping(){
+  // ตรวจว่าต้องแสดง mapping UI ไหม
+  const hasScheduleFields = ['subject','grade','room','day','start'].every(f=>_colMap[f]!==undefined);
+  const hasStudentFields  = (['subject','first','last'].every(f=>_colMap[f]!==undefined)) ||
+                            (['first','last'].every(f=>_colMap[f]!==undefined));
+
+  if(hasScheduleFields || hasStudentFields){
+    // detect ครบ → ข้ามไป preview โดยตรง
+    buildParsedData();
+    buildPreview();
+    goStep(3);
+  } else {
+    // ต้อง map
+    buildMappingUI();
+    goStep('2b');
+  }
+}
+
+function buildMappingUI(){
+  document.getElementById('mapping-sub').textContent =
+    `ระบบพบ ${_rawHeaders.length} คอลัมน์ — บอกว่าแต่ละอันคืออะไร`;
+
+  const allOpts = [...FIELD_OPTS_SCHEDULE,...FIELD_OPTS_STUDENT]
+    .filter((o,i,arr)=>arr.findIndex(x=>x.val===o.val)===i);
+
+  // ดูว่าไฟล์นี้เป็น schedule หรือ student หรือทั้งคู่
+  let html = `<div class="map-section-title">จับคู่คอลัมน์</div>`;
+
+  _rawHeaders.forEach((h,i)=>{
+    const autoVal = Object.entries(_colMap).find(([k,v])=>v===i)?.[0] || 'ignore';
+    const optHtml = allOpts.map(o=>
+      `<option value="${o.val}" ${autoVal===o.val?'selected':''}>${o.label}</option>`
+    ).join('');
+    html += `
+    <div class="col-map-grid">
+      <div class="col-map-label" title="${h}">${h||'(ว่าง)'}</div>
+      <div class="col-map-arrow">→</div>
+      <select class="form-input col-map-select" id="map-col-${i}">${optHtml}</select>
+    </div>`;
+  });
+
+  // Sample data
+  if(_rawRows.length){
+    const sample = _rawRows[0];
+    html += `<div class="map-section-title" style="margin-top:20px;">ตัวอย่างข้อมูล row แรก</div>
+    <div style="background:#f8fafc;border-radius:10px;padding:12px 14px;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;">
+    ${_rawHeaders.map((h,i)=>`<span><strong>${h}:</strong> ${String(sample[i]||'').slice(0,30)}</span>`).join('')}
+    </div>`;
+  }
+
+  document.getElementById('mapping-ui').innerHTML = html;
+}
+
+function applyMapping(){
+  // อ่าน mapping จาก UI
+  _colMap = {};
+  _rawHeaders.forEach((_,i)=>{
+    const sel = document.getElementById('map-col-'+i);
+    if(sel && sel.value !== 'ignore') _colMap[sel.value] = i;
+  });
+
+  const hasSubj = _colMap.subject !== undefined;
+  const hasName = _colMap.first !== undefined || _colMap.fullname !== undefined;
+  if(!hasSubj && !hasName){
+    showAlert('msg-map','กรุณาระบุ "วิชา" หรือ "ชื่อ" อย่างน้อย 1 อัน','error');
+    return;
+  }
+
+  buildParsedData();
+  buildPreview();
+  goStep(3);
+}
+
+// ════════════════════════════════════════
+// BUILD PARSED DATA
+// ════════════════════════════════════════
+function buildParsedData(){
+  const get = (row, field) => {
+    const idx = _colMap[field];
+    return idx !== undefined ? String(row[idx]||'').trim() : '';
+  };
+
+  // ตรวจว่าเป็น schedule หรือ student
+  const hasSchedule = _colMap.day !== undefined || _colMap.start !== undefined;
+  const hasStudent  = _colMap.first !== undefined || _colMap.fullname !== undefined;
+
+  _parsedData.schedules = [];
+  _parsedData.students  = [];
+
+  _rawRows.forEach(row=>{
+    const subject = get(row,'subject');
+    const grade   = get(row,'grade');
+    const room    = get(row,'room');
+    if(!subject && !get(row,'first') && !get(row,'fullname')) return;
+
+    if(hasSchedule && get(row,'day')){
+      _parsedData.schedules.push({
+        subject, grade, room,
+        day: get(row,'day'),
+        start: get(row,'start'),
+        end: get(row,'end'),
+        year: get(row,'year') || String(new Date().getFullYear()+543),
+        semester: get(row,'semester') || '1',
+      });
+    }
+
+    if(hasStudent){
+      let first = get(row,'first');
+      let last  = get(row,'last');
+      // handle fullname
+      if(!first && _colMap.fullname !== undefined){
+        const full = get(row,'fullname');
+        // ลบคำนำหน้า ด.ช. ด.ญ. นาย นางสาว
+        const cleaned = full.replace(/^(ด\.ช\.|ด\.ญ\.|นาย|นางสาว|นาง)\s*/,'').trim();
+        const parts = cleaned.split(/\s+/);
+        first = parts[0]||''; last = parts.slice(1).join(' ')||'';
+      }
+      if(!first) return;
+      _parsedData.students.push({
+        subject, grade, room,
+        no: parseInt(get(row,'no'))||0,
+        first, last,
+        studentId: get(row,'studentId')||'',
+      });
+    }
+  });
+
+  // Image students
+  if(_imageStudents.length){
+    _parsedData.students.push(..._imageStudents);
+  }
+}
+
+// ════════════════════════════════════════
+// IMAGE PARSING
+// ════════════════════════════════════════
+function handleImageFile(e){ const f = e.target.files[0]; if(f) processImageFile(f); }
+
+function processImageFile(file){
+  const status = document.getElementById('image-status');
+  status.innerHTML = `<div class="alert alert-info" style="margin-top:16px;"><div class="alert-icon">⏳</div><div>กำลังอ่านรูปภาพ <strong>${file.name}</strong>...</div></div>`;
+
+  // อ่านเป็น base64 แล้วส่งให้ parse
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    const img = new Image();
+    img.onload = ()=>{
+      // OCR via canvas text extraction (basic)
+      // For now: show form ให้ครูกรอก subject/grade/room แล้ว parse ชื่อจากรูป
+      status.innerHTML = `<div class="alert alert-success" style="margin-top:16px;"><div class="alert-icon">✅</div><div>อ่านรูปสำเร็จ — กรุณากรอกข้อมูลด้านล่าง</div></div>`;
+      document.getElementById('image-form').style.display = '';
+
+      // Preview รูป
+      const imgPreview = document.createElement('img');
+      imgPreview.src = e.target.result;
+      imgPreview.style.cssText = 'width:100%;border-radius:10px;margin-top:12px;border:1px solid var(--border);';
+      status.appendChild(imgPreview);
+
+      document.getElementById('btn-s2').style.display = '';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function collectImageData(){
+  const subject = document.getElementById('img-subject').value.trim();
+  const grade   = document.getElementById('img-grade').value.trim();
+  const room    = document.getElementById('img-room').value.trim();
+  if(!subject||!grade||!room) return false;
+
+  // สร้าง mock schedule จากข้อมูลรูป
+  _parsedData.schedules = [{subject, grade, room, day:'', start:'', end:'', year: String(new Date().getFullYear()+543), semester:'1'}];
+  _parsedData.students = _imageStudents; // จะถูก merge ใน buildParsedData
+  return true;
+}
+
+// ════════════════════════════════════════
+// PREVIEW
+// ════════════════════════════════════════
+function gradeColor(grade){
+  if(!grade) return '#1d9e75';
+  if(grade.startsWith('ป.')) return '#ca8a04';
+  const n = parseInt((grade||'').replace('ม.',''));
+  return n<=3 ? '#16a34a' : '#2563eb';
+}
+
+function buildPreview(){
+  const { schedules, students } = _parsedData;
+
+  // Group sections
+  const sectionMap = {};
+  [...schedules, ...students].forEach(item=>{
+    const key = `${item.subject}||${item.grade}||${item.room}`;
+    if(!sectionMap[key]) sectionMap[key] = {subject:item.subject, grade:item.grade, room:item.room, schedules:0, students:0};
+    if(item.day !== undefined) sectionMap[key].schedules++;
+    if(item.first !== undefined) sectionMap[key].students++;
+  });
+  const sections = Object.values(sectionMap);
+
+  // Summary
+  document.getElementById('preview-summary').innerHTML = `
+    <div class="summary-card">
+      <div class="summary-num">${sections.length}</div>
+      <div class="summary-lbl">วิชา-ห้องเรียน</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num">${schedules.length}</div>
+      <div class="summary-lbl">คาบสอน</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num">${students.length}</div>
+      <div class="summary-lbl">นักเรียน</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num">${[...new Set(students.map(s=>`${s.grade}${s.room}`))].length||sections.length}</div>
+      <div class="summary-lbl">ห้องเรียน</div>
+    </div>`;
+
+  // Sections list
+  document.getElementById('preview-sections').innerHTML = sections.map(s=>{
+    const color = gradeColor(s.grade);
+    const meta = [s.schedules?`${s.schedules} คาบ`:'', s.students?`${s.students} คน`:''].filter(Boolean).join(' · ');
+    return `<div class="confirm-item">
+      <div class="confirm-dot" style="background:${color};"></div>
+      <div class="confirm-name">${s.subject||'?'} ${s.grade||''}${s.room?'/'+s.room:''}</div>
+      <div class="confirm-meta">${meta||'–'}</div>
+    </div>`;
+  }).join('');
+
+  // Students sample
+  if(students.length){
+    const sample = students.slice(0,5);
+    document.getElementById('preview-students-wrap').style.display = '';
+    document.getElementById('preview-students-table').innerHTML =
+      `<thead><tr><th>เลขที่</th><th>ชื่อ</th><th>นามสกุล</th><th>วิชา/ห้อง</th></tr></thead>
+      <tbody>${sample.map(s=>`<tr>
+        <td>${s.no||'–'}</td><td>${s.first}</td><td>${s.last||'–'}</td>
+        <td style="color:var(--muted);">${s.subject||'–'} ${s.grade||''}${s.room?'/'+s.room:''}</td>
+      </tr>`).join('')}</tbody>`;
+  }
+}
+
+function showImportReady(msg){
+  document.getElementById('excel-status').innerHTML =
+    `<div class="alert alert-success" style="margin-top:16px;"><div class="alert-icon">✅</div><div>${msg}</div></div>`;
+  document.getElementById('btn-s2').style.display = '';
+  // auto build
+  buildParsedData();
+}
+
+// ════════════════════════════════════════
+// STEP 3 — DO IMPORT
+// ════════════════════════════════════════
+async function doImport(){
+  const { schedules, students } = _parsedData;
+  if(!schedules.length && !students.length){
+    showAlert('msg-s3','ไม่มีข้อมูลให้นำเข้า','error'); return;
+  }
+
+  document.getElementById('btn-s3').disabled = true;
+  document.getElementById('import-progress').style.display = '';
+  setProgress(5, 'กำลังสร้างวิชา-ห้องเรียน...');
+
+  // Group sections
+  const sectionMap = {};
+  [...schedules,...students].forEach(item=>{
+    const key = `${item.subject}||${item.grade}||${item.room}`;
+    if(!sectionMap[key]) sectionMap[key] = {subject:item.subject, grade:item.grade, room:item.room, _dbId:null};
+  });
+  const sections = Object.values(sectionMap).filter(s=>s.subject);
+  const total = sections.length + schedules.length + Math.ceil(students.length/20);
+
+  // 1. สร้าง sections
+  let done = 0;
+  for(const sec of sections){
+    const result = await CKService.createSection({
+      subject_name: sec.subject,
+      grade_level: sec.grade || 'ไม่ระบุ',
+      room: sec.room || '1',
+      academic_year: String(new Date().getFullYear()+543),
+      semester: 1,
+      color: gradeColor(sec.grade),
+    });
+    if(result) sec._dbId = result.id;
+    done++;
+    setProgress(Math.round(5 + (done/total)*30), `สร้างวิชา ${done}/${sections.length}...`);
+  }
+
+  // 2. สร้าง schedules
+  const dayMap = {'จันทร์':1,'อังคาร':2,'พุธ':3,'พฤหัสบดี':4,'ศุกร์':5,'เสาร์':6,'อาทิตย์':7};
+  for(const sch of schedules){
+    const sec = sectionMap[`${sch.subject}||${sch.grade}||${sch.room}`];
+    if(!sec?._dbId || !sch.day) continue;
+    const weekday = dayMap[sch.day] || 1;
+    await CKService.createSchedule({
+      course_section_id: sec._dbId,
+      weekday,
+      start_time: (sch.start||'08:00').includes(':') ? sch.start+':00' : '08:00:00',
+      end_time:   (sch.end||'09:00').includes(':')   ? sch.end+':00'   : '09:00:00',
+    });
+    done++;
+    setProgress(Math.round(35 + (done/total)*30), `สร้างตาราง ${schedules.indexOf(sch)+1}/${schedules.length}...`);
+  }
+
+  // 3. import นักเรียน (batch by section)
+  const studentsBySec = {};
+  students.forEach(s=>{
+    const key = `${s.subject}||${s.grade}||${s.room}`;
+    if(!studentsBySec[key]) studentsBySec[key] = [];
+    studentsBySec[key].push(s);
+  });
+
+  let stuDone = 0;
+  for(const [key, stus] of Object.entries(studentsBySec)){
+    const sec = sectionMap[key];
+    if(!sec?._dbId) continue;
+    await CKService.importStudents(sec._dbId, stus.map(s=>({
+      student_number: s.no || 0,
+      first_name: s.first || '',
+      last_name: s.last || '',
+    })));
+    stuDone += stus.length;
+    setProgress(Math.round(65 + (stuDone/students.length)*30), `นำเข้านักเรียน ${stuDone}/${students.length}...`);
+  }
+
+  setProgress(100, 'เสร็จสิ้น!');
+  await delay(600);
+
+  // Done
+  const sumParts = [
+    sections.length ? `${sections.length} วิชา-ห้อง` : '',
+    schedules.length ? `${schedules.length} คาบสอน` : '',
+    students.length ? `${students.length} นักเรียน` : '',
+  ].filter(Boolean).join(' · ');
+
+  document.getElementById('done-summary').innerHTML = `นำเข้าสำเร็จ<br><strong>${sumParts}</strong>`;
+  goStep('done');
+}
+
+// ════════════════════════════════════════
+// TEMPLATE DOWNLOAD
+// ════════════════════════════════════════
+function downloadTemplate(){
+  const a = document.createElement('a');
+  a.href = 'classkru-template.xlsx';
+  a.download = 'classkru-template.xlsx';
+  a.click();
+}
+
+function skipImport(){ location.href = 'index.html'; }
+
+// ════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════
+function showAlert(id, text, type){
+  const icons = {error:'❌',success:'✅',info:'ℹ️',warn:'⚠️'};
+  document.getElementById(id).innerHTML =
+    `<div class="alert alert-${type}" style="margin-top:12px;">
+      <div class="alert-icon">${icons[type]||'ℹ️'}</div><div>${text}</div>
+    </div>`;
+}
+
+function setLoading(id, loading, label){
+  const btn = document.getElementById(id);
+  if(!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? `<span class="spinner"></span>${label||'กำลังโหลด...'}`
+    : label || 'ดำเนินการ';
+}
+
+function setProgress(pct, label){
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = label;
+}
+
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+</script>
+</body>
+</html>

@@ -15,7 +15,7 @@
   --bg:#f0f4f8;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
   --sh:0 1px 4px rgba(0,0,0,.07);--sh-md:0 4px 14px rgba(0,0,0,.10);
   --tr:all .18s cubic-bezier(.4,0,.2,1);
-  --sidebar:210px;
+  --sidebar:260px;
 }
 body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
@@ -46,7 +46,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
   position:fixed;top:0;left:0;bottom:0;z-index:100;
   box-shadow:var(--sh);
 }
-.sb-logo{display:flex;align-items:center;gap:9px;padding:16px 16px 14px;border-bottom:1px solid var(--border);}
+.sb-logo{display:flex;justify-content:center;align-items:center;height:96px;border-bottom:1px solid var(--border);}
 .sb-logo-box{width:34px;height:34px;background:linear-gradient(135deg,var(--primary),var(--pk));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .sb-logo-text{font-size:16px;font-weight:800;}
 .sb-back{display:flex;align-items:center;gap:7px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:1px solid var(--border);transition:var(--tr);}
@@ -78,7 +78,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .topbar-sub{font-size:12px;color:var(--muted);}
 
 /* content */
-.content{padding:22px 24px;display:flex;flex-direction:column;gap:18px;}
+.content{padding:28px 40px;display:flex;flex-direction:column;gap:20px;}
 
 /* stat cards */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
@@ -195,47 +195,23 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
   <!-- ══ SIDEBAR ══ -->
   <aside class="sidebar">
     <div class="sb-logo">
-      <img src="classkru-logo.png" alt="ClassKru" style="height:56px;width:auto;display:block;">
-    </div>
-    <div class="sb-back" onclick="window.location.href='index.html'">
-      ← กลับหน้าหลัก
-    </div>
-    <div class="sb-class-section">
-      <div class="sb-class-label">ห้องเรียนปัจจุบัน</div>
-      <div class="sb-class-current">
-        <div class="sb-class-name" id="sb-class-name">ม.3/1</div>
-        <div class="sb-class-sub" id="sb-class-sub">วิทยาศาสตร์</div>
-        <div class="sb-class-count" id="sb-class-count">34 คน</div>
-      </div>
+      <img src="classkru-logo.png" alt="ClassKru" style="height:68px;width:auto;">
     </div>
     <div class="sb-nav-section">เมนู</div>
     <div class="sb-link" onclick="window.location.href='index.html'">
       <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>หน้าหลัก
     </div>
-    <div class="sb-link active" onclick="setNav(this)">
-      <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>ภาพรวมห้องเรียน
+    <div class="sb-link" onclick="window.location.href='overview.html?class='+currentClass">
+      <span class="ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>ภาพรวมการเข้าเรียน
     </div>
-    <div class="sb-link" onclick="setNav(this);window.location.href='attendance.html'">
-      <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M15.5 16.5l1.5 1.5 2.5-2.5"/></svg></span>เช็คชื่อ
+    <div class="sb-link" onclick="window.location.href='attendance.html?class='+currentClass">
+      <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg></span>เช็คชื่อ
     </div>
-    <div class="sb-link" onclick="setNav(this);toast('คะแนน — กำลังพัฒนา')">
-      <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></span>คะแนน
-    </div>
-    <div class="sb-link" onclick="setNav(this);toast('งานที่มอบหมาย — กำลังพัฒนา')">
-      <span class="ico"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg></span>งานที่มอบหมาย
-    </div>
-    <div class="sb-link" onclick="setNav(this);toast('นักเรียน — กำลังพัฒนา')">
+    <div class="sb-link" onclick="window.location.href='student.html?class='+currentClass+'&id=0'">
       <span class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></span>นักเรียน
     </div>
-    <div class="sb-nav-section">รายงาน</div>
-    <div class="sb-link" onclick="setNav(this);toast('สรุปผล — กำลังพัฒนา')">
-      <span class="ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>สรุปผล
-    </div>
-    <div class="sb-link" onclick="setNav(this);toast('ตัดเกรด — กำลังพัฒนา')">
-      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M8 21l4-8 4 8"/><path d="M9.5 17h5"/></svg></span>ตัดเกรด
-    </div>
-    <div class="sb-link" onclick="setNav(this);toast('Export — กำลังพัฒนา')">
-      <span class="ico"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>Export
+    <div class="sb-link" onclick="toast('ตั้งค่า — เร็วๆ นี้')">
+      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>ตั้งค่า
     </div>
     <div class="sb-spacer"></div>
     <div class="sb-date" id="sb-date"></div>
@@ -249,12 +225,12 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
       <!-- mobile back (hidden on desktop) -->
       <button class="btn btn-outline btn-sm" onclick="window.location.href='index.html'" style="display:none" id="mobile-back">← หน้าหลัก</button>
       <div>
-        <div class="topbar-title" id="topbar-title">🏠 หน้าหลัก</div>
+        <div class="topbar-title" id="topbar-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>ภาพรวมห้องเรียน</div>
         <div class="topbar-sub" id="topbar-sub"></div>
       </div>
       <div style="flex:1"></div>
-      <button class="btn btn-primary btn-sm" onclick="window.location.href='attendance.html'">✅ เช็คชื่อ</button>
-      <button class="btn btn-outline btn-sm" onclick="toast('📤 Export')">📤 Export</button>
+      <button class="btn btn-primary btn-sm" onclick="window.location.href='attendance.html'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-1px;margin-right:4px"><path d="M20 6L9 17l-5-5"/></svg>เช็คชื่อ</button>
+      <button class="btn btn-outline btn-sm" onclick="toast('ดาวน์โหลด Excel')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-1px;margin-right:4px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>ดาวน์โหลด Excel</button>
     </div>
 
     <!-- content -->
@@ -263,25 +239,25 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
       <!-- STAT CARDS -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-icon" style="background:#f0fdf4">👨‍🎓</div>
+          <div class="stat-icon" style="background:#f0fdf4"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></div>
           <div class="stat-val" id="sc-total">34</div>
           <div class="stat-label">นักเรียนทั้งหมด</div>
           <div class="stat-pill" style="background:#f0fdf4;color:#15803d" id="sc-class-pill">ม.3/1</div>
         </div>
         <div class="stat-card" onclick="window.location.href='attendance.html'" style="cursor:pointer">
-          <div class="stat-icon" style="background:#eff6ff">✅</div>
+          <div class="stat-icon" style="background:#eff6ff"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></div>
           <div class="stat-val" id="sc-present">—</div>
           <div class="stat-label">มาเรียนวันนี้</div>
           <div class="stat-pill" id="sc-present-pill" style="background:#eff6ff;color:#1d4ed8">ยังไม่ได้เช็ค</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon" style="background:#fffbeb">⭐</div>
+          <div class="stat-icon" style="background:#fffbeb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="1.8" stroke-linecap="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></div>
           <div class="stat-val">73.4</div>
           <div class="stat-label">คะแนนเฉลี่ย</div>
           <div class="stat-pill" style="background:#fffbeb;color:#b45309">↓ ลดลง</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon" style="background:#fdf2f8">📋</div>
+          <div class="stat-icon" style="background:#fdf2f8"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#be185d" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg></div>
           <div class="stat-val">28</div>
           <div class="stat-label">ส่งงานครบ</div>
           <div class="stat-pill" style="background:#fdf2f8;color:#be185d">82.4%</div>
@@ -293,7 +269,10 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
         <div class="panel">
           <div class="panel-head">
             <div class="panel-title"><span class="panel-dot" style="background:#1d9e75"></span>การเข้าเรียนวันนี้</div>
-            <button class="btn-ghost" onclick="window.location.href='attendance.html'">ดูทั้งหมด →</button>
+            <div style="display:flex;gap:6px;">
+              <button class="btn-ghost" onclick="window.location.href='overview.html?class='+currentClass" style="font-size:11px;">รายงาน →</button>
+              <button class="btn-ghost" onclick="window.location.href='attendance.html?class='+currentClass">เช็คชื่อ →</button>
+            </div>
           </div>
           <div class="panel-body">
             <div class="att-summary">
@@ -303,7 +282,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
             </div>
             <div id="att-list"></div>
             <div style="text-align:center;margin-top:8px">
-              <button class="btn btn-primary btn-sm" onclick="window.location.href='attendance.html'" style="width:100%;justify-content:center">✅ เช็คชื่อเลย</button>
+              <button class="btn btn-primary btn-sm" onclick="window.location.href='attendance.html'" style="width:100%;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-1px;margin-right:4px"><path d="M20 6L9 17l-5-5"/></svg>เช็คชื่อเลย</button>
             </div>
           </div>
         </div>
@@ -359,25 +338,25 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 </div><!-- /app -->
 
 <nav class="bottom-nav">
-  <button class="bn-item active" onclick="window.location.href='index.html'">
+  <button class="bn-item" onclick="window.location.href='index.html'">
     <span class="bn-ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>
     <span class="bn-lbl">หน้าหลัก</span>
   </button>
-  <button class="bn-item" onclick="window.location.href='attendance.html'">
-    <span class="bn-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/><path d="M15.5 16.5l1.5 1.5 2.5-2.5"/></svg></span>
+  <button class="bn-item" onclick="window.location.href='overview.html?class='+currentClass">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+    <span class="bn-lbl">ภาพรวม</span>
+  </button>
+  <button class="bn-item" onclick="window.location.href='attendance.html?class='+currentClass">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg></span>
     <span class="bn-lbl">เช็คชื่อ</span>
   </button>
-  <button class="bn-item" onclick="toast('งานนักเรียน — กำลังพัฒนา')">
-    <span class="bn-ico"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg></span>
-    <span class="bn-lbl">งานนักเรียน</span>
+  <button class="bn-item" onclick="window.location.href='student.html?class='+currentClass+'&id=0'">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></span>
+    <span class="bn-lbl">นักเรียน</span>
   </button>
-  <button class="bn-item" onclick="toast('คะแนน — กำลังพัฒนา')">
-    <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/><path d="M15 13l2 2 4-4"/></svg></span>
-    <span class="bn-lbl">คะแนน</span>
-  </button>
-  <button class="bn-item" onclick="toast('เพิ่มเติม')">
-    <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></span>
-    <span class="bn-lbl">เพิ่มเติม</span>
+  <button class="bn-item" onclick="toast('ตั้งค่า — เร็วๆ นี้')">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
+    <span class="bn-lbl">ตั้งค่า</span>
   </button>
 </nav>
 
@@ -392,11 +371,17 @@ const CHART_DATA=[
   {m:'ม.ค.',v:68},{m:'ก.พ.',v:72},{m:'มี.ค.',v:70},
   {m:'เม.ย.',v:75},{m:'พ.ค.',v:73},{m:'มิ.ย.',v:73},
 ];
+const ASSIGN_ICONS={
+  g:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>`,
+  b:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>`,
+  y:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>`,
+  p:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#be185d" stroke-width="1.8" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>`,
+};
 const ASSIGNS=[
-  {name:'ใบงานที่ 1',due:'15 มิ.ย.',submitted:28,total:34,color:'#f0fdf4',icon:'📗',overdue:false},
-  {name:'Quiz บทที่ 3',due:'18 มิ.ย.',submitted:21,total:34,color:'#eff6ff',icon:'📘',overdue:false},
-  {name:'โปรเจกต์หน่วย 2',due:'10 มิ.ย.',submitted:12,total:34,color:'#fffbeb',icon:'📙',overdue:true},
-  {name:'รายงานการทดลอง',due:'5 มิ.ย.',submitted:8,total:34,color:'#fdf2f8',icon:'📕',overdue:true},
+  {name:'ใบงานที่ 1',due:'15 มิ.ย.',submitted:28,total:34,color:'#f0fdf4',iconKey:'g',overdue:false},
+  {name:'Quiz บทที่ 3',due:'18 มิ.ย.',submitted:21,total:34,color:'#eff6ff',iconKey:'b',overdue:false},
+  {name:'โปรเจกต์หน่วย 2',due:'10 มิ.ย.',submitted:12,total:34,color:'#fffbeb',iconKey:'y',overdue:true},
+  {name:'รายงานการทดลอง',due:'5 มิ.ย.',submitted:8,total:34,color:'#fdf2f8',iconKey:'p',overdue:true},
 ];
 const SCORE_MOCK=[
   {exam:54,hw:18,total:89,grade:'A'},{exam:43,hw:15,total:74,grade:'B+'},
@@ -426,14 +411,25 @@ function render(){
   const todayKey=fmtKey(new Date());
   const today=new Date();
 
+  // level color
+  const lc=CK.LEVEL_COLORS[cls.level||'junior'];
+
   // sidebar + topbar
   document.getElementById('sb-class-name').textContent=cls.name;
+  document.getElementById('sb-class-name').style.color=lc.icon;
   document.getElementById('sb-class-sub').textContent=cls.subject;
+  document.getElementById('sb-class-sub').style.color=lc.text;
   document.getElementById('sb-class-count').textContent=cls.count+' คน';
+  document.getElementById('sb-class-count').style.color=lc.icon;
+  document.getElementById('sb-class-current').style.background=lc.bg;
+  document.getElementById('sb-class-current').style.borderColor=lc.border;
   document.getElementById('sb-date').textContent=fmtDateThai(today);
-  document.getElementById('topbar-title').textContent='🏠 หน้าหลัก';
+  document.getElementById('topbar-title').textContent='ภาพรวมห้องเรียน';
   document.getElementById('topbar-sub').textContent=`${cls.name} ${cls.subject}`;
-  document.getElementById('sc-class-pill').textContent=cls.name;
+  const pill=document.getElementById('sc-class-pill');
+  pill.textContent=cls.name;
+  pill.style.background=lc.bg;
+  pill.style.color=lc.text;
   document.getElementById('sc-total').textContent=cls.count;
 
   // today attendance
@@ -451,16 +447,28 @@ function render(){
   document.getElementById('att-absent-chip').textContent=`ขาด ${a}`;
   document.getElementById('att-late-chip').textContent=`สาย ${l}`;
 
-  // attendance list (5 คน)
-  const sample=students.slice(0,5);
+  // attendance list (5 คน — แสดงคนที่ขาด/สาย/ลาก่อน ถ้าไม่มีก็แสดง 5 คนแรก)
+  const atRisk=students.filter(s=>{const r=s.history[todayKey];return r&&r.status!=='present';});
+  const sample=(atRisk.length>0?atRisk:students).slice(0,5);
   document.getElementById('att-list').innerHTML=sample.map(s=>{
     const r=s.history[todayKey];
-    const st=r?r.status:'present';
-    const chipClass=st==='present'?'sc-present':st==='late'?'sc-late':'sc-absent';
-    const chipLabel=st==='present'?'มาเรียน':st==='late'?'สาย':st==='absent'?'ขาดเรียน':'ลา';
+    if(!r) return `<div class="stu-row">
+      <span class="stu-no">${s.no}</span>
+      <div class="av" style="width:30px;height:30px;background:${s.col.bg};color:${s.col.c}">${s.fn[0]}</div>
+      <span class="stu-name">${s.fn} ${s.ln}</span>
+      <span class="chip" style="font-size:10px;background:#f1f5f9;color:#64748b">ยังไม่เช็ค</span>
+    </div>`;
+    const chipClass=r.status==='present'?'sc-present':r.status==='late'?'sc-late':'sc-absent';
+    const sIco={
+      present:`<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="vertical-align:-1px;margin-right:2px"><path d="M20 6L9 17l-5-5"/></svg>`,
+      late:`<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-1px;margin-right:2px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
+      absent:`<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="vertical-align:-1px;margin-right:2px"><path d="M18 6L6 18M6 6l12 12"/></svg>`,
+      leave:`<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-1px;margin-right:2px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>`,
+    };
+    const chipLabel={present:`${sIco.present}มาเรียน`,late:`${sIco.late}สาย`,absent:`${sIco.absent}ขาดเรียน`,leave:`${sIco.leave}ลา`}[r.status]||'ลา';
     return `<div class="stu-row">
       <span class="stu-no">${s.no}</span>
-      <div class="av" style="width:30px;height:30px;background:${s.col.bg};color:${s.col.c}">${s.fn[0]}${s.ln[0]}</div>
+      <div class="av" style="width:30px;height:30px;background:${s.col.bg};color:${s.col.c}">${s.fn[0]}</div>
       <span class="stu-name">${s.fn} ${s.ln}</span>
       <span class="chip ${chipClass}" style="font-size:10px">${chipLabel}</span>
     </div>`;
@@ -499,7 +507,7 @@ function render(){
     const bar=pct>=80?'#1d9e75':pct>=50?'#f59e0b':'#ef4444';
     const tc=pct>=80?'#15803d':pct>=50?'#b45309':'#dc2626';
     return `<div class="assign-row">
-      <div class="assign-ico" style="background:${a.color}">${a.icon}</div>
+      <div class="assign-ico" style="background:${a.color}">${ASSIGN_ICONS[a.iconKey]}</div>
       <div class="assign-info">
         <div class="assign-name">${a.name}${a.overdue?'<span class="overdue">เกิน</span>':''}</div>
         <div class="assign-due">ครบ ${a.due}</div>
@@ -519,20 +527,20 @@ function render(){
   }).filter(s=>s.miss>=3).sort((a,b)=>b.miss-a.miss).slice(0,4);
 
   document.getElementById('risk-list').innerHTML=risks.length===0
-    ?'<div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">🎉 ไม่มีนักเรียนเสี่ยง</div>'
+    ?'<div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px;color:#1d9e75"><path d="M20 6L9 17l-5-5"/></svg>ไม่มีนักเรียนเสี่ยง</div>'
     :risks.map(s=>{
       const pct=Math.min(100,Math.round(s.miss/MAX_ABSENT*100));
       const bar=pct>=100?'#ef4444':pct>=75?'#f59e0b':'#1d9e75';
       const tc=pct>=100?'#dc2626':pct>=75?'#b45309':'#15803d';
       return `<div class="risk-row">
-        <div class="av" style="width:30px;height:30px;background:${s.col.bg};color:${s.col.c};font-size:10px">${s.fn[0]}${s.ln[0]}</div>
+        <div class="av" style="width:30px;height:30px;background:${s.col.bg};color:${s.col.c};font-size:10px">${s.fn[0]}</div>
         <div class="risk-info">
           <div class="risk-name">${s.fn} ${s.ln}</div>
           <div class="risk-sub">ขาด ${s.miss} · สาย ${s.late}</div>
         </div>
         <div class="risk-bar-wrap">
           <div class="risk-track"><div class="risk-fill" style="width:${pct}%;background:${bar}"></div></div>
-          <div class="risk-txt" style="color:${tc}">${Math.max(0,MAX_ABSENT-s.miss)===0?'⚠️':'เหลือ '+(MAX_ABSENT-s.miss)}</div>
+          <div class="risk-txt" style="color:${tc}">${Math.max(0,MAX_ABSENT-s.miss)===0?'เกิน!':'เหลือ '+(MAX_ABSENT-s.miss)}</div>
         </div>
       </div>`;
     }).join('');

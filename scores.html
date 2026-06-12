@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>คะแนน — ClassKru</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
+  --bg:#f0f4f8;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --sh:0 1px 4px rgba(0,0,0,.07);--sh-md:0 4px 14px rgba(0,0,0,.10);
+  --tr:all .18s cubic-bezier(.4,0,.2,1);
+  --sidebar:260px;
+}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── SHARED ── */
+.btn{font-family:'Sarabun',sans-serif;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:var(--tr);border-radius:12px;}
+.btn:active{transform:scale(.96);}
+.btn-primary{background:var(--primary);color:#fff;font-size:14px;padding:9px 18px;}
+.btn-primary:hover{background:var(--pk);}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text);font-size:13px;padding:7px 14px;}
+.btn-outline:hover{border-color:#94a3b8;}
+.btn-sm{font-size:12px;padding:5px 12px;border-radius:10px;}
+
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-60px);background:rgba(15,23,42,.88);color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:22px;white-space:nowrap;z-index:9999;transition:transform .25s cubic-bezier(.4,0,.2,1);pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* grade colors */
+.gA  {background:#f0fdf4;color:#15803d;}
+.gBp {background:#eff6ff;color:#1d4ed8;}
+.gB  {background:#eff6ff;color:#2563eb;}
+.gCp {background:#fffbeb;color:#b45309;}
+.gC  {background:#fffbeb;color:#d97706;}
+.gDp {background:#fff7ed;color:#c2410c;}
+.gD  {background:#fff7ed;color:#ea580c;}
+.gF  {background:#fef2f2;color:#dc2626;}
+
+/* ── LAYOUT ── */
+.app{display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;box-shadow:var(--sh);}
+.sb-logo{display:flex;justify-content:center;align-items:center;height:96px;border-bottom:1px solid var(--border);}
+.sb-nav-sec{padding:14px 14px 4px;font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;}
+.sb-link{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);border-left:3px solid transparent;}
+.sb-link:hover{background:#f8fafc;color:var(--text);}
+.sb-link.active{background:var(--pbg);color:var(--primary);border-left-color:var(--primary);}
+.sb-link .ico{width:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-link .ico svg{width:18px;height:18px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s;}
+.sb-link.active .ico svg,.sb-link:hover .ico svg{stroke:var(--primary);}
+.sb-spacer{flex:1;}
+.sb-date{padding:12px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600;}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:50;box-shadow:var(--sh);}
+.topbar-title{font-size:16px;font-weight:800;flex:1;display:flex;align-items:center;gap:8px;}
+.content{padding:28px 40px 60px;display:flex;flex-direction:column;gap:20px;max-width:1100px;}
+
+/* ── CLASS TABS ── */
+.class-tabs{display:flex;gap:8px;flex-wrap:wrap;}
+.class-tab{font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;padding:6px 18px;border-radius:20px;border:2px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:var(--tr);}
+.class-tab:hover{border-color:#94a3b8;color:var(--text);}
+.class-tab.active{border-color:var(--primary);background:var(--pbg);color:var(--primary);}
+
+/* ── ASSIGNMENT TABS ── */
+.assign-type-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.atype-btn{font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:var(--tr);}
+.atype-btn.active{background:#0f172a;color:#fff;border-color:#0f172a;}
+.atype-btn:hover:not(.active){border-color:#94a3b8;}
+
+/* ── SUMMARY CARDS ── */
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.sum-card{background:#fff;border-radius:16px;padding:14px 16px;border:1.5px solid var(--border);box-shadow:var(--sh);}
+.sum-val{font-size:28px;font-weight:800;line-height:1;}
+.sum-lbl{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600;}
+.sum-sub{font-size:11px;font-weight:700;margin-top:6px;display:inline-flex;padding:2px 9px;border-radius:20px;}
+
+/* ── SCORE TABLE ── */
+.tbl-wrap{background:#fff;border-radius:18px;border:1.5px solid var(--border);box-shadow:var(--sh);overflow:hidden;}
+.tbl-head{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:#f8fafc;gap:12px;flex-wrap:wrap;}
+.tbl-title{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.search-wrap{position:relative;}
+.search-wrap input{font-family:'Sarabun',sans-serif;font-size:13px;padding:7px 12px 7px 34px;border-radius:10px;border:1.5px solid var(--border);color:var(--text);transition:var(--tr);width:200px;}
+.search-wrap input:focus{outline:none;border-color:var(--primary);}
+.search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);}
+
+.score-tbl{width:100%;border-collapse:collapse;}
+.score-tbl thead th{font-size:12px;font-weight:800;color:var(--muted);padding:10px 12px;background:#f8fafc;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap;}
+.score-tbl thead th:nth-child(1){width:48px;}
+.score-tbl thead th:nth-child(2){text-align:left;min-width:160px;}
+.score-tbl tbody tr{transition:var(--tr);}
+.score-tbl tbody tr:hover td{background:#f8fafc;}
+.score-tbl td{padding:10px 12px;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:600;color:var(--text);vertical-align:middle;text-align:center;}
+.score-tbl tbody tr:last-child td{border-bottom:none;}
+.score-tbl td:nth-child(2){text-align:left;}
+
+.av{width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.name-cell{display:flex;align-items:center;gap:9px;cursor:pointer;}
+.name-cell:hover .stu-name{color:var(--primary);text-decoration:underline;}
+
+/* score input */
+.score-input{font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;text-align:center;width:52px;padding:5px 6px;border-radius:8px;border:1.5px solid var(--border);background:#f8fafc;color:var(--text);transition:var(--tr);}
+.score-input:focus{outline:none;border-color:var(--primary);background:#fff;}
+.score-input.missing{background:#fef2f2;border-color:#fca5a5;color:#dc2626;}
+.score-max{font-size:10px;color:var(--muted);margin-top:1px;}
+
+.grade-pill{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;}
+.total-score{font-size:15px;font-weight:800;color:var(--primary);}
+.pct-bar-wrap{display:flex;align-items:center;gap:8px;}
+.pct-bar{height:5px;background:#f1f5f9;border-radius:99px;overflow:hidden;flex:1;min-width:60px;}
+.pct-fill{height:100%;border-radius:99px;transition:width .4s;}
+.pct-txt{font-size:11px;font-weight:800;min-width:36px;text-align:right;}
+
+/* risk indicators */
+.risk-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.risk-ok{background:#22c55e;}
+.risk-warn{background:#f59e0b;}
+.risk-danger{background:#ef4444;}
+
+/* ── MOBILE ── */
+.mobile-ui{display:none;}
+@media(max-width:767px){
+  .main{margin-left:0;}
+  .sidebar{display:none;}
+  .content{padding:14px 14px 80px;}
+  .summary-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .sum-val{font-size:22px;}
+  .mobile-ui{display:block;}
+  .topbar{padding:0 14px;}
+  .search-wrap input{width:160px;}
+  .score-input{width:44px;font-size:12px;}
+  .score-tbl thead th,.score-tbl td{padding:8px 8px;}
+}
+
+/* ── BOTTOM NAV (mobile) ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e8edf2;height:60px;display:none;z-index:200;box-shadow:0 -1px 0 rgba(0,0,0,.06);padding-bottom:env(safe-area-inset-bottom,0);}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:'Sarabun',sans-serif;padding:6px 0 4px;}
+.bn-item:active{opacity:.6;}
+.bn-ico svg{width:24px;height:24px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.bn-lbl{font-size:10px;font-weight:600;color:#9ca3af;}
+.bn-item.active .bn-ico svg{stroke:var(--primary);}
+.bn-item.active .bn-lbl{color:var(--primary);font-weight:700;}
+@media(max-width:767px){.bottom-nav{display:flex;}}
+
+/* ── ASSIGNMENT HEADER ROW ── */
+.assign-th{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.assign-th-name{font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px;}
+.assign-th-max{font-size:9px;color:#94a3b8;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <img src="classkru-logo.png" alt="ClassKru" style="height:68px;width:auto;">
+    </div>
+    <div class="sb-nav-sec">เมนู</div>
+    <div class="sb-link" onclick="go('index.html')">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>หน้าหลัก
+    </div>
+    <div class="sb-link" onclick="go('overview.html')">
+      <span class="ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>ภาพรวม
+    </div>
+    <div class="sb-link" onclick="go('attendance.html')">
+      <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg></span>เช็คชื่อ
+    </div>
+    <div class="sb-link active">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>คะแนน
+    </div>
+    <div class="sb-link" onclick="go('student.html?class=m31&id=0')">
+      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></span>นักเรียน
+    </div>
+    <div class="sb-link" onclick="showToast('ตั้งค่า — เร็วๆ นี้')">
+      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>ตั้งค่า
+    </div>
+    <div class="sb-spacer"></div>
+    <div class="sb-date" id="sb-date"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#fffbeb;border-radius:8px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        </span>
+        คะแนน
+      </div>
+      <div class="class-tabs" id="class-tabs"></div>
+      <button class="btn btn-outline btn-sm" onclick="exportCSV()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        ดาวน์โหลด
+      </button>
+    </div>
+
+    <div class="content">
+
+      <!-- SUMMARY -->
+      <div class="summary-grid" id="summary-grid"></div>
+
+      <!-- SCORE TABLE -->
+      <div class="tbl-wrap">
+        <div class="tbl-head">
+          <div class="tbl-title" id="tbl-title">รายชื่อนักเรียน</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div class="assign-type-tabs" id="assign-type-tabs"></div>
+            <div class="search-wrap">
+              <span class="search-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span>
+              <input type="text" id="search" placeholder="ค้นหาชื่อ..." oninput="renderTable()">
+            </div>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="score-tbl" id="score-tbl">
+            <thead id="tbl-thead"></thead>
+            <tbody id="tbl-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bn-item" onclick="go('index.html')">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V10.5z"/><path d="M9 21V13h6v8"/></svg></span>
+    <span class="bn-lbl">หน้าหลัก</span>
+  </button>
+  <button class="bn-item" onclick="go('overview.html')">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+    <span class="bn-lbl">ภาพรวม</span>
+  </button>
+  <button class="bn-item" onclick="go('attendance.html')">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg></span>
+    <span class="bn-lbl">เช็คชื่อ</span>
+  </button>
+  <button class="bn-item active">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></span>
+    <span class="bn-lbl">นักเรียน</span>
+  </button>
+  <button class="bn-item" onclick="showToast('ตั้งค่า — เร็วๆ นี้')">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
+    <span class="bn-lbl">ตั้งค่า</span>
+  </button>
+</nav>
+
+<div class="toast" id="toast-el"></div>
+
+<script src="ck-data.js"></script>
+<script>
+const CLASSES = CK.CLASSES;
+const params = new URLSearchParams(window.location.search);
+let currentClass = params.get('class') || 'm31';
+if(!CLASSES.find(c=>c.id===currentClass)) currentClass='m31';
+
+let filterType = 'all'; // all | exam | hw | project | quiz
+
+const MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const TYPE_LABEL={all:'ทั้งหมด',exam:'สอบ',hw:'ใบงาน',project:'โปรเจกต์',quiz:'Quiz'};
+
+function go(url){ window.location.href=url; }
+function showToast(msg){
+  const t=document.getElementById('toast-el');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+/* ── CLASS TABS ── */
+function buildClassTabs(){
+  document.getElementById('class-tabs').innerHTML=CLASSES.map(c=>{
+    const lc=CK.LEVEL_COLORS[c.level||'junior'];
+    const active=c.id===currentClass;
+    return `<button class="class-tab ${active?'active':''}" onclick="switchClass('${c.id}')"
+      style="${active?`border-color:${lc.icon};background:${lc.bg};color:${lc.text};`:''}">${c.name}</button>`;
+  }).join('');
+}
+
+function switchClass(id){
+  currentClass=id;
+  buildClassTabs();
+  filterType='all';
+  buildTypeTabs();
+  renderSummary();
+  renderTable();
+}
+
+/* ── TYPE TABS ── */
+function buildTypeTabs(){
+  const types=['all','exam','hw','project','quiz'];
+  document.getElementById('assign-type-tabs').innerHTML=types.map(t=>
+    `<button class="atype-btn ${filterType===t?'active':''}" onclick="setFilter('${t}')">${TYPE_LABEL[t]}</button>`
+  ).join('');
+}
+
+function setFilter(type){
+  filterType=type;
+  buildTypeTabs();
+  renderTable();
+}
+
+/* ── SUMMARY ── */
+function renderSummary(){
+  const cls=CLASSES.find(c=>c.id===currentClass);
+  const data=CK.getClassScores(currentClass);
+  const grades={A:0,'B+':0,B:0,'C+':0,C:0,'D+':0,D:0,F:0};
+  let totalPct=0;
+  data.forEach(d=>{ grades[d.grade]=(grades[d.grade]||0)+1; totalPct+=d.pct; });
+  const avg=data.length?Math.round(totalPct/data.length*10)/10:0;
+  const passing=data.filter(d=>d.grade!=='F').length;
+  const missing=data.filter(d=>d.missing>0).length;
+
+  const gradeColor=avg>=75?{bg:'#f0fdf4',c:'#15803d'}:avg>=60?{bg:'#fffbeb',c:'#b45309'}:{bg:'#fef2f2',c:'#dc2626'};
+
+  document.getElementById('summary-grid').innerHTML=`
+    <div class="sum-card">
+      <div class="sum-val" style="color:var(--primary)">${cls.count}</div>
+      <div class="sum-lbl">นักเรียนทั้งหมด</div>
+      <div class="sum-sub" style="background:var(--pbg);color:#15803d">${cls.name}</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-val" style="color:${gradeColor.c}">${avg}%</div>
+      <div class="sum-lbl">คะแนนเฉลี่ย</div>
+      <div class="sum-sub" style="background:${gradeColor.bg};color:${gradeColor.c}">${avg>=75?'ผ่านเกณฑ์':avg>=60?'ใกล้เกณฑ์':'ต่ำกว่าเกณฑ์'}</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-val" style="color:#1d4ed8">${passing}</div>
+      <div class="sum-lbl">ผ่าน (ไม่ติด F)</div>
+      <div class="sum-sub" style="background:#eff6ff;color:#1d4ed8">${Math.round(passing/cls.count*100)}%</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-val" style="color:${missing>0?'#dc2626':'#15803d'}">${missing}</div>
+      <div class="sum-lbl">ยังไม่ส่งงานบางชิ้น</div>
+      <div class="sum-sub" style="background:${missing>0?'#fef2f2':'#f0fdf4'};color:${missing>0?'#dc2626':'#15803d'}">${missing>0?'ต้องติดตาม':'ครบทุกคน'}</div>
+    </div>`;
+}
+
+/* ── SCORE TABLE ── */
+function renderTable(){
+  const assignments=CK.getAssignments(currentClass)
+    .filter(a=>filterType==='all'||a.type===filterType);
+  const students=CK.getStudents(currentClass);
+  const query=(document.getElementById('search')?.value||'').toLowerCase();
+
+  const cls=CLASSES.find(c=>c.id===currentClass);
+  document.getElementById('tbl-title').textContent=
+    `${cls.name} · ${cls.count} คน`;
+
+  // thead
+  document.getElementById('tbl-thead').innerHTML=`<tr>
+    <th>เลขที่</th>
+    <th style="text-align:left">ชื่อ-นามสกุล</th>
+    ${assignments.map(a=>`
+      <th>
+        <div class="assign-th">
+          <div class="assign-th-name" title="${a.name}">${a.name.length>12?a.name.slice(0,12)+'…':a.name}</div>
+          <div class="assign-th-max">/${a.maxScore}</div>
+        </div>
+      </th>`).join('')}
+    <th>รวม</th>
+    <th>%</th>
+    <th>เกรด</th>
+  </tr>`;
+
+  // tbody
+  const filtered=students.filter(s=>{
+    if(!query) return true;
+    return `${s.fn} ${s.ln}`.toLowerCase().includes(query)||String(s.no).includes(query);
+  });
+
+  document.getElementById('tbl-tbody').innerHTML=filtered.map(s=>{
+    const scoreMap=CK.getStudentScores(currentClass, s.id);
+    const {total,maxTotal,pct,grade,missing}=CK.calcGrade(currentClass, s.id);
+    const stats=CK.getStudentAttendStats(s);
+    const gradeCls='g'+grade.replace('+','p');
+    const barColor=pct>=75?'#1d9e75':pct>=60?'#f59e0b':'#ef4444';
+
+    const scoreCells=assignments.map(a=>{
+      const sc=scoreMap[a.id];
+      const isEmpty=sc===null||sc===undefined;
+      return `<td>
+        <input class="score-input ${isEmpty?'missing':''}"
+          type="number" min="0" max="${a.maxScore}"
+          value="${isEmpty?'':sc}"
+          placeholder="-"
+          onchange="saveScore(${s.id},'${a.id}',this,${a.maxScore})"
+          title="${a.name}">
+        ${isEmpty?'<div class="score-max" style="color:#dc2626">ไม่ส่ง</div>':''}
+      </td>`;
+    }).join('');
+
+    return `<tr>
+      <td style="color:#94a3b8;font-weight:700">${s.no}</td>
+      <td>
+        <div class="name-cell" onclick="go('student.html?class=${currentClass}&id=${s.id}')">
+          <div class="av" style="background:${s.col.bg};color:${s.col.c}">${s.fn[0]}</div>
+          <div>
+            <div style="font-weight:700;font-size:13px">${s.fn} ${s.ln}</div>
+            <div style="display:flex;align-items:center;gap:4px;margin-top:1px">
+              <div class="risk-dot risk-${stats.riskLevel}"></div>
+              <span style="font-size:10px;color:var(--muted)">ขาด ${stats.miss} / ลา ${stats.leave}</span>
+            </div>
+          </div>
+        </div>
+      </td>
+      ${scoreCells}
+      <td class="total-score">${total}</td>
+      <td>
+        <div class="pct-bar-wrap">
+          <div class="pct-bar"><div class="pct-fill" style="width:${pct}%;background:${barColor}"></div></div>
+          <div class="pct-txt" style="color:${barColor}">${pct}%</div>
+        </div>
+      </td>
+      <td><span class="grade-pill ${gradeCls}">${grade}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function saveScore(studentId, assignmentId, inputEl, maxScore){
+  let val=parseFloat(inputEl.value);
+  if(isNaN(val)||val<0){ val=0; inputEl.value=0; }
+  if(val>maxScore){ val=maxScore; inputEl.value=maxScore; }
+  CK.setScore(currentClass, studentId, assignmentId, val);
+  inputEl.classList.remove('missing');
+  // อัพเดท summary แต่ไม่ re-render ทั้งหมด (ไม่ reset cursor)
+  renderSummary();
+  showToast('บันทึกคะแนนแล้ว');
+}
+
+/* ── EXPORT ── */
+function exportCSV(){
+  const assignments=CK.getAssignments(currentClass);
+  const students=CK.getStudents(currentClass);
+  let csv='เลขที่,ชื่อ,นามสกุล';
+  assignments.forEach(a=>{ csv+=`,${a.name} (/${a.maxScore})`; });
+  csv+=',รวม,เปอร์เซ็นต์,เกรด\n';
+  students.forEach(s=>{
+    const scores=CK.getStudentScores(currentClass,s.id);
+    const {total,pct,grade}=CK.calcGrade(currentClass,s.id);
+    csv+=`${s.no},${s.fn},${s.ln}`;
+    assignments.forEach(a=>{ csv+=`,${scores[a.id]??''}`; });
+    csv+=`,${total},${pct}%,${grade}\n`;
+  });
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url;
+  a.download=`คะแนน_${currentClass}_${CK.fmtKey(new Date())}.csv`;
+  a.click();
+  showToast('ดาวน์โหลดเรียบร้อย');
+}
+
+/* ── INIT ── */
+function init(){
+  const now=new Date();
+  const sbDate=document.getElementById('sb-date');
+  if(sbDate) sbDate.textContent=`วัน${DAYS[now.getDay()]}ที่ ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()+543}`;
+  buildClassTabs();
+  buildTypeTabs();
+  renderSummary();
+  renderTable();
+}
+init();
+</script>
+</body>
+</html>
