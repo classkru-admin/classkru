@@ -625,76 +625,89 @@ function processExcelFile(file){
   reader.readAsArrayBuffer(file);
 }
 
+function findHeaderRow(rows, keywords){
+  // หา row ที่มี keyword ครบ >= 2 อัน และอยู่ใน cell แยกกัน (ไม่ใช่ merged title)
+  for(let i=0;i<Math.min(15,rows.length);i++){
+    const cells = rows[i].map(c=>String(c||'').trim()).filter(c=>c);
+    const matches = keywords.filter(kw=>cells.some(c=>c.includes(kw)));
+    if(matches.length >= 2) return i;
+  }
+  return -1;
+}
+
 function parseClassKruTemplate(wb){
-  // Parse ตารางสอน sheet
+  // ── ตารางสอน ──
   const wsSchedule = wb.Sheets[wb.SheetNames.find(s=>s.includes('ตารางสอน'))];
   const schedRows = XLSX.utils.sheet_to_json(wsSchedule, {header:1, defval:''});
-
-  // หา header row (row ที่มี 'วิชา')
-  let headerRow = -1;
-  for(let i=0;i<schedRows.length;i++){
-    if(schedRows[i].some(c=>String(c).includes('วิชา'))){ headerRow = i; break; }
-  }
+  const headerRow = findHeaderRow(schedRows, ['วิชา','วัน','เวลา','ห้อง']);
 
   const schedules = [];
   if(headerRow >= 0){
     const hdr = schedRows[headerRow].map(c=>String(c).trim());
-    const iSubject = hdr.findIndex(h=>h.includes('วิชา'));
+    const iSubject = hdr.findIndex(h=>h==='วิชา'||h==='รายวิชา');
     const iGrade   = hdr.findIndex(h=>h.includes('ชั้น')||h.includes('ระดับ'));
-    const iRoom    = hdr.findIndex(h=>h.includes('ห้อง'));
+    const iRoom    = hdr.findIndex(h=>h==='ห้อง'||h==='กลุ่ม');
     const iDay     = hdr.findIndex(h=>h.includes('วัน'));
     const iStart   = hdr.findIndex(h=>h.includes('เริ่ม'));
     const iEnd     = hdr.findIndex(h=>h.includes('สิ้น')||h.includes('จบ'));
+    const iYear    = hdr.findIndex(h=>h.includes('ปี'));
+    const iSem     = hdr.findIndex(h=>h.includes('ภาค'));
 
     for(let r=headerRow+1;r<schedRows.length;r++){
       const row = schedRows[r];
       const subject = String(row[iSubject]||'').trim();
-      if(!subject) continue;
+      if(!subject || subject.includes('ClassKru') || subject.includes('กรอก')) continue;
       schedules.push({
-        subject, grade: String(row[iGrade]||'').trim(),
+        subject,
+        grade: String(row[iGrade]||'').trim(),
         room: String(row[iRoom]||'').trim(),
         day: String(row[iDay]||'').trim(),
         start: String(row[iStart]||'').trim(),
         end: String(row[iEnd]||'').trim(),
+        year: String(row[iYear]||new Date().getFullYear()+543).trim(),
+        semester: String(row[iSem]||'1').trim(),
       });
     }
   }
 
-  // Parse รายชื่อนักเรียน sheet
+  // ── รายชื่อนักเรียน ──
   const wsStudents = wb.Sheets[wb.SheetNames.find(s=>s.includes('รายชื่อ'))];
   const stuRows = XLSX.utils.sheet_to_json(wsStudents, {header:1, defval:''});
-  let stuHeader = -1;
-  for(let i=0;i<stuRows.length;i++){
-    if(stuRows[i].some(c=>String(c).includes('เลขที่'))){ stuHeader = i; break; }
-  }
+  const stuHeader = findHeaderRow(stuRows, ['ชื่อ','นามสกุล','เลขที่']);
+
   const students = [];
   if(stuHeader >= 0){
     const hdr = stuRows[stuHeader].map(c=>String(c).trim());
-    const iSubject = hdr.findIndex(h=>h.includes('วิชา'));
+    const iSubject = hdr.findIndex(h=>h==='วิชา'||h==='รายวิชา');
     const iGrade   = hdr.findIndex(h=>h.includes('ชั้น')||h.includes('ระดับ'));
-    const iRoom    = hdr.findIndex(h=>h.includes('ห้อง'));
-    const iNo      = hdr.findIndex(h=>h.includes('เลขที่')||h==='ที่');
-    const iFirst   = hdr.findIndex(h=>h.includes('ชื่อ')&&!h.includes('นามสกุล'));
-    const iLast    = hdr.findIndex(h=>h.includes('นามสกุล')||h.includes('สกุล'));
+    const iRoom    = hdr.findIndex(h=>h==='ห้อง');
+    const iNo      = hdr.findIndex(h=>h==='เลขที่'||h==='ที่'||h==='ลำดับ');
+    const iFirst   = hdr.findIndex(h=>h==='ชื่อ'||(h.includes('ชื่อ')&&!h.includes('นามสกุล')&&!h.includes('เล่น')));
+    const iLast    = hdr.findIndex(h=>h==='นามสกุล'||h==='สกุล');
     const iId      = hdr.findIndex(h=>h.includes('รหัส'));
 
     for(let r=stuHeader+1;r<stuRows.length;r++){
       const row = stuRows[r];
       const first = String(row[iFirst]||'').trim();
-      if(!first) continue;
+      if(!first || first.includes('ClassKru') || first.includes('กรอก')) continue;
       students.push({
         subject: String(row[iSubject]||'').trim(),
         grade: String(row[iGrade]||'').trim(),
         room: String(row[iRoom]||'').trim(),
         no: parseInt(row[iNo])||0,
-        first, last: String(row[iLast]||'').trim(),
+        first,
+        last: String(row[iLast]||'').trim(),
         studentId: String(row[iId]||'').trim(),
       });
     }
   }
 
   _parsedData = { schedules, students };
-  showImportReady(schedules.length + ' คาบสอน + ' + students.length + ' นักเรียน จาก ClassKru Template');
+  const msg = [
+    schedules.length ? `${schedules.length} คาบสอน` : '',
+    students.length  ? `${students.length} นักเรียน` : '',
+  ].filter(Boolean).join(' + ') + ' จาก ClassKru Template';
+  showImportReady(msg);
 }
 
 function parseGenericSheet(rows, fileName, wb, allSheets){
