@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seed Data — ClassKru</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sarabun',sans-serif;background:#f5f7fa;color:#0f172a;padding:32px 16px;}
+.wrap{max-width:560px;margin:0 auto;}
+h1{font-size:22px;font-weight:800;margin-bottom:4px;}
+.sub{font-size:13px;color:#64748b;margin-bottom:24px;}
+.card{background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:20px;margin-bottom:16px;}
+.card h2{font-size:15px;font-weight:800;margin-bottom:12px;color:#1d9e75;}
+.row{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px;}
+.row:last-child{border:none;}
+.lbl{color:#64748b;width:80px;flex-shrink:0;}
+.val{font-weight:700;}
+.btn{width:100%;padding:14px;border-radius:12px;border:none;background:#1d9e75;color:#fff;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:800;cursor:pointer;margin-top:20px;}
+.btn:hover{background:#0f6e56;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.log{background:#0f172a;color:#86efac;border-radius:12px;padding:16px;font-family:monospace;font-size:12px;line-height:1.8;margin-top:16px;max-height:300px;overflow-y:auto;display:none;}
+.log.show{display:block;}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;}
+.tag-ok{background:#dcfce7;color:#15803d;}
+.tag-err{background:#fee2e2;color:#dc2626;}
+.done-msg{text-align:center;padding:20px;font-size:16px;font-weight:800;color:#1d9e75;display:none;}
+.warn{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 14px;font-size:13px;color:#92400e;margin-bottom:16px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌱 Seed Test Data</h1>
+  <div class="sub">ใส่ข้อมูลตัวอย่างเข้า Supabase สำหรับทดสอบ ClassKru</div>
+
+  <div class="warn">⚠️ ต้อง login ก่อน — ถ้ายังไม่ได้ login ระบบจะ redirect ไป login.html</div>
+
+  <div class="card">
+    <h2>📚 วิชาที่จะสร้าง (2 sections)</h2>
+    <div class="row"><span class="lbl">วิชา 1</span><span class="val">สุขศึกษา ม.1/1</span></div>
+    <div class="row"><span class="lbl">ตาราง</span><span class="val">จันทร์ 08:30–09:30, พุธ 10:30–11:30</span></div>
+    <div class="row"><span class="lbl">นักเรียน</span><span class="val">5 คน (เลขที่ 1–5)</span></div>
+    <div class="row"><span class="lbl">วิชา 2</span><span class="val">พลศึกษา ม.2/1</span></div>
+    <div class="row"><span class="lbl">ตาราง</span><span class="val">อังคาร 09:30–10:30, พฤหัส 13:00–14:00</span></div>
+    <div class="row"><span class="lbl">นักเรียน</span><span class="val">5 คน (เลขที่ 1–5)</span></div>
+  </div>
+
+  <button class="btn" id="seed-btn" onclick="runSeed()">🌱 สร้างข้อมูลทดสอบ</button>
+  <div class="done-msg" id="done-msg">✅ สร้างข้อมูลเสร็จแล้ว! <a href="index.html" style="color:#1d9e75;">→ ไปหน้าแรก</a></div>
+  <div class="log" id="log"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="ck-service.js"></script>
+<script>
+const SECTIONS = [
+  {
+    subject: 'สุขศึกษา', grade: 'ม.1', room: '1',
+    color: '#16a34a',
+    schedules: [
+      {weekday:1, start:'08:30', end:'09:30'},
+      {weekday:3, start:'10:30', end:'11:30'},
+    ],
+    students: [
+      {no:1, first:'สมชาย', last:'ใจดี'},
+      {no:2, first:'สมหญิง', last:'รักเรียน'},
+      {no:3, first:'วิชัย', last:'สุขสันต์'},
+      {no:4, first:'มานะ', last:'ตั้งใจ'},
+      {no:5, first:'มานี', last:'ขยัน'},
+    ]
+  },
+  {
+    subject: 'พลศึกษา', grade: 'ม.2', room: '1',
+    color: '#16a34a',
+    schedules: [
+      {weekday:2, start:'09:30', end:'10:30'},
+      {weekday:4, start:'13:00', end:'14:00'},
+    ],
+    students: [
+      {no:1, first:'อนันต์', last:'เจริญ'},
+      {no:2, first:'อนงค์', last:'สวยงาม'},
+      {no:3, first:'ประเสริฐ', last:'ดีมาก'},
+      {no:4, first:'ประภา', last:'สดใส'},
+      {no:5, first:'ชัยชนะ', last:'เก่งกาจ'},
+    ]
+  }
+];
+
+function log(msg, ok=true){
+  const el = document.getElementById('log');
+  el.classList.add('show');
+  el.innerHTML += `<div>${ok?'✓':'✗'} ${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+async function runSeed(){
+  const btn = document.getElementById('seed-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ กำลังสร้าง...';
+
+  // Auth check
+  const user = await CKService.requireAuth();
+  if(!user){ return; }
+  log(`Login แล้ว: ${user.email}`);
+
+  // Upsert user profile
+  await CKService.updateUserProfile({ display_name: 'ครูทดสอบ', school_name: 'โรงเรียนทดสอบ' });
+  log('บันทึกโปรไฟล์ครู');
+
+  for(const sec of SECTIONS){
+    log(`\n--- สร้าง ${sec.subject} ${sec.grade}/${sec.room} ---`);
+
+    // Create section
+    const section = await CKService.createSection({
+      subject_name: sec.subject,
+      grade_level: sec.grade,
+      room: sec.room,
+      academic_year: '2568',
+      semester: 1,
+      color: sec.color,
+    });
+
+    if(!section){ log(`สร้าง section ล้มเหลว`, false); continue; }
+    log(`Section ID: ${section.id.slice(0,8)}...`);
+
+    // Create schedules
+    for(const sch of sec.schedules){
+      const DAY = {1:'จันทร์',2:'อังคาร',3:'พุธ',4:'พฤหัสบดี',5:'ศุกร์'};
+      const result = await CKService.createSchedule({
+        course_section_id: section.id,
+        weekday: sch.weekday,
+        start_time: sch.start + ':00',
+        end_time: sch.end + ':00',
+      });
+      if(result) log(`ตาราง: ${DAY[sch.weekday]} ${sch.start}–${sch.end}`);
+      else log(`สร้างตารางล้มเหลว`, false);
+    }
+
+    // Import students
+    const ok = await CKService.importStudents(section.id, sec.students.map(s=>({
+      student_number: s.no,
+      first_name: s.first,
+      last_name: s.last,
+    })));
+    if(ok) log(`นักเรียน: ${sec.students.length} คน`);
+    else log(`import นักเรียนล้มเหลว`, false);
+  }
+
+  log('\n🎉 เสร็จสิ้น!');
+  btn.textContent = '✅ เสร็จแล้ว';
+  document.getElementById('done-msg').style.display = 'block';
+}
+</script>
+</body>
+</html>
