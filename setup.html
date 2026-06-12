@@ -225,6 +225,12 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
           </div>
         </div>
         <div id="excel-status"></div>
+        <div id="excel-cancel" style="display:none;margin-top:10px;">
+          <button class="btn btn-ghost" style="font-size:13px;padding:8px 16px;color:#ef4444;border-color:#fecaca;" onclick="cancelExcel()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            ยกเลิก / เปลี่ยนไฟล์
+          </button>
+        </div>
       </div>
 
       <!-- MODE: Image/PDF -->
@@ -241,6 +247,12 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
           </div>
         </div>
         <div id="image-status"></div>
+        <div id="image-cancel" style="display:none;margin-top:10px;">
+          <button class="btn btn-ghost" style="font-size:13px;padding:8px 16px;color:#ef4444;border-color:#fecaca;" onclick="cancelImage()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            ยกเลิก / เปลี่ยนรูป
+          </button>
+        </div>
         <!-- Image preview + confirm form -->
         <div id="image-form" style="display:none;">
           <div class="alert alert-info" style="margin-top:16px;">
@@ -555,8 +567,28 @@ function dzDrop(e, type){
 // ════════════════════════════════════════
 function handleExcelFile(e){ const f = e.target.files[0]; if(f) processExcelFile(f); }
 
+function cancelExcel(){
+  document.getElementById('excel-status').innerHTML = '';
+  document.getElementById('excel-cancel').style.display = 'none';
+  document.getElementById('btn-s2').style.display = 'none';
+  document.getElementById('file-excel').value = '';
+  _rawRows = []; _rawHeaders = []; _colMap = {};
+  _parsedData = {schedules:[], students:[]};
+}
+
+function cancelImage(){
+  document.getElementById('image-status').innerHTML = '';
+  document.getElementById('image-cancel').style.display = 'none';
+  document.getElementById('image-form').style.display = 'none';
+  document.getElementById('btn-s2').style.display = 'none';
+  document.getElementById('file-image').value = '';
+  _imageStudents = [];
+  _parsedData = {schedules:[], students:[]};
+}
+
 function processExcelFile(file){
   const status = document.getElementById('excel-status');
+  document.getElementById('excel-cancel').style.display = 'none';
   status.innerHTML = `<div class="alert alert-info" style="margin-top:16px;"><div class="alert-icon">⏳</div><div>กำลังอ่านไฟล์ <strong>${file.name}</strong>...</div></div>`;
 
   const reader = new FileReader();
@@ -692,11 +724,12 @@ function parseGenericSheet(rows, fileName, wb, allSheets){
   if(hasScheduleFields || hasStudentFields){
     document.getElementById('excel-status').innerHTML =
       `<div class="alert alert-success" style="margin-top:16px;"><div class="alert-icon">✅</div><div>พบ <strong>${_rawRows.length}</strong> แถว — ระบบ detect คอลัมน์อัตโนมัติได้แล้ว</div></div>`;
+    document.getElementById('excel-cancel').style.display = '';
     document.getElementById('btn-s2').style.display = '';
   } else {
-    // ต้อง manual map
     document.getElementById('excel-status').innerHTML =
       `<div class="alert alert-warn" style="margin-top:16px;"><div class="alert-icon">⚠️</div><div>พบ <strong>${_rawRows.length}</strong> แถว — ระบบ detect คอลัมน์บางส่วนไม่ได้ กรุณาระบุเพิ่มเติม</div></div>`;
+    document.getElementById('excel-cancel').style.display = '';
     document.getElementById('btn-s2').style.display = '';
   }
 }
@@ -852,6 +885,7 @@ function processImageFile(file){
       // For now: show form ให้ครูกรอก subject/grade/room แล้ว parse ชื่อจากรูป
       status.innerHTML = `<div class="alert alert-success" style="margin-top:16px;"><div class="alert-icon">✅</div><div>อ่านรูปสำเร็จ — กรุณากรอกข้อมูลด้านล่าง</div></div>`;
       document.getElementById('image-form').style.display = '';
+      document.getElementById('image-cancel').style.display = '';
 
       // Preview รูป
       const imgPreview = document.createElement('img');
@@ -947,8 +981,8 @@ function buildPreview(){
 function showImportReady(msg){
   document.getElementById('excel-status').innerHTML =
     `<div class="alert alert-success" style="margin-top:16px;"><div class="alert-icon">✅</div><div>${msg}</div></div>`;
+  document.getElementById('excel-cancel').style.display = '';
   document.getElementById('btn-s2').style.display = '';
-  // auto build
   buildParsedData();
 }
 
