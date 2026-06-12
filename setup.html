@@ -546,7 +546,7 @@ const COL_HINTS = {
   no:        ['เลขที่','ที่','no','number','ลำดับ'],
   first:     ['ชื่อ','name','firstname','first'],
   last:      ['นามสกุล','สกุล','lastname','last','surname'],
-  fullname:  ['ชื่อ-นามสกุล','ชื่อนามสกุล','fullname','ชื่อ - นามสกุล'],
+  fullname:  ['ชื่อ-นามสกุล','ชื่อนามสกุล','fullname','ชื่อ - นามสกุล','ชื่อ-สกุล','ชื่อ สกุล','ชื่อสกุล'],
   studentId: ['รหัส','id','student_id','เลขประจำตัว'],
   year:      ['ปีการศึกษา','year','ปี'],
   semester:  ['ภาค','ภาคเรียน','semester','term'],
@@ -797,15 +797,18 @@ function goToMapping(){
 
   // ── Generic sheet — ตรวจว่าต้อง mapping ไหม ──
   const hasScheduleFields = ['subject','grade','room','day','start'].every(f=>_colMap[f]!==undefined);
-  const hasStudentFields  = (['subject','first','last'].every(f=>_colMap[f]!==undefined)) ||
-                            (['first','last'].every(f=>_colMap[f]!==undefined));
+  const hasStudentFields  = (['first','last'].every(f=>_colMap[f]!==undefined)) ||
+                            _colMap.fullname !== undefined;
   if(hasScheduleFields || hasStudentFields){
     buildParsedData();
     buildPreview();
     goStep(3);
-  } else {
+  } else if(_rawHeaders.length){
     buildMappingUI();
     goStep('2b');
+  } else {
+    // ไม่มีทั้งข้อมูล parse แล้วและ header — อย่าพาไปหน้า mapping เปล่าๆ
+    showAlert('msg-s2','อ่านคอลัมน์จากไฟล์ไม่ได้ — กรุณาตรวจไฟล์ว่ามีหัวตาราง (เช่น วิชา, ชื่อ, นามสกุล) แล้วอัปโหลดใหม่ หรือใช้ Template ของ ClassKru','error');
   }
 }
 
@@ -941,7 +944,7 @@ function parseClassKruTemplate(wb){
 
     for(let r=stuHeader+1;r<stuRows.length;r++){
       const row = stuRows[r];
-      const first = String(row[iFirst]||'').trim();
+      const first = String(row[iFirst]||'').trim().replace(/^(ด\.ช\.|ด\.ญ\.|เด็กชาย|เด็กหญิง|นาย|นางสาว|นาง)\s*/,'').trim();
       if(!first || first.includes('ClassKru') || first.includes('กรอก')) continue;
       students.push({
         subject: String(row[iSubject]||'').trim(),
@@ -953,6 +956,20 @@ function parseClassKruTemplate(wb){
         studentId: String(row[iId]||'').trim(),
       });
     }
+  }
+
+  // ── Fallback: template sheet name ถูก แต่หา header/ข้อมูลไม่เจอ → parse แบบ generic ──
+  if(!schedules.length && !students.length){
+    for(const sn of wb.SheetNames){
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], {header:1, defval:''});
+      const nonEmpty = rows.filter(r=>r.some(c=>String(c).trim()));
+      if(nonEmpty.length >= 2){
+        parseGenericSheet(rows, sn, wb, wb.SheetNames);
+        return;
+      }
+    }
+    showAlert('excel-status','ไม่พบข้อมูลในไฟล์ — กรุณาตรวจว่ากรอกข้อมูลไว้ใต้หัวตาราง แล้วลองอัปโหลดใหม่','error');
+    return;
   }
 
   _parsedData = { schedules, students };
@@ -970,11 +987,23 @@ function parseGenericSheet(rows, fileName, wb, allSheets){
     showAlert('excel-status','ไฟล์ว่างเปล่าหรืออ่านไม่ได้','error'); return;
   }
 
-  // หา header row = row แรกที่มีข้อความอย่างน้อย 2 cell
-  let headerIdx = 0;
-  for(let i=0;i<Math.min(10,nonEmpty.length);i++){
-    const textCells = nonEmpty[i].filter(c=>isNaN(Number(c))&&String(c).trim().length>0);
-    if(textCells.length >= 2){ headerIdx = i; break; }
+  // หา header row — เลือก row ที่ match keyword คอลัมน์ (COL_HINTS) มากที่สุดก่อน
+  // กัน title row เช่น "ชั้นประถมศึกษาปีที่ 6/1 ปีการศึกษา 2568" ถูกเลือกเป็น header
+  const allHints = Object.values(COL_HINTS).flat();
+  let headerIdx = -1, bestScore = 0;
+  for(let i=0;i<Math.min(15,nonEmpty.length);i++){
+    const cells = nonEmpty[i].map(c=>String(c).trim().toLowerCase()).filter(c=>c);
+    if(cells.length < 2) continue;
+    const score = cells.filter(c=>allHints.some(h=>c.includes(h.toLowerCase()))).length;
+    if(score > bestScore){ bestScore = score; headerIdx = i; }
+  }
+  // fallback: row แรกที่มีข้อความอย่างน้อย 2 cell
+  if(headerIdx < 0 || bestScore < 2){
+    headerIdx = 0;
+    for(let i=0;i<Math.min(10,nonEmpty.length);i++){
+      const textCells = nonEmpty[i].filter(c=>isNaN(Number(c))&&String(c).trim().length>0);
+      if(textCells.length >= 2){ headerIdx = i; break; }
+    }
   }
 
   _rawHeaders = nonEmpty[headerIdx].map(c=>String(c).trim());
@@ -986,15 +1015,21 @@ function parseGenericSheet(rows, fileName, wb, allSheets){
     const hl = h.toLowerCase();
     for(const [field, hints] of Object.entries(COL_HINTS)){
       if(hints.some(hint=>hl.includes(hint.toLowerCase()))){
-        if(!_colMap[field]) _colMap[field] = i;
+        if(_colMap[field]===undefined) _colMap[field] = i;
       }
     }
   });
 
+  // ถ้า "ชื่อ" กับ "นามสกุล" ชี้คอลัมน์เดียวกัน = จริงๆ คือชื่อ-สกุลรวมกัน
+  if(_colMap.first!==undefined && _colMap.first===_colMap.last){
+    _colMap.fullname = _colMap.first;
+    delete _colMap.first; delete _colMap.last;
+  }
+
   // ถ้า detect ได้ครบสำหรับ schedule หรือ student → ข้ามการ map
   const hasScheduleFields = ['subject','grade','room','day','start'].every(f=>_colMap[f]!==undefined);
-  const hasStudentFields  = (['subject','first','last'].every(f=>_colMap[f]!==undefined)) ||
-                            (['first','last'].every(f=>_colMap[f]!==undefined));
+  const hasStudentFields  = (['first','last'].every(f=>_colMap[f]!==undefined)) ||
+                            _colMap.fullname !== undefined;
 
   if(hasScheduleFields || hasStudentFields){
     document.getElementById('excel-status').innerHTML =
@@ -1099,13 +1134,14 @@ function buildParsedData(){
     }
 
     if(hasStudent){
-      let first = get(row,'first');
+      const TITLE_RE = /^(ด\.ช\.|ด\.ญ\.|เด็กชาย|เด็กหญิง|นาย|นางสาว|นาง)\s*/;
+      let first = get(row,'first').replace(TITLE_RE,'').trim();
       let last  = get(row,'last');
       // handle fullname
       if(!first && _colMap.fullname !== undefined){
         const full = get(row,'fullname');
         // ลบคำนำหน้า ด.ช. ด.ญ. นาย นางสาว
-        const cleaned = full.replace(/^(ด\.ช\.|ด\.ญ\.|นาย|นางสาว|นาง)\s*/,'').trim();
+        const cleaned = full.replace(TITLE_RE,'').trim();
         const parts = cleaned.split(/\s+/);
         first = parts[0]||''; last = parts.slice(1).join(' ')||'';
       }
