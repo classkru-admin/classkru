@@ -1200,11 +1200,15 @@ function setAll(status){
 /* ── DESKTOP TABS — Subject-first ── */
 function buildDesktopTabs(){
   const dow = new Date().getDay();
-  const todaySubjects = CK.getSubjectsForDay(dow);
-  // ถ้ามีวิชาวันนี้ แสดงเฉพาะห้องที่สอนวันนี้ก่อน แล้วตามด้วยทั้งหมด
-  const todayClassIds = CK.getTodayPeriods(dow).map(p=>p.classId);
-  const todayClasses = CLASSES.filter(c=>todayClassIds.includes(c.id));
-  const otherClasses = CLASSES.filter(c=>!todayClassIds.includes(c.id));
+  // ใช้ Supabase sections ถ้ามี ไม่งั้นใช้ CK mock
+  const allClasses = (CKService.getSections?.()?.length > 0)
+    ? CKService.getSections()
+    : CLASSES;
+  const todayClassIds = (_sbTodayPeriods||[]).length
+    ? (_sbTodayPeriods).map(p=>p.classId)
+    : CK.getTodayPeriods(dow).map(p=>p.classId);
+  const todayClasses = allClasses.filter(c=>todayClassIds.includes(c.id));
+  const otherClasses = allClasses.filter(c=>!todayClassIds.includes(c.id));
 
   let html = '';
   if(todayClasses.length){
@@ -1241,15 +1245,15 @@ function buildDesktopTabs(){
 function showSheet(){
   const pad2 = n => String(n).padStart(2,'0');
   const dow = currentDate.getDay();
-  // เรียงตามเวลา
-  const periods = CK.getTodayPeriods(dow);
+  const allClasses = (CKService.getSections?.()?.length > 0) ? CKService.getSections() : CLASSES;
+  const periods = (_sbTodayPeriods?.length) ? _sbTodayPeriods : CK.getTodayPeriods(dow);
   let html = '';
 
   if(!periods.length){
     html = `<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;font-weight:600;">ไม่มีคาบสอนวันนี้</div>`;
   } else {
     periods.forEach((p)=>{
-      const c = CLASSES.find(cl=>cl.id===p.classId);
+      const c = allClasses.find(cl=>cl.id===p.classId);
       if(!c) return;
       const lc = CK.LEVEL_COLORS[c.level||'junior'];
       const active = p.periodId===(_period?.periodId);
@@ -1271,13 +1275,16 @@ function showSheet(){
   document.getElementById('sheet-ov').classList.add('show');
 }
 
-function switchToPeriod(periodId){
-  const p = CK.getPeriod(periodId);
+async function switchToPeriod(periodId){
+  // หาจาก Supabase ก่อน fallback CK
+  let p = CKService.getPeriod(periodId) || CK.getPeriod(periodId);
   if(!p) return;
   _period = p;
   document.getElementById('sheet-ov').classList.remove('show');
   const emptyEl = document.getElementById('m-empty-state');
   if(emptyEl) emptyEl.style.display = 'none';
+  // โหลด students + attendance ของ section ใหม่
+  await loadSupabaseData(p.classId, todayKey);
   switchClass(p.classId);
 }
 function closeSheetOv(e){ if(e.target.id==='sheet-ov') document.getElementById('sheet-ov').classList.remove('show'); }
@@ -1335,9 +1342,113 @@ function init(){
   buildMobileQueue(); renderMobileCard(); updateMobileStats();
   renderDesktopTable(); updateDesktopStats();
 }
-// ── Auth Guard ──
+let _sbTodayPeriods = []; // today's periods from Supabase
+
+// ── Supabase Data Cache ──
+// โหลดข้อมูลจาก Supabase เข้า cache แล้วให้ CK functions อ่านจาก cache
+let _sbStudentCache = {};   // { sectionId: [students] }
+let _sbAttendCache = {};    // { 'sectionId|dateKey': {studentId: {status,note}} }
+
+async function loadSupabaseData(sectionId, dateKey){
+  if(!sectionId) return;
+
+  // โหลด students ถ้ายังไม่มี
+  if(!_sbStudentCache[sectionId]){
+    const students = await CKService.getStudents(sectionId);
+    _sbStudentCache[sectionId] = students;
+  }
+
+  // โหลด attendance
+  const cacheKey = `${sectionId}|${dateKey}`;
+  if(!_sbAttendCache[cacheKey]){
+    const records = await CKService.getAttendance(sectionId, dateKey);
+    _sbAttendCache[cacheKey] = records || {};
+  }
+}
+
+// Override CK functions ให้อ่านจาก Supabase cache
+const _origGetStudents = CK.getStudents.bind(CK);
+CK.getStudents = function(classId){
+  if(_sbStudentCache[classId] && _sbStudentCache[classId].length > 0)
+    return _sbStudentCache[classId];
+  return _origGetStudents(classId);
+};
+
+const _origGetAttendance = CK.getAttendance.bind(CK);
+CK.getAttendance = function(periodId, dateKey){
+  // sectionId ใน Supabase = classId ของ period
+  const sectionId = _period?.classId;
+  const cacheKey = `${sectionId}|${dateKey}`;
+  if(sectionId && _sbAttendCache[cacheKey])
+    return _sbAttendCache[cacheKey];
+  return _origGetAttendance(periodId, dateKey);
+};
+
+const _origSetAttendancePeriod = CK.setAttendancePeriod.bind(CK);
+CK.setAttendancePeriod = function(periodId, dateKey, studentId, status, note){
+  // บันทึก localStorage เดิม
+  _origSetAttendancePeriod(periodId, dateKey, studentId, status, note);
+  // บันทึก cache
+  const sectionId = _period?.classId;
+  if(sectionId){
+    const cacheKey = `${sectionId}|${dateKey}`;
+    if(!_sbAttendCache[cacheKey]) _sbAttendCache[cacheKey] = {};
+    _sbAttendCache[cacheKey][studentId] = { status, note: note||'' };
+  }
+  // sync Supabase async (ไม่รอ)
+  if(sectionId){
+    CKService.setAttendancePeriod(sectionId, dateKey, studentId, status, note||'')
+      .catch(e=>console.warn('sync attendance failed:', e));
+  }
+};
+
+const _origBulkSet = CK.bulkSetAttendancePeriod.bind(CK);
+CK.bulkSetAttendancePeriod = function(periodId, dateKey, records){
+  _origBulkSet(periodId, dateKey, records);
+  const sectionId = _period?.classId;
+  if(sectionId){
+    const cacheKey = `${sectionId}|${dateKey}`;
+    if(!_sbAttendCache[cacheKey]) _sbAttendCache[cacheKey] = {};
+    records.forEach(r=>{ _sbAttendCache[cacheKey][r.id] = {status:r.status, note:r.note||''}; });
+    CKService.bulkSetAttendancePeriod(sectionId, dateKey, records)
+      .catch(e=>console.warn('sync bulk failed:', e));
+  }
+};
+
+// ── Auth Guard + Load Supabase Data ──
 (async function(){
   await CKService.requireAuth();
+
+  // โหลด schedules ก่อน
+  await CKService.loadSchedules();
+  await CKService.loadSections();
+  const dow = new Date().getDay();
+  _sbTodayPeriods = await CKService.getTodayPeriods(dow);
+
+  // ถ้ามี periodId จาก URL — หา section จาก Supabase
+  if(_periodId){
+    const sbPeriod = CKService.getPeriod(_periodId);
+    if(sbPeriod && sbPeriod.classId){
+      _period = sbPeriod;
+      currentClass = sbPeriod.classId;
+    }
+  }
+
+  // ถ้าไม่มี period — หาจากวันนี้
+  if(!_period || !_period.classId){
+    const dow = new Date().getDay();
+    const todayPeriods = await CKService.getTodayPeriods(dow);
+    if(todayPeriods.length){
+      _period = todayPeriods[0];
+      currentClass = _period.classId;
+    }
+  }
+
+  // โหลด students + attendance จาก Supabase
+  if(_period?.classId){
+    await loadSupabaseData(_period.classId, todayKey);
+  }
+
   init();
 })();
 </script>
