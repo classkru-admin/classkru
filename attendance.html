@@ -630,14 +630,31 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
 <div class="toast" id="toast-el"></div>
 
 <script src="ck-service.js"></script>
-<script src="ck-data.js"></script>
 <script>
-/* ══ DATA (จาก shared layer) ══ */
-const MAX_ABSENT=8;
-const CLASSES=CK.CLASSES;
+/* ══ DATA — Supabase only ══ */
+const MAX_ABSENT = 8;
+const LEVEL_COLORS = CKService.LEVEL_COLORS;
 
-// helper อ่านนักเรียนของ class ปัจจุบัน (live จาก localStorage)
-function getStudents(classId){ return CK.getStudents(classId||currentClass); }
+// CK stub — ป้องกัน undefined ถ้ายังมี ref เหลืออยู่
+const CK = {
+  CLASSES: [],
+  TIMETABLE: {},
+  LEVEL_COLORS,
+  fmtKey: CKService.fmtKey,
+  getStudents: (id) => _sbStudentCache[id] || [],
+  getAttendance: (pid, dk) => {
+    const sid = _period?.classId;
+    return sid ? (_sbAttendCache[`${sid}|${dk}`] || {}) : {};
+  },
+  setAttendancePeriod: () => {},
+  bulkSetAttendancePeriod: () => {},
+  getPeriod: (id) => CKService.getPeriod(id),
+  getTodayPeriods: (dow) => [],
+  _loadStore: () => null,
+  _saveStore: () => {},
+};
+
+function getStudents(classId){ return _sbStudentCache[classId||currentClass] || []; }
 
 /* ── STATE ── */
 const _params=new URLSearchParams(window.location.search);
@@ -645,17 +662,11 @@ const _params=new URLSearchParams(window.location.search);
 // รับทั้ง ?period=xxx และ ?class=xxx (backward compat)
 // ถ้ามี period ให้ใช้ classId จาก period นั้น
 let _periodId = _params.get('period')||null;
-let _period = _periodId ? CK.getPeriod(_periodId) : null;
-let currentClass = _period ? _period.classId : (_params.get('class')||'m31');
-if(!CLASSES.find(c=>c.id===currentClass)) currentClass='m31';
-// ถ้าไม่มี period ให้หา period แรกของ class นี้วันนี้ (เพื่อแก้ undefined)
-if(!_period){
-  const dow = new Date().getDay();
-  _period = (CK.getTodayPeriods(dow)||[]).find(p=>p.classId===currentClass) || null;
-}
+let _period = null; // จะ set ใน init async
+let currentClass = _params.get('class')||null; // จะ set จาก Supabase
 
 let currentDate=new Date();
-let todayKey=CK.fmtKey(currentDate);
+let todayKey=CKService.fmtKey(currentDate);
 // Mobile swipe state
 let queue=[],queuePos=0,isDone=false,undoStack=[];
 let changedRows=0;
@@ -673,19 +684,13 @@ function fmtShort(d){
   return `${D[d.getDay()]} ${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()+543}`;
 }
 function absCounts(student){
-  // นับจาก period attendance ทุก period ของ classId นี้ตลอดทุกวัน
+  // นับจาก _sbAttendCache ทุก dateKey ของ sectionId นี้
   const c={present:0,late:0,absent:0,leave:0};
-  const store=CK._loadStore?.();
-  if(!store?.attendance) return c;
-  // รวมทุก period ที่เป็น classId เดียวกัน
-  const classId=student.classId||currentClass;
-  const relatedPeriods=Object.values(CK.TIMETABLE).flat().filter(p=>p.classId===classId);
-  relatedPeriods.forEach(p=>{
-    const periodData=store.attendance[p.periodId]||{};
-    Object.values(periodData).forEach(dayRec=>{
-      const r=dayRec[student.id];
-      if(r&&c[r.status]!==undefined) c[r.status]++;
-    });
+  const sectionId = student.classId || currentClass;
+  Object.entries(_sbAttendCache).forEach(([key, records])=>{
+    if(!key.startsWith(sectionId+'|')) return;
+    const r = records[student.id];
+    if(r && c[r.status] !== undefined) c[r.status]++;
   });
   return c;
 }
@@ -720,26 +725,25 @@ function updateDateDisplay(){
 function switchClass(id){
   currentClass=id;
   document.getElementById('sheet-ov').classList.remove('show');
+  const allSections = CKService.getSections();
   document.querySelectorAll('.d-tab').forEach(t=>{
     const active=t.dataset.id===id;
     t.classList.toggle('active',active);
-    const lc=CK.LEVEL_COLORS[(CLASSES.find(c=>c.id===t.dataset.id)||{}).level||'junior'];
+    const sec = allSections.find(c=>c.id===t.dataset.id);
+    const lc = LEVEL_COLORS[sec?.level||'junior'];
     t.style.borderColor=active?lc.icon:'';
     t.style.background=active?lc.bg:'';
     t.style.color=active?lc.text:'';
   });
-  const cls=CLASSES.find(c=>c.id===id);
-  // หา subject จาก period ปัจจุบัน (ถ้ามี) หรือจาก timetable วันนี้
-  const subjectLabel = _period && _period.classId===id
-    ? _period.subject
-    : (CK.getTodayPeriods(new Date().getDay()).find(p=>p.classId===id)||{}).subject || '';
+  const cls = allSections.find(c=>c.id===id);
+  const subjectLabel = _period?.classId===id ? _period.subject : (_sbTodayPeriods.find(p=>p.classId===id)||{}).subject||'';
   const mLabel=document.getElementById('m-class-label');
   const dLabel=document.getElementById('d-class-name-lbl');
-  if(mLabel){
-    const lc2=CK.LEVEL_COLORS[cls?.level||'junior'];
-    mLabel.innerHTML=`<div style="font-size:18px;font-weight:800;color:var(--text);">${subjectLabel||cls.name}</div><div style="font-size:13px;font-weight:700;color:${lc2.text};display:flex;align-items:center;justify-content:center;gap:4px;margin-top:1px;"><span style="width:6px;height:6px;border-radius:50%;background:${lc2.icon};display:inline-block;"></span>${cls.name} · ${cls.count} คน</div>`;
+  if(mLabel && cls){
+    const lc2 = LEVEL_COLORS[cls.level||'junior'];
+    mLabel.innerHTML=`<div style="font-size:18px;font-weight:800;color:var(--text);">${subjectLabel||cls.name}</div><div style="font-size:13px;font-weight:700;color:${lc2.text};display:flex;align-items:center;justify-content:center;gap:4px;margin-top:1px;"><span style="width:6px;height:6px;border-radius:50%;background:${lc2.icon};display:inline-block;"></span>${cls.name} · ${cls.count||0} คน</div>`;
   }
-  if(dLabel) dLabel.textContent=`${cls.name}${subjectLabel?' — '+subjectLabel:''} · ${cls.count} คน`;
+  if(dLabel && cls) dLabel.textContent=`${cls.name}${subjectLabel?' — '+subjectLabel:''} · ${cls.count||0} คน`;
   undoStack=[];
   buildMobileQueue(); renderMobileCard(); updateMobileStats();
   renderDesktopTable(); updateDesktopStats();
@@ -747,13 +751,17 @@ function switchClass(id){
 }
 
 /* ── SHARED: save ── */
-function doSave(){
+async function doSave(){
   if(_period){
-    const periodId=_period.periodId;
-    const records=getStudents(currentClass)
-      .map(s=>{ const r=CK.getAttendance(periodId,todayKey)[s.id]; return r?{id:s.id,status:r.status,note:r.note||''}:null; })
+    const sectionId = _period.classId;
+    const records = getStudents(currentClass)
+      .map(s=>{ const r=CK.getAttendance(_period.periodId,todayKey)[s.id]; return r?{id:s.id,status:r.status,note:r.note||''}:null; })
       .filter(Boolean);
-    CK.bulkSetAttendancePeriod(periodId, todayKey, records);
+    // sync Supabase
+    if(sectionId && records.length){
+      await CKService.bulkSetAttendancePeriod(sectionId, todayKey, records)
+        .catch(e=>console.warn('save failed:',e));
+    }
   }
   changedRows=0; updateSaveBar();
   document.getElementById('d-changed').classList.remove('show');
@@ -762,8 +770,7 @@ function doSave(){
 
 /* ── AUTOSAVE ── */
 function autoSave(classId, dateKey, studentId, status, note){
-  if(_period){ CK.setAttendancePeriod(_period.periodId, dateKey, studentId, status, note||''); }
-  else { CK.setAttendance(classId, dateKey, studentId, status, note||''); }
+  CK.setAttendancePeriod(_period?.periodId, dateKey, studentId, status, note||'');
   showAutoSaveToast();
 }
 function showAutoSaveToast(){}
@@ -835,13 +842,13 @@ function markChanged(){
 /* ── SHARED: export ── */
 function exportCSV(){
   const students=getStudents(currentClass);
-  const records=_period?CK.getAttendance(_period.periodId,todayKey):{};
+  const records=CK.getAttendance(_period?.periodId, todayKey);
   const LABEL={present:'มาเรียน',late:'มาสาย',absent:'ขาดเรียน',leave:'ลา'};
   let csv='เลขที่,ชื่อ,นามสกุล,สถานะ,หมายเหตุ\n';
   students.forEach(s=>{
     const r=records[s.id];
     const statusLabel=r?LABEL[r.status]:'ยังไม่เช็ค';
-    csv+=`${s.no},${s.fn},${s.ln},${statusLabel},${r?r.note||'':''}\n`;
+    csv+=`${s.no},${s.fn||s.first_name||''},${s.ln||s.last_name||''},${statusLabel},${r?r.note||'':''}\n`;
   });
   const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
@@ -858,7 +865,7 @@ function buildMobileQueue(){
   const records=_period?CK.getAttendance(_period.periodId,todayKey):{};
   const unchecked=students.filter(s=>!records[s.id]).map(s=>s.id);
   const checked=students.filter(s=>records[s.id]).map(s=>s.id);
-  queue=[...unchecked,...checked];
+  queue=[...unchecked,...checked]; // queue เก็บ student.id
   queuePos=0; isDone=unchecked.length===0; undoStack=[];
   if(isDone) showMobileDone();
 }
@@ -870,7 +877,8 @@ function renderMobileCard(){
   document.getElementById('m-done').classList.remove('show');
 
   const allStudents=getStudents(currentClass);
-  const s=allStudents[queue[queuePos]];
+  const sid=queue[queuePos];
+  const s=allStudents.find(x=>x.id===sid);
   if(!s){isDone=true;showMobileDone();return;}
 
   document.getElementById('card-no').textContent=`เลขที่ ${s.no} / ${allStudents.length}`;
@@ -888,14 +896,13 @@ function renderMobileCard(){
     <span class="chip" style="${badgeColor}">${miss>=MAX_ABSENT?'เกินแล้ว!':'ขาดได้อีก '+left}</span>`;
 
   const DOT={present:'#1d9e75',late:'#f59e0b',absent:'#ef4444',leave:'#6366f1'};
-  // รวม attendance ทุก period ของ classId นี้ เรียงตามวันที่
-  const store4=CK._loadStore?.();
-  const classId4=s.classId||currentClass;
-  const relPeriods=Object.values(CK.TIMETABLE).flat().filter(p=>p.classId===classId4);
+  // history dots จาก _sbAttendCache
+  const sectionId4=s.classId||currentClass;
   const allRecs={};
-  relPeriods.forEach(p=>{
-    const pd=store4?.attendance?.[p.periodId]||{};
-    Object.entries(pd).forEach(([dk,dayR])=>{ if(dayR[s.id]&&!allRecs[dk]) allRecs[dk]=dayR[s.id]; });
+  Object.entries(_sbAttendCache).forEach(([key,records])=>{
+    if(!key.startsWith(sectionId4+'|')) return;
+    const dateKey = key.split('|')[1];
+    if(records[s.id] && !allRecs[dateKey]) allRecs[dateKey]=records[s.id];
   });
   const recent=Object.entries(allRecs).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,20);
   document.getElementById('card-dots').innerHTML=recent.map(([,r])=>
@@ -916,12 +923,12 @@ function renderMobileCard(){
 
 function act(status){
   if(isDone) return;
-  const s=getStudents(currentClass)[queue[queuePos]];
+  const allStudents=getStudents(currentClass);
+  const s=allStudents.find(x=>x.id===queue[queuePos]);
   if(!s) return;
-  const periodRecs2=_period?CK.getAttendance(_period.periodId,todayKey):{};
-  undoStack.push({id:s.id,prev:periodRecs2[s.id]||null,pos:queuePos});
-  if(_period){ CK.setAttendancePeriod(_period.periodId, todayKey, s.id, status, ''); }
-  else { CK.setAttendance(currentClass, todayKey, s.id, status, ''); }
+  const currentRecs=CK.getAttendance(_period?.periodId, todayKey);
+  undoStack.push({id:s.id, prev:currentRecs[s.id]||null, pos:queuePos});
+  CK.setAttendancePeriod(_period?.periodId, todayKey, s.id, status, '');
   showAutoSaveToast();
   const card=document.getElementById('swipe-card');
   if(status==='late') card.classList.add('fly-l');
@@ -936,26 +943,29 @@ function act(status){
 function undo(){
   if(!undoStack.length){showToast('ไม่มีการเช็คชื่อให้ย้อน');return;}
   const last=undoStack.pop();
+  const sectionId = _period?.classId;
+  const cacheKey = `${sectionId}|${todayKey}`;
 
   if(last.prev){
     // คืนค่าเดิม
-    if(_period){ CK.setAttendancePeriod(_period.periodId, todayKey, last.id, last.prev.status, last.prev.note||''); }
-    else { CK.setAttendance(currentClass, todayKey, last.id, last.prev.status, last.prev.note||''); }
+    if(!_sbAttendCache[cacheKey]) _sbAttendCache[cacheKey] = {};
+    _sbAttendCache[cacheKey][last.id] = last.prev;
+    if(sectionId){
+      CKService.setAttendancePeriod(sectionId, todayKey, last.id, last.prev.status, last.prev.note||'')
+        .catch(e=>console.warn('undo sync failed:',e));
+    }
   } else {
-    // ยังไม่เคยเช็ค — ลบ record นี้ออกจาก period attendance
-    if(_period){
-      const store=CK._loadStore?.();
-      if(store?.attendance?.[_period.periodId]?.[todayKey]){
-        delete store.attendance[_period.periodId][todayKey][last.id];
-        CK._saveStore?.(store);
+    // ยังไม่เคยเช็ค — ลบออกจาก cache
+    if(_sbAttendCache[cacheKey]) delete _sbAttendCache[cacheKey][last.id];
+    // ไม่มี Supabase delete สำหรับ single record — clearAttendance แล้ว re-import จะหนักเกิน
+    // ใช้วิธี bulk ส่ง records ที่เหลือ
+    if(sectionId){
+      const remaining = Object.entries(_sbAttendCache[cacheKey]||{})
+        .map(([id,r])=>({id, status:r.status, note:r.note||''}));
+      if(remaining.length){
+        CKService.bulkSetAttendancePeriod(sectionId, todayKey, remaining)
+          .catch(e=>console.warn('undo bulk sync failed:',e));
       }
-    } else {
-      const allStudents = getStudents(currentClass);
-      const periodRecs3=CK.getAttendance(_period?.periodId||'',todayKey);
-      const records = allStudents
-        .filter(s => s.id !== last.id && periodRecs3[s.id])
-        .map(s => ({id:s.id, status:periodRecs3[s.id].status, note:periodRecs3[s.id].note||''}));
-      CK.bulkSetAttendancePeriod(_period?.periodId||currentClass, todayKey, records);
     }
   }
 
@@ -1123,10 +1133,9 @@ function renderDesktopTable(){
 }
 
 function dSetStatus(studentId, status, btn){
-  const periodRecords=_period?CK.getAttendance(_period.periodId,todayKey):{};
-  const note=(_period?periodRecords[studentId]:null)?.note||'';
-  if(_period){ CK.setAttendancePeriod(_period.periodId, todayKey, studentId, status, note); }
-  else { CK.setAttendance(currentClass, todayKey, studentId, status, note); }
+  const periodRecords=CK.getAttendance(_period?.periodId, todayKey);
+  const note=periodRecords[studentId]?.note||'';
+  CK.setAttendancePeriod(_period?.periodId, todayKey, studentId, status, note);
 
   const stMap={present:'active-p',late:'active-l',absent:'active-a',leave:'active-v'};
   const container=document.getElementById('dsb-'+studentId);
@@ -1140,10 +1149,9 @@ function dSetStatus(studentId, status, btn){
 }
 
 function dSetNote(studentId, note){
-  const periodRecords=_period?CK.getAttendance(_period.periodId,todayKey):{};
-  const status=(_period?periodRecords[studentId]:null)?.status||'present';
-  if(_period){ CK.setAttendancePeriod(_period.periodId, todayKey, studentId, status, note); }
-  else { CK.setAttendance(currentClass, todayKey, studentId, status, note); }
+  const periodRecords=CK.getAttendance(_period?.periodId, todayKey);
+  const status=periodRecords[studentId]?.status||'present';
+  CK.setAttendancePeriod(_period?.periodId, todayKey, studentId, status, note);
   markChanged();
 }
 
@@ -1170,16 +1178,15 @@ function confirmReset(){
   document.getElementById('reset-ov').classList.add('show');
 }
 function closeReset(){ document.getElementById('reset-ov').classList.remove('show'); }
-function doReset(){
-  if(_period){
-    // ล้าง period attendance เฉพาะ period นี้
-    const store=CK._loadStore?.();
-    if(store?.attendance?.[_period.periodId]?.[todayKey]){
-      delete store.attendance[_period.periodId][todayKey];
-      CK._saveStore?.(store);
-    }
-  } else {
-    CK.clearAttendance(currentClass, todayKey);
+async function doReset(){
+  const sectionId = _period?.classId;
+  if(sectionId){
+    // ล้าง Supabase
+    await CKService.clearAttendance(sectionId, todayKey).catch(e=>console.warn('reset failed:',e));
+    // ล้าง cache
+    const cacheKey = `${sectionId}|${todayKey}`;
+    _sbAttendCache[cacheKey] = {};
+    CKService.clearCache(sectionId);
   }
   undoStack=[];
   buildMobileQueue(); renderMobileCard(); updateMobileStats(); updateMobileProgress();
@@ -1189,9 +1196,8 @@ function doReset(){
 
 function setAll(status){
   const records=getStudents(currentClass).map(s=>({id:s.id,status,note:''}));
-  if(_period){ CK.bulkSetAttendancePeriod(_period.periodId, todayKey, records); }
-  else { CK.bulkSetAttendance(currentClass, todayKey, records); }
-  // อัพเดททั้ง mobile และ desktop
+  // อัพเดท cache + sync Supabase
+  CK.bulkSetAttendancePeriod(_period?.periodId||currentClass, todayKey, records);
   buildMobileQueue(); renderMobileCard(); updateMobileStats(); updateMobileProgress();
   renderDesktopTable(); updateDesktopStats(); markChanged();
   showToast({present:'มาทุกคน',late:'สายทุกคน',absent:'ขาดทุกคน',leave:'ลาทุกคน'}[status]);
@@ -1199,43 +1205,32 @@ function setAll(status){
 
 /* ── DESKTOP TABS — Subject-first ── */
 function buildDesktopTabs(){
-  const dow = new Date().getDay();
-  // ใช้ Supabase sections ถ้ามี ไม่งั้นใช้ CK mock
-  const allClasses = (CKService.getSections?.()?.length > 0)
-    ? CKService.getSections()
-    : CLASSES;
-  const todayClassIds = (_sbTodayPeriods||[]).length
-    ? (_sbTodayPeriods).map(p=>p.classId)
-    : CK.getTodayPeriods(dow).map(p=>p.classId);
+  const allClasses = CKService.getSections();
+  const todayClassIds = (_sbTodayPeriods||[]).map(p=>p.classId);
   const todayClasses = allClasses.filter(c=>todayClassIds.includes(c.id));
   const otherClasses = allClasses.filter(c=>!todayClassIds.includes(c.id));
 
   let html = '';
   if(todayClasses.length){
     html += todayClasses.map(c=>{
-      const lc=CK.LEVEL_COLORS[c.level||'junior'];
-      const active=c.id===currentClass;
-      const subj=(CK.getTodayPeriods(dow).find(p=>p.classId===c.id)||{}).subject||'';
+      const lc = LEVEL_COLORS[c.level||'junior'];
+      const active = c.id===currentClass;
+      const subj = (_sbTodayPeriods.find(p=>p.classId===c.id)||{}).subject||'';
       return `<button class="d-tab ${active?'active':''}" data-id="${c.id}" onclick="switchClass('${c.id}')"
-        style="${active?`border-color:${lc.icon};background:${lc.bg};color:${lc.text};`:``}"
+        style="${active?`border-color:${lc.icon};background:${lc.bg};color:${lc.text};`:''}"
         title="${subj}">${c.name}</button>`;
     }).join('');
     if(otherClasses.length){
       html += `<span style="color:#cbd5e1;font-size:16px;align-self:center;">|</span>`;
       html += otherClasses.map(c=>{
-        const lc=CK.LEVEL_COLORS[c.level||'junior'];
-        const active=c.id===currentClass;
+        const lc = LEVEL_COLORS[c.level||'junior'];
+        const active = c.id===currentClass;
         return `<button class="d-tab ${active?'active':''}" data-id="${c.id}" onclick="switchClass('${c.id}')"
-          style="${active?`border-color:${lc.icon};background:${lc.bg};color:${lc.text};`:`opacity:.6;`}">${c.name}</button>`;
+          style="${active?`border-color:${lc.icon};background:${lc.bg};color:${lc.text};`:'opacity:.6;'}">${c.name}</button>`;
       }).join('');
     }
   } else {
-    html += CLASSES.map(c=>{
-      const lc=CK.LEVEL_COLORS[c.level||'junior'];
-      const active=c.id===currentClass;
-      return `<button class="d-tab ${active?'active':''}" data-id="${c.id}" onclick="switchClass('${c.id}')"
-        style="${active?`border-color:${lc.icon};background:${lc.bg};color:${lc.text};`:``}">${c.name}</button>`;
-    }).join('');
+    html = `<div style="font-size:13px;color:var(--muted);padding:10px 4px;">ไม่มีคาบสอนวันนี้</div>`;
   }
   const dTabs=document.getElementById('d-tabs');
   if(dTabs) dTabs.innerHTML=html;
@@ -1244,9 +1239,8 @@ function buildDesktopTabs(){
 /* ── SHEET — Subject-first picker ── */
 function showSheet(){
   const pad2 = n => String(n).padStart(2,'0');
-  const dow = currentDate.getDay();
-  const allClasses = (CKService.getSections?.()?.length > 0) ? CKService.getSections() : CLASSES;
-  const periods = (_sbTodayPeriods?.length) ? _sbTodayPeriods : CK.getTodayPeriods(dow);
+  const allClasses = CKService.getSections();
+  const periods = _sbTodayPeriods || [];
   let html = '';
 
   if(!periods.length){
@@ -1255,13 +1249,13 @@ function showSheet(){
     periods.forEach((p)=>{
       const c = allClasses.find(cl=>cl.id===p.classId);
       if(!c) return;
-      const lc = CK.LEVEL_COLORS[c.level||'junior'];
+      const lc = LEVEL_COLORS[c.level||'junior'];
       const active = p.periodId===(_period?.periodId);
       html += `<div style="display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;border:1.5px solid ${active?lc.border:'var(--border)'};background:${active?lc.bg:'#fff'};cursor:pointer;transition:all .15s;" onclick="switchToPeriod('${p.periodId}')">
         <div style="width:8px;height:8px;border-radius:50%;background:${lc.icon};flex-shrink:0;"></div>
         <div style="flex:1;">
           <div style="font-size:14px;font-weight:800;color:var(--text);">${p.subject} — ${c.name}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${pad2(p.s[0])}:${pad2(p.s[1])}–${pad2(p.e[0])}:${pad2(p.e[1])} · ${c.count} คน</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${pad2(p.s[0])}:${pad2(p.s[1])}–${pad2(p.e[0])}:${pad2(p.e[1])} · ${c.count||0} คน</div>
         </div>
         ${active
           ? `<span style="font-size:13px;font-weight:800;color:${lc.text};">✓</span>`
@@ -1276,8 +1270,7 @@ function showSheet(){
 }
 
 async function switchToPeriod(periodId){
-  // หาจาก Supabase ก่อน fallback CK
-  let p = CKService.getPeriod(periodId) || CK.getPeriod(periodId);
+  let p = CKService.getPeriod(periodId);
   if(!p) return;
   _period = p;
   document.getElementById('sheet-ov').classList.remove('show');
@@ -1290,8 +1283,8 @@ async function switchToPeriod(periodId){
 function closeSheetOv(e){ if(e.target.id==='sheet-ov') document.getElementById('sheet-ov').classList.remove('show'); }
 
 function confirmSetAll(){
-  const cls=CLASSES.find(c=>c.id===currentClass);
-  document.getElementById('confirm-sub').textContent=`นักเรียน ${cls.count} คนจะถูกบันทึกว่า "มาเรียน"`;
+  const cls = CKService.getSections().find(c=>c.id===currentClass);
+  document.getElementById('confirm-sub').textContent=`นักเรียน ${cls?.count||0} คนจะถูกบันทึกว่า "มาเรียน"`;
   document.getElementById('confirm-ov').classList.add('show');
 }
 function closeConfirm(){ document.getElementById('confirm-ov').classList.remove('show'); }
@@ -1311,21 +1304,21 @@ function init(){
   todayKey=fmtKey(currentDate);
   updateDateDisplay();
   buildDesktopTabs();
-  const cls=CLASSES.find(c=>c.id===currentClass);
-  const _subjectLabel = _period && _period.classId===currentClass
+  const cls = CKService.getSections().find(c=>c.id===currentClass);
+  const _subjectLabel = _period?.classId===currentClass
     ? _period.subject
-    : (CK.getTodayPeriods(new Date().getDay()).find(p=>p.classId===currentClass)||{}).subject || '';
+    : (_sbTodayPeriods.find(p=>p.classId===currentClass)||{}).subject || '';
   const noSubjectInit = !_period;
   const mLabel=document.getElementById('m-class-label');
   const dLabel=document.getElementById('d-class-name-lbl');
   if(mLabel){
     if(noSubjectInit){ mLabel.innerHTML=''; }
-    else {
-      const lc=CK.LEVEL_COLORS[cls?.level||'junior'];
-      mLabel.innerHTML=`<div style="font-size:16px;font-weight:800;color:var(--text);">${_subjectLabel||cls.name}</div><div style="font-size:13px;font-weight:700;color:${lc.text};display:flex;align-items:center;justify-content:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:${lc.icon};display:inline-block;"></span>${cls.name} · ${cls.count} คน</div>`;
+    else if(cls){
+      const lc = LEVEL_COLORS[cls.level||'junior'];
+      mLabel.innerHTML=`<div style="font-size:16px;font-weight:800;color:var(--text);">${_subjectLabel||cls.name}</div><div style="font-size:13px;font-weight:700;color:${lc.text};display:flex;align-items:center;justify-content:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:${lc.icon};display:inline-block;"></span>${cls.name} · ${cls.count||0} คน</div>`;
     }
   }
-  if(dLabel) dLabel.textContent = noSubjectInit ? '' : `${cls.name}${_subjectLabel?' — '+_subjectLabel:''} · ${cls.count} คน`;
+  if(dLabel) dLabel.textContent = noSubjectInit ? '' : `${cls?.name||''}${_subjectLabel?' — '+_subjectLabel:''} · ${cls?.count||0} คน`;
   // วันที่ใน sidebar
   const sbDate=document.getElementById('d-sb-date');
   if(sbDate){
@@ -1366,85 +1359,73 @@ async function loadSupabaseData(sectionId, dateKey){
   }
 }
 
-// Override CK functions ให้อ่านจาก Supabase cache
-const _origGetStudents = CK.getStudents.bind(CK);
+// ══ SUPABASE-ONLY DATA LAYER ══
+// ไม่ใช้ localStorage อีกต่อไป — ทุก read/write ผ่าน _sbAttendCache + Supabase
+
+// getStudents: อ่านจาก Supabase cache เท่านั้น
 CK.getStudents = function(classId){
-  if(_sbStudentCache[classId] && _sbStudentCache[classId].length > 0)
-    return _sbStudentCache[classId];
-  return _origGetStudents(classId);
+  return _sbStudentCache[classId] || [];
 };
 
-const _origGetAttendance = CK.getAttendance.bind(CK);
+// getAttendance: อ่านจาก cache โดยใช้ sectionId|dateKey เป็น key
+// ** KEY FIX: แต่ละ section แยก cache ของตัวเอง ไม่ปนกัน **
 CK.getAttendance = function(periodId, dateKey){
-  // sectionId ใน Supabase = classId ของ period
   const sectionId = _period?.classId;
-  const cacheKey = `${sectionId}|${dateKey}`;
-  if(sectionId && _sbAttendCache[cacheKey])
-    return _sbAttendCache[cacheKey];
-  return _origGetAttendance(periodId, dateKey);
+  if(!sectionId) return {};
+  return _sbAttendCache[`${sectionId}|${dateKey}`] || {};
 };
 
-const _origSetAttendancePeriod = CK.setAttendancePeriod.bind(CK);
+// setAttendancePeriod: เขียน cache + sync Supabase — ไม่แตะ localStorage
 CK.setAttendancePeriod = function(periodId, dateKey, studentId, status, note){
-  // บันทึก localStorage เดิม
-  _origSetAttendancePeriod(periodId, dateKey, studentId, status, note);
-  // บันทึก cache
   const sectionId = _period?.classId;
-  if(sectionId){
-    const cacheKey = `${sectionId}|${dateKey}`;
-    if(!_sbAttendCache[cacheKey]) _sbAttendCache[cacheKey] = {};
-    _sbAttendCache[cacheKey][studentId] = { status, note: note||'' };
-  }
-  // sync Supabase async (ไม่รอ)
-  if(sectionId){
-    CKService.setAttendancePeriod(sectionId, dateKey, studentId, status, note||'')
-      .catch(e=>console.warn('sync attendance failed:', e));
-  }
+  if(!sectionId) return;
+  const cacheKey = `${sectionId}|${dateKey}`;
+  if(!_sbAttendCache[cacheKey]) _sbAttendCache[cacheKey] = {};
+  _sbAttendCache[cacheKey][studentId] = { status, note: note||'' };
+  // sync Supabase async
+  CKService.setAttendancePeriod(sectionId, dateKey, studentId, status, note||'')
+    .catch(e => console.warn('sync failed:', e));
 };
 
-const _origBulkSet = CK.bulkSetAttendancePeriod.bind(CK);
+// bulkSetAttendancePeriod: เขียน cache ทั้งหมด + sync Supabase
 CK.bulkSetAttendancePeriod = function(periodId, dateKey, records){
-  _origBulkSet(periodId, dateKey, records);
   const sectionId = _period?.classId;
-  if(sectionId){
-    const cacheKey = `${sectionId}|${dateKey}`;
-    if(!_sbAttendCache[cacheKey]) _sbAttendCache[cacheKey] = {};
-    records.forEach(r=>{ _sbAttendCache[cacheKey][r.id] = {status:r.status, note:r.note||''}; });
-    CKService.bulkSetAttendancePeriod(sectionId, dateKey, records)
-      .catch(e=>console.warn('sync bulk failed:', e));
-  }
+  if(!sectionId) return;
+  const cacheKey = `${sectionId}|${dateKey}`;
+  if(!_sbAttendCache[cacheKey]) _sbAttendCache[cacheKey] = {};
+  records.forEach(r => { _sbAttendCache[cacheKey][r.id] = {status:r.status, note:r.note||''}; });
+  CKService.bulkSetAttendancePeriod(sectionId, dateKey, records)
+    .catch(e => console.warn('bulk sync failed:', e));
 };
 
 // ── Auth Guard + Load Supabase Data ──
 (async function(){
   await CKService.requireAuth();
 
-  // โหลด schedules ก่อน
-  await CKService.loadSchedules();
-  await CKService.loadSections();
   const dow = new Date().getDay();
+  todayKey = CKService.fmtKey(currentDate);
+
+  // โหลด sections + schedules
+  await CKService.loadSections();
+  await CKService.loadSchedules();
   _sbTodayPeriods = await CKService.getTodayPeriods(dow);
 
-  // ถ้ามี periodId จาก URL — หา section จาก Supabase
+  // ถ้ามี ?period=xxx จาก URL
   if(_periodId){
     const sbPeriod = CKService.getPeriod(_periodId);
-    if(sbPeriod && sbPeriod.classId){
+    if(sbPeriod?.classId){
       _period = sbPeriod;
       currentClass = sbPeriod.classId;
     }
   }
 
-  // ถ้าไม่มี period — หาจากวันนี้
-  if(!_period || !_period.classId){
-    const dow = new Date().getDay();
-    const todayPeriods = await CKService.getTodayPeriods(dow);
-    if(todayPeriods.length){
-      _period = todayPeriods[0];
-      currentClass = _period.classId;
-    }
+  // ถ้ายังไม่มี period — ใช้คาบแรกของวันนี้
+  if(!_period && _sbTodayPeriods.length){
+    _period = _sbTodayPeriods[0];
+    currentClass = _period.classId;
   }
 
-  // โหลด students + attendance จาก Supabase
+  // โหลด students + attendance ของ section ที่เลือก
   if(_period?.classId){
     await loadSupabaseData(_period.classId, todayKey);
   }

@@ -210,13 +210,90 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
 
       <!-- Mode tabs -->
       <div class="mode-tabs">
-        <button class="mode-tab active" id="tab-excel" onclick="switchMode('excel')">📊 Excel / CSV</button>
-        <button class="mode-tab" id="tab-image" onclick="switchMode('image')">📷 รูปภาพ / PDF</button>
+        <button class="mode-tab active" id="tab-manual" onclick="switchMode('manual')">✏️ กรอกเอง</button>
+        <button class="mode-tab" id="tab-excel" onclick="switchMode('excel')">📊 Excel</button>
+        <button class="mode-tab" id="tab-image" onclick="switchMode('image')">📷 รูปภาพ</button>
         <button class="mode-tab" id="tab-template" onclick="switchMode('template')">📋 Template</button>
       </div>
 
+      <!-- MODE: Manual -->
+      <div id="mode-manual">
+        <div class="alert alert-info" style="margin-bottom:16px;">
+          <div class="alert-icon">✏️</div>
+          <div>เพิ่มวิชา+ตาราง แล้วกรอกรายชื่อนักเรียนแต่ละห้อง</div>
+        </div>
+
+        <!-- Section list -->
+        <div id="manual-sections-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+
+        <!-- Add section form -->
+        <div id="manual-add-section" style="background:#f8fafc;border:1.5px dashed var(--border);border-radius:14px;padding:16px;">
+          <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:12px;">➕ เพิ่มวิชา-ห้องเรียน</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+            <div>
+              <label class="form-label">วิชา</label>
+              <input type="text" class="form-input" id="m-subject" placeholder="สุขศึกษา">
+            </div>
+            <div>
+              <label class="form-label">ระดับชั้น</label>
+              <select class="form-input" id="m-grade">
+                <option value="">เลือก...</option>
+                <optgroup label="ประถม">
+                  <option>ป.1</option><option>ป.2</option><option>ป.3</option>
+                  <option>ป.4</option><option>ป.5</option><option>ป.6</option>
+                </optgroup>
+                <optgroup label="มัธยม">
+                  <option>ม.1</option><option>ม.2</option><option>ม.3</option>
+                  <option>ม.4</option><option>ม.5</option><option>ม.6</option>
+                </optgroup>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">ห้อง</label>
+              <input type="text" class="form-input" id="m-room" placeholder="1" style="max-width:80px;">
+            </div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px;">ตารางสอน (เพิ่มได้หลายคาบ)</div>
+          <div id="m-schedules-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 32px;gap:8px;align-items:end;">
+            <div>
+              <label class="form-label">วัน</label>
+              <select class="form-input" id="m-day">
+                <option value="1">จันทร์</option>
+                <option value="2">อังคาร</option>
+                <option value="3">พุธ</option>
+                <option value="4">พฤหัสบดี</option>
+                <option value="5">ศุกร์</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">เริ่ม</label>
+              <input type="time" class="form-input" id="m-start" value="08:30">
+            </div>
+            <div>
+              <label class="form-label">สิ้นสุด</label>
+              <input type="time" class="form-input" id="m-end" value="09:30">
+            </div>
+            <button onclick="addManualSchedule()" style="height:42px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:18px;cursor:pointer;font-weight:800;">+</button>
+          </div>
+
+          <div style="font-size:13px;font-weight:700;color:var(--muted);margin:14px 0 8px;">รายชื่อนักเรียน</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <input type="text" class="form-input" id="m-students-raw" placeholder="วางรายชื่อ 1 คน/บรรทัด หรือ: 1 สมชาย ใจดี" style="flex:1;">
+            <button onclick="parseManualStudents()" class="btn btn-outline" style="white-space:nowrap;">วิเคราะห์</button>
+          </div>
+          <div id="m-students-preview" style="font-size:12px;color:var(--muted);margin-bottom:10px;"></div>
+
+          <button onclick="addManualSection()" class="btn btn-primary" style="width:100%;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            เพิ่มวิชานี้
+          </button>
+          <div id="msg-manual" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
       <!-- MODE: Excel/CSV -->
-      <div id="mode-excel">
+      <div id="mode-excel" style="display:none;">
         <input type="file" id="file-excel" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleExcelFile(event)">
         <div class="drop-zone" id="dz-excel"
           onclick="document.getElementById('file-excel').click()"
@@ -240,6 +317,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
 
       <!-- MODE: Image/PDF -->
       <div id="mode-image" style="display:none;">
+
         <input type="file" id="file-image" accept="image/*,.pdf" style="display:none;" onchange="handleImageFile(event)">
         <div class="drop-zone" id="dz-image"
           onclick="document.getElementById('file-image').click()"
@@ -284,6 +362,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
 
       <!-- MODE: Template -->
       <div id="mode-template" style="display:none;">
+
         <div class="template-box" onclick="downloadTemplate()">
           <div class="template-box-icon">📥</div>
           <div class="template-box-text">
@@ -420,7 +499,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
 // STATE
 // ════════════════════════════════════════
 let currentStep = 1;
-let currentMode = 'excel';
+let currentMode = 'manual';
 let _user = null;
 let _rawRows = [];          // parsed rows from file
 let _rawHeaders = [];       // column headers
@@ -549,11 +628,171 @@ async function saveStep1(){
 // ════════════════════════════════════════
 function switchMode(mode){
   currentMode = mode;
-  ['excel','image','template'].forEach(m=>{
-    document.getElementById('tab-'+m).classList.toggle('active', m===mode);
-    document.getElementById('mode-'+m).style.display = m===mode ? '' : 'none';
+  ['manual','excel','image','template'].forEach(m=>{
+    const tab = document.getElementById('tab-'+m);
+    const panel = document.getElementById('mode-'+m);
+    if(tab) tab.classList.toggle('active', m===mode);
+    if(panel) panel.style.display = m===mode ? '' : 'none';
   });
-  document.getElementById('btn-s2').style.display = 'none';
+  // manual mode: show next button if has sections
+  if(mode === 'manual'){
+    updateManualNextBtn();
+  } else {
+    document.getElementById('btn-s2').style.display = 'none';
+  }
+}
+
+// ════════════════════════════════════════
+// MANUAL MODE
+// ════════════════════════════════════════
+let _manualSections = []; // [{subject, grade, room, schedules:[{day,start,end}], students:[{no,first,last}]}]
+let _manualSchedules = []; // temp schedules for current section being added
+
+function addManualSchedule(){
+  const day   = parseInt(document.getElementById('m-day').value);
+  const start = document.getElementById('m-start').value;
+  const end   = document.getElementById('m-end').value;
+  if(!start||!end){ return; }
+  _manualSchedules.push({day, start, end});
+  renderManualSchedules();
+}
+
+function renderManualSchedules(){
+  const DAY = ['','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์'];
+  const el = document.getElementById('m-schedules-list');
+  if(!_manualSchedules.length){
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML = _manualSchedules.map((s,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;background:var(--pbg);border-radius:8px;padding:6px 10px;">
+      <span style="font-size:12px;font-weight:700;flex:1;">${DAY[s.day]} ${s.start}–${s.end}</span>
+      <button onclick="_manualSchedules.splice(${i},1);renderManualSchedules()" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:16px;padding:0;">×</button>
+    </div>`).join('');
+}
+
+function parseManualStudents(){
+  const raw = document.getElementById('m-students-raw').value.trim();
+  if(!raw){ return; }
+  const lines = raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  const students = [];
+  lines.forEach((line,i)=>{
+    // ลบคำนำหน้า ด.ช. ด.ญ. นาย นางสาว
+    let clean = line.replace(/^(ด\.ช\.|ด\.ญ\.|นาย|นางสาว|นาง)\s*/,'').trim();
+    // format: "1 ชื่อ นามสกุล" หรือ "ชื่อ นามสกุล"
+    const numMatch = clean.match(/^(\d+)\s+(.+)/);
+    let no = i+1, rest = clean;
+    if(numMatch){ no = parseInt(numMatch[1]); rest = numMatch[2].trim(); }
+    const parts = rest.split(/\s+/);
+    students.push({ no, first: parts[0]||'', last: parts.slice(1).join(' ')||'' });
+  });
+  document.getElementById('m-students-preview').innerHTML =
+    `<span style="color:var(--primary);font-weight:700;">✓ พบ ${students.length} คน</span> — ${students.slice(0,3).map(s=>s.first).join(', ')}${students.length>3?'...':''}`;
+  // store in element dataset
+  document.getElementById('m-students-raw').dataset.parsed = JSON.stringify(students);
+}
+
+function addManualSection(){
+  const subject = document.getElementById('m-subject').value.trim();
+  const grade   = document.getElementById('m-grade').value;
+  const room    = document.getElementById('m-room').value.trim() || '1';
+  if(!subject){ showAlert('msg-manual','กรุณากรอกชื่อวิชา','error'); return; }
+  if(!grade){   showAlert('msg-manual','กรุณาเลือกระดับชั้น','error'); return; }
+
+  const rawEl = document.getElementById('m-students-raw');
+  let students = [];
+  try{ students = JSON.parse(rawEl.dataset.parsed||'[]'); } catch(e){}
+  // ถ้ายังไม่ parse ลองทำตอนนี้
+  if(!students.length && rawEl.value.trim()){
+    parseManualStudents();
+    try{ students = JSON.parse(rawEl.dataset.parsed||'[]'); } catch(e){}
+  }
+
+  _manualSections.push({ subject, grade, room, schedules:[..._manualSchedules], students });
+
+  // reset form
+  document.getElementById('m-subject').value = '';
+  document.getElementById('m-grade').value = '';
+  document.getElementById('m-room').value = '';
+  document.getElementById('m-students-raw').value = '';
+  document.getElementById('m-students-raw').dataset.parsed = '';
+  document.getElementById('m-students-preview').innerHTML = '';
+  document.getElementById('msg-manual').innerHTML = '';
+  _manualSchedules = [];
+  renderManualSchedules();
+  renderManualSectionsList();
+  updateManualNextBtn();
+}
+
+function removeManualSection(i){
+  _manualSections.splice(i,1);
+  renderManualSectionsList();
+  updateManualNextBtn();
+}
+
+function renderManualSectionsList(){
+  const el = document.getElementById('manual-sections-list');
+  if(!_manualSections.length){ el.innerHTML=''; return; }
+  const DAY = ['','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์'];
+  el.innerHTML = _manualSections.map((sec,i)=>{
+    const schedStr = sec.schedules.map(s=>`${DAY[s.day]} ${s.start}`).join(', ') || 'ไม่มีตาราง';
+    const color = sec.grade.startsWith('ป.') ? '#ca8a04' : '#16a34a';
+    return `<div style="display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;">
+      <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:800;">${sec.subject} ${sec.grade}/${sec.room}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${schedStr} · ${sec.students.length} นักเรียน</div>
+      </div>
+      <button onclick="removeManualSection(${i})" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:18px;padding:0 4px;">×</button>
+    </div>`;
+  }).join('');
+}
+
+function updateManualNextBtn(){
+  const btn = document.getElementById('btn-s2');
+  if(_manualSections.length > 0){
+    btn.style.display = '';
+    btn.textContent = `ถัดไป (${_manualSections.length} วิชา) →`;
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+// Override goToMapping ให้รับ manual mode ด้วย
+const _origGoToMapping = goToMapping;
+function goToMapping(){
+  if(currentMode === 'manual'){
+    if(!_manualSections.length){ showAlert('msg-s2','กรุณาเพิ่มวิชาอย่างน้อย 1 วิชา','error'); return; }
+    // แปลง _manualSections → _parsedData format
+    const DAY_NUM_TO_TH = {1:'จันทร์',2:'อังคาร',3:'พุธ',4:'พฤหัสบดี',5:'ศุกร์'};
+    _parsedData.schedules = [];
+    _parsedData.students  = [];
+    _manualSections.forEach(sec=>{
+      sec.schedules.forEach(sch=>{
+        _parsedData.schedules.push({
+          subject: sec.subject, grade: sec.grade, room: sec.room,
+          day: DAY_NUM_TO_TH[sch.day] || 'จันทร์',
+          start: sch.start, end: sch.end,
+          year: String(new Date().getFullYear()+543), semester:'1',
+        });
+      });
+      // ถ้าไม่มีตาราง ก็ยังต้อง create section
+      if(!sec.schedules.length){
+        _parsedData.schedules.push({
+          subject: sec.subject, grade: sec.grade, room: sec.room,
+          day:'', start:'', end:'',
+          year: String(new Date().getFullYear()+543), semester:'1',
+        });
+      }
+      sec.students.forEach(s=>{
+        _parsedData.students.push({ subject:sec.subject, grade:sec.grade, room:sec.room, ...s });
+      });
+    });
+    buildPreview();
+    goStep(3);
+    return;
+  }
+  _origGoToMapping();
 }
 
 // ════════════════════════════════════════
@@ -1053,16 +1292,17 @@ async function doImport(){
   }
 
   // 2. สร้าง schedules
-  const dayMap = {'จันทร์':1,'อังคาร':2,'พุธ':3,'พฤหัสบดี':4,'ศุกร์':5,'เสาร์':6,'อาทิตย์':7};
+  const dayMap = {'จันทร์':1,'อังคาร':2,'พุธ':3,'พฤหัสบดี':4,'ศุกร์':5,'เสาร์':6,'อาทิตย์':7,'sunday':0,'monday':1,'tuesday':2,'wednesday':3,'thursday':4,'friday':5,'saturday':6};
   for(const sch of schedules){
     const sec = sectionMap[`${sch.subject}||${sch.grade}||${sch.room}`];
-    if(!sec?._dbId || !sch.day) continue;
-    const weekday = dayMap[sch.day] || 1;
+    if(!sec?._dbId) continue;
+    if(!sch.day || !sch.start || sch.start === '') continue; // ข้ามถ้าไม่มีตาราง
+    const weekday = dayMap[sch.day] ?? dayMap[sch.day.toLowerCase()] ?? 1;
     await CKService.createSchedule({
       course_section_id: sec._dbId,
       weekday,
-      start_time: (sch.start||'08:00').includes(':') ? sch.start+':00' : '08:00:00',
-      end_time:   (sch.end||'09:00').includes(':')   ? sch.end+':00'   : '09:00:00',
+      start_time: fmtTimeForDB(sch.start, '08:00:00'),
+      end_time:   fmtTimeForDB(sch.end,   '09:00:00'),
     });
     done++;
     setProgress(Math.round(35 + (done/total)*30), `สร้างตาราง ${schedules.indexOf(sch)+1}/${schedules.length}...`);
@@ -1141,6 +1381,26 @@ function setProgress(pct, label){
 }
 
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/** แปลง time string หรือ Excel serial → "HH:MM:SS" */
+function fmtTimeForDB(val, fallback){
+  if(!val) return fallback;
+  const s = String(val).trim();
+  // Excel serial time (0–1 as fraction of day)
+  const num = parseFloat(s);
+  if(!isNaN(num) && num >= 0 && num < 1){
+    const totalMins = Math.round(num * 24 * 60);
+    const h = Math.floor(totalMins / 60);
+    const m = totalMins % 60;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00`;
+  }
+  // "8:30" หรือ "08:30" หรือ "08:30:00"
+  const match = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+  if(match){
+    return `${String(parseInt(match[1])).padStart(2,'0')}:${match[2]}:00`;
+  }
+  return fallback;
+}
 </script>
 </body>
 </html>

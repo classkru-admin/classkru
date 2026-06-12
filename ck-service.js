@@ -400,8 +400,13 @@ async function updateUserProfile({ display_name, school_name }){
   if(!sb||!_currentUser) return false;
   const { error } = await sb
     .from('users')
-    .update({ display_name, school_name, updated_at: new Date().toISOString() })
-    .eq('id', _currentUser.id);
+    .upsert({
+      id: _currentUser.id,
+      email: _currentUser.email,
+      display_name: display_name || '',
+      school_name: school_name || '',
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'id' });
   if(error){ console.error('updateUserProfile:', error); return false; }
   return true;
 }
