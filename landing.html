@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClassKru — ระบบเช็คชื่อสำหรับครูไทย</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;
+  --text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --bg:#f8fafc;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Sarabun',sans-serif;color:var(--text);background:#fff;overflow-x:hidden;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;padding:0 24px;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-logo img{height:36px;}
+.nav-logo-text{font-size:18px;font-weight:800;color:var(--text);}
+.nav-links{display:flex;align-items:center;gap:8px;}
+.nav-link{font-size:14px;font-weight:600;color:var(--muted);text-decoration:none;padding:8px 14px;border-radius:10px;transition:all .15s;}
+.nav-link:hover{color:var(--text);background:#f1f5f9;}
+.nav-cta{background:var(--primary);color:#fff !important;border-radius:10px;padding:8px 18px;font-weight:700;}
+.nav-cta:hover{background:var(--pk) !important;}
+
+/* ── HERO ── */
+.hero{min-height:100dvh;display:flex;align-items:center;padding:80px 24px 60px;background:linear-gradient(135deg,#f0fdf4 0%,#fff 50%,#eff6ff 100%);}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:#dcfce7;color:#15803d;font-size:12px;font-weight:800;padding:5px 12px;border-radius:99px;margin-bottom:20px;border:1px solid #86efac;}
+.hero-title{font-size:48px;font-weight:800;line-height:1.15;margin-bottom:16px;letter-spacing:-.5px;}
+.hero-title span{color:var(--primary);}
+.hero-sub{font-size:17px;color:var(--muted);line-height:1.7;margin-bottom:32px;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-hero-primary{background:var(--primary);color:#fff;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:800;padding:14px 28px;border-radius:14px;border:none;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.btn-hero-primary:hover{background:var(--pk);transform:translateY(-1px);box-shadow:0 8px 20px rgba(29,158,117,.3);}
+.btn-hero-outline{background:#fff;color:var(--text);font-family:'Sarabun',sans-serif;font-size:16px;font-weight:700;padding:14px 28px;border-radius:14px;border:1.5px solid var(--border);cursor:pointer;transition:all .15s;text-decoration:none;}
+.btn-hero-outline:hover{border-color:var(--primary);color:var(--primary);}
+.hero-stats{display:flex;gap:24px;margin-top:36px;flex-wrap:wrap;}
+.hero-stat{text-align:center;}
+.hero-stat-num{font-size:28px;font-weight:800;color:var(--primary);}
+.hero-stat-lbl{font-size:12px;color:var(--muted);font-weight:600;}
+
+/* ── APP PREVIEW ── */
+.app-preview{position:relative;}
+.preview-phone{background:#fff;border-radius:28px;box-shadow:0 24px 60px rgba(0,0,0,.15);border:1px solid var(--border);overflow:hidden;max-width:320px;margin:0 auto;}
+.preview-phone-bar{background:#f8fafc;padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.preview-phone-dot{width:10px;height:10px;border-radius:50%;}
+.preview-desktop{background:#fff;border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.12);border:1px solid var(--border);overflow:hidden;position:absolute;right:-40px;bottom:-40px;width:340px;}
+.preview-desktop-bar{background:#f8fafc;padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted);}
+
+/* Mock UI inside preview */
+.mock-topbar{background:#fff;border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+.mock-logo{height:30px;}
+.mock-content{padding:14px;}
+.mock-date{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px;}
+.mock-title{font-size:18px;font-weight:800;margin-bottom:12px;}
+.mock-card{background:linear-gradient(135deg,#1d9e75,#0f6e56);border-radius:14px;padding:14px;color:#fff;margin-bottom:10px;}
+.mock-card-lbl{font-size:10px;font-weight:700;opacity:.8;margin-bottom:4px;}
+.mock-card-name{font-size:15px;font-weight:800;margin-bottom:8px;}
+.mock-card-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;width:100%;cursor:pointer;}
+.mock-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9;}
+.mock-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.mock-row-info{flex:1;}
+.mock-row-subj{font-size:13px;font-weight:700;}
+.mock-row-cls{font-size:11px;color:var(--muted);}
+.mock-badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;background:#dcfce7;color:#15803d;}
+
+/* Desktop mock */
+.mock-d-sidebar{width:60px;background:#f8fafc;border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:16px;}
+.mock-d-icon{width:32px;height:32px;border-radius:8px;background:var(--border);display:flex;align-items:center;justify-content:center;}
+.mock-d-icon.active{background:var(--pbg);}
+.mock-d-main{flex:1;padding:16px;}
+.mock-d-head{font-size:13px;font-weight:800;margin-bottom:12px;color:var(--text);}
+.mock-d-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;margin-bottom:4px;}
+.mock-d-row.active{background:var(--pbg);}
+.mock-d-row-name{font-size:11px;font-weight:700;}
+.mock-d-row-cls{font-size:10px;color:var(--muted);}
+.mock-d-bar{height:4px;border-radius:99px;background:#e2e8f0;margin-top:4px;overflow:hidden;}
+.mock-d-bar-fill{height:100%;border-radius:99px;}
+
+/* Float badges */
+.float-badge{position:absolute;background:#fff;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:10px 14px;display:flex;align-items:center;gap:8px;border:1px solid var(--border);}
+.float-badge-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.float-badge-text{font-size:12px;font-weight:700;}
+.float-badge-sub{font-size:10px;color:var(--muted);}
+
+/* ── FEATURES ── */
+.features{padding:80px 24px;background:#fff;}
+.section-center{text-align:center;margin-bottom:48px;}
+.section-badge{display:inline-flex;align-items:center;gap:6px;background:#eff6ff;color:#1d4ed8;font-size:12px;font-weight:800;padding:5px 12px;border-radius:99px;margin-bottom:14px;}
+.section-title{font-size:36px;font-weight:800;margin-bottom:12px;}
+.section-sub{font-size:16px;color:var(--muted);max-width:520px;margin:0 auto;}
+.features-grid{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.feature-card{background:var(--bg);border-radius:20px;padding:28px;border:1px solid var(--border);transition:all .2s;}
+.feature-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.08);border-color:var(--pbd);}
+.feature-icon{width:48px;height:48px;border-radius:14px;background:var(--pbg);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px;}
+.feature-title{font-size:17px;font-weight:800;margin-bottom:8px;}
+.feature-desc{font-size:14px;color:var(--muted);line-height:1.7;}
+
+/* ── HOW IT WORKS ── */
+.how{padding:80px 24px;background:var(--bg);}
+.steps-grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative;}
+.steps-grid::before{content:'';position:absolute;top:28px;left:12.5%;right:12.5%;height:2px;background:linear-gradient(90deg,var(--primary),#86efac);z-index:0;}
+.step-item{text-align:center;position:relative;z-index:1;}
+.step-num{width:56px;height:56px;border-radius:50%;background:var(--primary);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.step-title{font-size:15px;font-weight:800;margin-bottom:6px;}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.6;}
+
+/* ── TESTIMONIAL ── */
+.testimonial{padding:80px 24px;background:#fff;}
+.testimonial-grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.t-card{background:var(--bg);border-radius:20px;padding:24px;border:1px solid var(--border);}
+.t-quote{font-size:15px;line-height:1.7;color:var(--text);margin-bottom:16px;}
+.t-quote::before{content:'"';font-size:32px;color:var(--primary);line-height:0;vertical-align:-12px;margin-right:4px;}
+.t-author{display:flex;align-items:center;gap:10px;}
+.t-av{width:36px;height:36px;border-radius:50%;background:var(--pbg);color:var(--primary);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.t-name{font-size:13px;font-weight:800;}
+.t-school{font-size:11px;color:var(--muted);}
+
+/* ── CTA ── */
+.cta{padding:80px 24px;background:linear-gradient(135deg,#0f6e56,#1d9e75);text-align:center;color:#fff;}
+.cta-title{font-size:40px;font-weight:800;margin-bottom:14px;}
+.cta-sub{font-size:16px;opacity:.85;margin-bottom:36px;}
+.btn-cta-white{background:#fff;color:var(--primary);font-family:'Sarabun',sans-serif;font-size:16px;font-weight:800;padding:14px 32px;border-radius:14px;border:none;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-block;}
+.btn-cta-white:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2);}
+
+/* ── FOOTER ── */
+footer{background:#0f172a;color:#94a3b8;padding:40px 24px;text-align:center;}
+.footer-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;}
+.footer-logo img{height:32px;filter:brightness(0) invert(1);opacity:.7;}
+.footer-logo-text{font-size:16px;font-weight:800;color:#fff;}
+footer p{font-size:13px;line-height:1.7;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hero-inner{grid-template-columns:1fr;gap:40px;text-align:center;}
+  .hero-title{font-size:32px;}
+  .hero-btns{justify-content:center;}
+  .hero-stats{justify-content:center;}
+  .preview-desktop{display:none;}
+  .features-grid{grid-template-columns:1fr;}
+  .steps-grid{grid-template-columns:repeat(2,1fr);}
+  .steps-grid::before{display:none;}
+  .testimonial-grid{grid-template-columns:1fr;}
+  .nav-links .nav-link:not(.nav-cta){display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <img src="classkru-logo.png" alt="ClassKru" onerror="this.style.display='none'">
+    <div class="nav-logo-text">ClassKru</div>
+  </div>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">ฟีเจอร์</a>
+    <a href="#how" class="nav-link">วิธีใช้</a>
+    <a href="login.html" class="nav-link">เข้าสู่ระบบ</a>
+    <a href="login.html" class="nav-link nav-cta">เริ่มใช้ฟรี →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+        ฟรี · ไม่ต้องติดตั้ง · พร้อมใช้ทันที
+      </div>
+      <h1 class="hero-title">ระบบเช็คชื่อ<br>สำหรับ<span> ครูไทย</span></h1>
+      <p class="hero-sub">เช็คชื่อนักเรียนได้ใน 30 วินาที<br>ไม่ต้องพิมพ์ ไม่ต้องกรอกกระดาษ<br>ดูสถิติย้อนหลังได้ทุกเวลา</p>
+      <div class="hero-btns">
+        <a href="login.html" class="btn-hero-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+          เริ่มใช้งานฟรี
+        </a>
+        <a href="#how" class="btn-hero-outline">ดูวิธีใช้</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num">30 วิ</div>
+          <div class="hero-stat-lbl">เช็คชื่อเสร็จ</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">0 บาท</div>
+          <div class="hero-stat-lbl">ค่าใช้จ่าย</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">∞</div>
+          <div class="hero-stat-lbl">นักเรียน/ห้อง</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- App Preview -->
+    <div class="app-preview" style="position:relative;min-height:480px;">
+
+      <!-- Mobile Preview -->
+      <div class="preview-phone" style="position:relative;z-index:2;">
+        <div class="preview-phone-bar">
+          <div class="preview-phone-dot" style="background:#ef4444;"></div>
+          <div class="preview-phone-dot" style="background:#f59e0b;"></div>
+          <div class="preview-phone-dot" style="background:#22c55e;"></div>
+          <div style="flex:1;text-align:center;font-size:11px;font-weight:700;color:#94a3b8;">classkru-app.vercel.app</div>
+        </div>
+        <div class="mock-topbar">
+          <div style="font-size:14px;font-weight:800;">ClassKru</div>
+          <div style="width:28px;height:28px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          </div>
+        </div>
+        <div class="mock-content">
+          <div class="mock-date">วันศุกร์ · 12 มิ.ย.</div>
+          <div class="mock-title">หน้าหลัก</div>
+          <div class="mock-card">
+            <div class="mock-card-lbl">คาบปัจจุบัน — กำลังสอนอยู่</div>
+            <div class="mock-card-name">สุขพลศึกษา — ป.4/1</div>
+            <button class="mock-card-btn">เช็คชื่อเลย ›</button>
+          </div>
+          <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:8px;">ตารางสอนวันนี้ · 4 คาบ</div>
+          <div class="mock-row">
+            <div class="mock-dot" style="background:#ca8a04;"></div>
+            <div class="mock-row-info">
+              <div class="mock-row-subj">ป้องกันทุจริต</div>
+              <div class="mock-row-cls">ป.6/1 · 10:30–11:40</div>
+            </div>
+            <div class="mock-badge">เช็คแล้ว</div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-dot" style="background:#ca8a04;"></div>
+            <div class="mock-row-info">
+              <div class="mock-row-subj">สุขพลศึกษา</div>
+              <div class="mock-row-cls">ป.4/1 · 12:40–13:40</div>
+            </div>
+            <span style="font-size:10px;font-weight:800;color:#fff;background:var(--primary);padding:3px 8px;border-radius:6px;">กำลังสอน</span>
+          </div>
+          <div class="mock-row" style="border-bottom:none;">
+            <div class="mock-dot" style="background:#16a34a;"></div>
+            <div class="mock-row-info">
+              <div class="mock-row-subj">พลศึกษา</div>
+              <div class="mock-row-cls">ม.2/1 · 13:40–14:40</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Preview -->
+      <div class="preview-desktop" style="position:absolute;right:-20px;bottom:-30px;z-index:1;">
+        <div class="preview-desktop-bar">
+          <div class="preview-phone-dot" style="background:#ef4444;width:8px;height:8px;"></div>
+          <div class="preview-phone-dot" style="background:#f59e0b;width:8px;height:8px;"></div>
+          <div class="preview-phone-dot" style="background:#22c55e;width:8px;height:8px;"></div>
+          <span style="margin-left:4px;">ภาพรวมการเข้าเรียน</span>
+        </div>
+        <div style="display:flex;min-height:200px;">
+          <div class="mock-d-sidebar">
+            <div class="mock-d-icon active">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="mock-d-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </div>
+            <div class="mock-d-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+            </div>
+          </div>
+          <div class="mock-d-main">
+            <div class="mock-d-head">วันนี้ · 4 คาบ</div>
+            <div class="mock-d-row active">
+              <div class="mock-dot" style="background:#ca8a04;"></div>
+              <div>
+                <div class="mock-d-row-name">สุขพลศึกษา ป.4/1</div>
+                <div class="mock-d-bar"><div class="mock-d-bar-fill" style="width:88%;background:#16a34a;"></div></div>
+                <div class="mock-d-row-cls">มา 35 · ขาด 0 · สาย 0</div>
+              </div>
+            </div>
+            <div class="mock-d-row">
+              <div class="mock-dot" style="background:#ca8a04;"></div>
+              <div>
+                <div class="mock-d-row-name">พลศึกษา ม.2/1</div>
+                <div class="mock-d-bar"><div class="mock-d-bar-fill" style="width:72%;background:#d97706;"></div></div>
+                <div class="mock-d-row-cls">มา 29 · ขาด 3 · สาย 1</div>
+              </div>
+            </div>
+            <div class="mock-d-row">
+              <div class="mock-dot" style="background:#ca8a04;"></div>
+              <div>
+                <div class="mock-d-row-name">ป้องกันทุจริต ป.6/1</div>
+                <div class="mock-d-bar"><div class="mock-d-bar-fill" style="width:94%;background:#16a34a;"></div></div>
+                <div class="mock-d-row-cls">มา 38 · ขาด 1 · สาย 0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Float badge -->
+      <div class="float-badge" style="position:absolute;top:20px;right:-10px;z-index:3;">
+        <div class="float-badge-icon" style="background:#dcfce7;">✅</div>
+        <div>
+          <div class="float-badge-text">เช็คชื่อเสร็จ!</div>
+          <div class="float-badge-sub">ป.4/1 · 35 คน · 30 วิ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-center">
+    <div class="section-badge">✨ ฟีเจอร์หลัก</div>
+    <h2 class="section-title">ออกแบบมาเพื่อครูไทย</h2>
+    <p class="section-sub">ทุกฟีเจอร์ตอบโจทย์ชีวิตจริงของครูประจำวิชา ไม่ใช่แค่ระบบเช็คชื่อทั่วไป</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <div class="feature-title">Swipe เช็คชื่อบนมือถือ</div>
+      <div class="feature-desc">ปัดซ้าย-ขวาเพื่อเช็คชื่อ ใช้ได้ขณะยืนหน้าห้อง ไม่ต้องพิมพ์ ไม่ต้องคลิกหลายครั้ง</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">ภาพรวมสถิติ Desktop</div>
+      <div class="feature-desc">ดูสถิติทั้งเทอม กราฟการมาเรียน นักเรียนเสี่ยงขาดเกณฑ์ ใช้ได้ดีบน PC</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Setup ง่าย โยนไฟล์ครั้งเดียว</div>
+      <div class="feature-desc">อัพโหลด Excel ตารางสอน+รายชื่อนักเรียน ระบบสร้างทุกอย่างให้อัตโนมัติ</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">☁️</div>
+      <div class="feature-title">Sync ทุกอุปกรณ์</div>
+      <div class="feature-desc">เช็คชื่อบนมือถือ ดูผลบน PC ได้ทันที ข้อมูลเดียวกันทุกที่ทุกเวลา</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔔</div>
+      <div class="feature-title">แจ้งเตือนนักเรียนเสี่ยง</div>
+      <div class="feature-desc">ระบบแจ้งอัตโนมัติเมื่อนักเรียนใกล้เกินเกณฑ์ขาดเรียน ป้องกันก่อนสายเกินไป</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📤</div>
+      <div class="feature-title">Export รายงาน</div>
+      <div class="feature-desc">ดาวน์โหลดรายงานการเข้าเรียนเป็น CSV ได้ทุกเวลา พร้อมส่งฝ่ายปกครอง</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-center">
+    <div class="section-badge" style="background:#fef3c7;color:#92400e;">🚀 วิธีใช้</div>
+    <h2 class="section-title">พร้อมใช้ใน 3 นาที</h2>
+    <p class="section-sub">ตั้งค่าครั้งเดียว ใช้ได้ทั้งเทอม ไม่ต้องมีความรู้ด้าน IT</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-title">สมัครฟรี</div>
+      <div class="step-desc">สมัครด้วย email ไม่มีค่าใช้จ่าย ไม่ต้องดาวน์โหลด</div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-title">โยนไฟล์</div>
+      <div class="step-desc">อัพโหลด Excel ตารางสอน+รายชื่อ ระบบจัดการให้</div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-title">เช็คชื่อ</div>
+      <div class="step-desc">เปิดมือถือ ปัด swipe เช็คชื่อเสร็จใน 30 วินาที</div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-title">ดูรายงาน</div>
+      <div class="step-desc">เปิด PC ดูสถิติภาพรวม export รายงานได้ทันที</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="testimonial">
+  <div class="section-center">
+    <div class="section-badge" style="background:#fce7f3;color:#9d174d;">💬 เสียงจากครู</div>
+    <h2 class="section-title">ครูบอกว่าอย่างไร</h2>
+  </div>
+  <div class="testimonial-grid">
+    <div class="t-card">
+      <div class="t-quote">เช็คชื่อ 35 คนเสร็จใน 1 นาที แต่ก่อนใช้เวลา 5 นาทีทุกคาบ ประหยัดเวลาไปเยอะมาก</div>
+      <div class="t-author">
+        <div class="t-av">ส</div>
+        <div>
+          <div class="t-name">ครูสมหญิง</div>
+          <div class="t-school">ครูพลศึกษา โรงเรียนสาธิต</div>
+        </div>
+      </div>
+    </div>
+    <div class="t-card">
+      <div class="t-quote">ชอบที่มันซิงค์กับมือถือ ระหว่างสอนเช็คบนโทรศัพท์ กลับมานั่งโต๊ะดูสถิติบน PC ได้เลย</div>
+      <div class="t-author">
+        <div class="t-av">ว</div>
+        <div>
+          <div class="t-name">ครูวิชัย</div>
+          <div class="t-school">ครูสุขศึกษา ม.ต้น</div>
+        </div>
+      </div>
+    </div>
+    <div class="t-card">
+      <div class="t-quote">Setup ง่ายมาก โยน Excel ที่มีอยู่แล้วเข้าไป ระบบสร้างตารางสอนให้หมดเลย ไม่ต้องกรอกเอง</div>
+      <div class="t-author">
+        <div class="t-av">น</div>
+        <div>
+          <div class="t-name">ครูนิภา</div>
+          <div class="t-school">ครูสังคม ระดับประถม</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2 class="cta-title">เริ่มใช้งานฟรีวันนี้</h2>
+  <p class="cta-sub">ไม่มีค่าใช้จ่าย · ไม่ต้องติดตั้ง · พร้อมใช้ใน 3 นาที</p>
+  <a href="login.html" class="btn-cta-white">สมัครใช้งานฟรี →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <img src="classkru-logo.png" alt="ClassKru" onerror="this.style.display='none'">
+    <div class="footer-logo-text">ClassKru</div>
+  </div>
+  <p>ระบบเช็คชื่อสำหรับครูไทย · พัฒนาด้วย ❤️ เพื่อครูไทย<br>
+  <span style="font-size:12px;opacity:.6;">© 2569 ClassKru · ฟรีตลอดไป</span></p>
+</footer>
+
+</body>
+</html>
