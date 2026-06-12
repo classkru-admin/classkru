@@ -757,18 +757,24 @@ function parseGenericSheet(rows, fileName, wb, allSheets){
 }
 
 function goToMapping(){
-  // ตรวจว่าต้องแสดง mapping UI ไหม
+  // ถ้า parseClassKruTemplate ทำงานแล้ว → _parsedData มีข้อมูลแล้ว ข้ามไป preview เลย
+  const hasData = (_parsedData.schedules.length > 0) || (_parsedData.students.length > 0);
+  if(hasData){
+    buildPreview();
+    goStep(3);
+    return;
+  }
+
+  // generic sheet — ตรวจว่าต้องแสดง mapping UI ไหม
   const hasScheduleFields = ['subject','grade','room','day','start'].every(f=>_colMap[f]!==undefined);
   const hasStudentFields  = (['subject','first','last'].every(f=>_colMap[f]!==undefined)) ||
                             (['first','last'].every(f=>_colMap[f]!==undefined));
 
   if(hasScheduleFields || hasStudentFields){
-    // detect ครบ → ข้ามไป preview โดยตรง
     buildParsedData();
     buildPreview();
     goStep(3);
   } else {
-    // ต้อง map
     buildMappingUI();
     goStep('2b');
   }
