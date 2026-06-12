@@ -1241,7 +1241,9 @@ function showImportReady(msg){
     `<div class="alert alert-success" style="margin-top:16px;"><div class="alert-icon">✅</div><div>${msg}</div></div>`;
   document.getElementById('excel-cancel').style.display = '';
   document.getElementById('btn-s2').style.display = '';
-  buildParsedData();
+  // ถ้า ClassKru template set _parsedData แล้ว ไม่ต้อง buildParsedData อีก
+  const hasData = (_parsedData.schedules.length > 0) || (_parsedData.students.length > 0);
+  if(!hasData) buildParsedData();
 }
 
 // ════════════════════════════════════════
