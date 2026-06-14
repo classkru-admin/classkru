@@ -9,7 +9,7 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
-  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#5b6675;--border:#e8edf2;
   --sh:0 1px 4px rgba(0,0,0,.07);--radius:16px;
 }
 html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
@@ -21,7 +21,7 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
 .logo-title{font-size:24px;font-weight:800;color:var(--text);}
 .logo-sub{font-size:14px;color:var(--muted);margin-top:4px;}
 
-.card{background:var(--card);border-radius:20px;padding:28px 24px;width:100%;max-width:400px;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid var(--border);}
+.card{background:var(--card);border-radius:20px;padding:28px 24px;width:100%;max-width:400px;box-shadow:0 4px 20px rgba(0,0,0,.07);border:1px solid var(--border);}
 
 .tab-row{display:flex;gap:6px;margin-bottom:24px;background:#f1f5f9;padding:4px;border-radius:12px;}
 .tab-btn{flex:1;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;padding:8px;border:none;border-radius:9px;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);}
@@ -147,13 +147,13 @@ async function checkSession(){
 }
 
 async function redirectToApp(){
-  // ถ้ายังไม่มี course_sections → ไป setup ก่อน
+  // ครูใหม่ (ยังไม่มี course_sections) → onboard (Smart Import "โยนไฟล์ แล้วระบบจัดการให้")
   try {
     const { data } = await sb
       .from('course_sections')
       .select('id')
       .limit(1);
-    location.href = (data && data.length > 0) ? 'index.html' : 'setup.html';
+    location.href = (data && data.length > 0) ? 'index.html' : 'onboard.html';
   } catch(e) {
     location.href = 'index.html';
   }

@@ -12,7 +12,7 @@
   --late:#f59e0b;--lbg:#fffbeb;
   --absent:#ef4444;--abg:#fef2f2;
   --leave:#6366f1;--vbg:#eef2ff;
-  --bg:#f0f4f8;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#5b6675;--border:#e8edf2;
   --sh:0 1px 4px rgba(0,0,0,.07);--sh-md:0 4px 14px rgba(0,0,0,.10);
   --tr:all .18s cubic-bezier(.4,0,.2,1);
   --sidebar:260px;
@@ -38,12 +38,12 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .sidebar{width:var(--sidebar);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;box-shadow:var(--sh);}
 .sb-logo{display:flex;justify-content:center;align-items:center;height:96px;border-bottom:1px solid var(--border);}
 .sb-nav-sec{padding:14px 14px 4px;font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;}
-.sb-link{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);border-left:3px solid transparent;}
+.sb-link{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);border-left:3px solid transparent;}
 .sb-link:hover{background:#f8fafc;color:var(--text);}
 .sb-link.active{background:var(--pbg);color:var(--primary);border-left-color:var(--primary);}
 .sb-link .ico svg{width:18px;height:18px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s;}
 .sb-link.active .ico svg,.sb-link:hover .ico svg{stroke:var(--primary);}
-.sb-link .ico{width:22px;display:flex;align-items:center;justify-content:center;}
+.sb-link .ico{width:18px;display:flex;align-items:center;justify-content:center;}
 .sb-spacer{flex:1;}
 .sb-date{padding:12px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600;}
 
@@ -141,16 +141,13 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
     <div class="sb-link" onclick="go('index.html')">
       <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>หน้าหลัก
     </div>
-    <div class="sb-link" onclick="go('overview.html')">
-      <span class="ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>ภาพรวม
-    </div>
     <div class="sb-link" onclick="go('attendance.html')">
       <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg></span>เช็คชื่อ
     </div>
-    <div class="sb-link active">
-      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></span>นักเรียน
+    <div class="sb-link" onclick="go('report.html')">
+      <span class="ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>รายงาน
     </div>
-    <div class="sb-link" onclick="showToast('ตั้งค่า — เร็วๆ นี้')">
+    <div class="sb-link" onclick="go('settings.html')">
       <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>ตั้งค่า
     </div>
     <div class="sb-spacer"></div>
@@ -184,19 +181,15 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
     <span class="bn-ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>
     <span class="bn-lbl">หน้าหลัก</span>
   </button>
-  <button class="bn-item" onclick="go('overview.html?class='+currentClass)">
-    <span class="bn-ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
-    <span class="bn-lbl">ภาพรวม</span>
-  </button>
   <button class="bn-item" onclick="go('attendance.html?class='+currentClass)">
     <span class="bn-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg></span>
     <span class="bn-lbl">เช็คชื่อ</span>
   </button>
-  <button class="bn-item active">
-    <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></span>
-    <span class="bn-lbl">นักเรียน</span>
+  <button class="bn-item" onclick="go('report.html?class='+currentClass)">
+    <span class="bn-ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+    <span class="bn-lbl">รายงาน</span>
   </button>
-  <button class="bn-item" onclick="showToast('ตั้งค่า — เร็วๆ นี้')">
+  <button class="bn-item" onclick="go('settings.html')">
     <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
     <span class="bn-lbl">ตั้งค่า</span>
   </button>

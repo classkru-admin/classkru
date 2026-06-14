@@ -15,10 +15,12 @@
   --late:#f59e0b;    --late-bg:#fffbeb;   --late-bd:#fcd34d;
   --absent:#ef4444;  --absent-bg:#fef2f2; --absent-bd:#fca5a5;
   --leave:#6366f1;   --leave-bg:#eef2ff;  --leave-bd:#a5b4fc;
-  --bg:#f0f4f8;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
-  --sh:0 2px 8px rgba(0,0,0,.08);--sh-md:0 4px 16px rgba(0,0,0,.11);--sh-lg:0 8px 32px rgba(0,0,0,.14);
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#5b6675;--border:#e8edf2;
+  --sh:0 2px 8px rgba(0,0,0,.07);--sh-md:0 4px 16px rgba(0,0,0,.10);--sh-lg:0 8px 32px rgba(0,0,0,.13);
   --tr:all .18s cubic-bezier(.4,0,.2,1);
   --radius:16px;
+  --sidebar-w:200px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
 }
 body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
 
@@ -39,11 +41,11 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
 .chip-a{background:var(--absent-bg);color:#dc2626;}
 .chip-v{background:var(--leave-bg);color:#4338ca;}
 
-.stat-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
-.stat-box{background:#fff;border-radius:12px;padding:7px 4px;text-align:center;border:1.5px solid var(--border);box-shadow:var(--sh);cursor:pointer;transition:var(--tr);}
+.stat-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.stat-box{background:#fff;border-radius:16px;padding:16px 18px;text-align:left;border:1.5px solid var(--border);box-shadow:var(--sh);cursor:pointer;transition:var(--tr);display:flex;flex-direction:column;gap:3px;}
 .stat-box:hover{transform:translateY(-2px);box-shadow:var(--sh-md);}
-.stat-box .sv{font-size:18px;font-weight:800;line-height:1;}
-.stat-box .sl{font-size:9px;font-weight:700;margin-top:2px;}
+.stat-box .sv{font-size:26px;font-weight:800;line-height:1;}
+.stat-box .sl{font-size:12px;font-weight:700;margin-top:2px;}
 .sb-p{border-color:var(--primary-bd);background:var(--primary-bg);}  .sb-p .sv,.sb-p .sl{color:#15803d;}
 .sb-l{border-color:var(--late-bd);background:var(--late-bg);}        .sb-l .sv,.sb-l .sl{color:#b45309;}
 .sb-a{border-color:var(--absent-bd);background:var(--absent-bg);}    .sb-a .sv,.sb-a .sl{color:#dc2626;}
@@ -151,7 +153,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
 
 /* action buttons */
 .m-actions{display:flex;gap:10px;justify-content:center;padding:6px 16px 12px;flex-shrink:0;}
-.m-action{width:60px;height:60px;border-radius:50%;border:2.5px solid var(--border);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:'Sarabun',sans-serif;font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;transition:var(--tr);box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.m-action{width:60px;height:60px;border-radius:50%;border:2.5px solid var(--border);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:'Sarabun',sans-serif;font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;transition:var(--tr);box-shadow:0 2px 8px rgba(0,0,0,.07);}
 .m-action:active{transform:scale(.88);}
 .m-action .ai{line-height:1;display:flex;align-items:center;justify-content:center;}
 .ma-p{background:#dcfce7;border-color:#22c55e;color:#15803d;}
@@ -168,6 +170,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
 .done-screen.show{opacity:1;pointer-events:all;}
 .done-emoji{font-size:60px;animation:bob .9s ease infinite alternate;}
 @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
 .done-title{font-size:22px;font-weight:800;}
 .done-sub{font-size:13px;color:var(--muted);text-align:center;}
 .done-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:280px;}
@@ -183,8 +186,8 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
   .desktop-ui{display:flex;height:100vh;overflow:hidden;}
 
   /* sidebar */
-  .d-sidebar{width:260px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;}
-  .d-sb-logo{display:flex;justify-content:center;align-items:center;height:96px;border-bottom:1px solid var(--border);}
+  .d-sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;}
+  .d-sb-logo{padding:0;border-bottom:1px solid var(--border);display:flex;justify-content:center;align-items:center;height:96px;}
   .d-sb-back{display:flex;align-items:center;gap:7px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:1px solid var(--border);transition:var(--tr);}
   .d-sb-back:hover{color:var(--text);background:#f8fafc;}
   .d-sb-class-section{padding:12px 14px 8px;}
@@ -194,12 +197,13 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
   .d-sb-class-sub{font-size:11px;color:var(--primary-dk);margin-top:1px;}
   .d-sb-class-count{font-size:11px;font-weight:700;color:var(--primary);margin-top:4px;}
   .d-sb-nav-section{padding:14px 14px 4px;font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;}
-  .d-sb-link{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);border-left:3px solid transparent;}
+  .d-sb-link{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);border-left:3px solid transparent;}
   .d-sb-link:hover{background:#f8fafc;color:var(--text);}
   .d-sb-link.active{background:var(--primary-bg);color:var(--primary);border-left-color:var(--primary);}
-  .d-sb-link .ico{width:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .d-sb-link .ico{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .d-sb-link .ico svg{width:18px;height:18px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s;}
   .d-sb-link.active .ico svg,.d-sb-link:hover .ico svg{stroke:var(--primary);}
+  .d-sb-link.active svg,.d-sb-link:hover svg{stroke:var(--primary);}
   .d-sb-spacer{flex:1;}
   .d-sb-date{padding:12px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600;}
 
@@ -209,10 +213,17 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
   /* topbar */
   .d-nav{background:#fff;border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0;box-shadow:var(--sh);}
   .d-nav-title{font-size:16px;font-weight:800;flex:1;}
+  .d-back-btn{display:flex;align-items:center;gap:6px;border-radius:20px;border:none;background:#f8fafc;cursor:pointer;color:#64748b;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;padding:7px 14px;flex-shrink:0;transition:var(--tr);}
+  .d-back-btn:hover{background:#fef3c7;color:#92400e;}
+  .d-tabs{display:flex;gap:2px;}
+  .d-tab{font-family:'Sarabun',sans-serif;font-size:15px;font-weight:700;color:var(--muted);background:none;border:none;border-bottom:2.5px solid transparent;padding:8px 16px;margin-bottom:-19px;padding-bottom:19px;cursor:pointer;transition:color .15s,border-color .15s;}
+  .d-tab:hover:not(.d-tab-lock):not(.d-tab-active){color:var(--primary);border-bottom-color:#86efac;}
+  .d-tab-active{color:var(--text);border-bottom-color:var(--primary);cursor:default;}
+  .d-tab-lock{color:#cbd5e1;cursor:not-allowed;}
   .d-nav-spacer{flex:1;}
   .d-class-tabs{display:flex;gap:6px;}
-  .d-tab{font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;padding:6px 16px;border-radius:20px;border:2px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:var(--tr);}
-  .d-tab:hover{border-color:#94a3b8;color:var(--text);}
+  .d-class-tab{font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;padding:6px 16px;border-radius:20px;border:2px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:var(--tr);}
+  .d-class-tab:hover{border-color:#94a3b8;color:var(--text);}
   .d-tab.active{border-color:var(--primary);background:var(--primary-bg);color:var(--primary);}
 
   /* main area */
@@ -225,12 +236,13 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
   .d-date-nav{display:flex;align-items:center;gap:8px;}
   .d-date-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:var(--tr);}
   .d-date-btn:hover{background:#f1f5f9;}
-  .d-date-pill{font-size:13px;font-weight:700;background:#fff;border:1.5px solid var(--border);padding:6px 18px;border-radius:20px;min-width:185px;text-align:center;}
+  .d-date-pill{font-size:13px;font-weight:700;background:#fff;border:1.5px solid var(--border);padding:6px 18px;border-radius:20px;min-width:185px;text-align:center;transition:border-color .15s,box-shadow .15s;}
+  .d-date-pill:hover{border-color:#a78bfa !important;box-shadow:0 0 0 3px rgba(167,139,250,.15);}
 
   /* quick set */
-  .d-quick{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:10px 16px;flex-wrap:wrap;}
-  .d-quick-label{font-size:12px;font-weight:700;color:var(--muted);}
-  .d-quick-btn{font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;border:1.5px solid transparent;cursor:pointer;transition:var(--tr);}
+  .d-quick{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:12px 18px;flex-wrap:wrap;}
+  .d-quick-label{font-size:13px;font-weight:700;color:var(--muted);margin-right:2px;}
+  .d-quick-btn{font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;padding:8px 18px;border-radius:12px;border:1.5px solid transparent;cursor:pointer;transition:var(--tr);display:inline-flex;align-items:center;}
   .d-quick-btn:hover{transform:translateY(-1px);box-shadow:var(--sh);}
   .dqb-p{background:var(--primary-bg);color:#15803d;border-color:var(--primary-bd);}
   .dqb-l{background:var(--late-bg);color:#b45309;border-color:var(--late-bd);}
@@ -254,23 +266,28 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
 
   /* student rows */
   .d-stu-table{width:100%;border-collapse:collapse;}
-  .d-stu-table thead th{font-size:13px;font-weight:800;color:var(--muted);padding:12px 14px;background:#f8fafc;border-bottom:1px solid var(--border);text-align:left;}
+  .d-stu-table thead th{font-size:14px;font-weight:800;color:var(--muted);padding:12px 14px;background:#f8fafc;border-bottom:1px solid var(--border);text-align:left;}
   .d-stu-table thead th.center{text-align:center;}
   .d-stu-table tbody tr{transition:var(--tr);}
   .d-stu-table tbody tr:hover td{background:#f8fafc;}
-  .d-stu-table tbody tr.row-absent td{background:#fff8f8;}
-  .d-stu-table tbody tr.row-late td{background:#fffdf0;}
-  .d-stu-table tbody tr.row-leave td{background:#f8f8ff;}
-  .d-stu-table td{padding:12px 14px;border-bottom:1px solid #f1f5f9;font-size:15px;font-weight:600;color:var(--text);vertical-align:middle;}
+  .d-stu-table tbody tr.row-present td{background:#e7f9ef;}
+  .d-stu-table tbody tr.row-absent td{background:#fdeaea;}
+  .d-stu-table tbody tr.row-late td{background:#fef6dd;}
+  .d-stu-table tbody tr.row-leave td{background:#e9edfc;}
+  .d-stu-table tbody tr.row-present:hover td{background:#d9f5e3;}
+  .d-stu-table tbody tr.row-absent:hover td{background:#fbdede;}
+  .d-stu-table tbody tr.row-late:hover td{background:#fdefc7;}
+  .d-stu-table tbody tr.row-leave:hover td{background:#dde3fa;}
+  .d-stu-table td{padding:11px 14px;border-bottom:1px solid #f1f5f9;font-size:14px;font-weight:400;color:var(--text);vertical-align:middle;}
   .d-stu-table tbody tr:last-child td{border-bottom:none;}
   .d-stu-table td.center{text-align:center;}
   .d-av{width:40px;height:40px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;}
   .d-name-cell{display:flex;align-items:center;gap:10px;}
 
   /* status toggle */
-  .d-status-btns{display:flex;gap:4px;}
-  .d-sb{font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:var(--tr);}
-  .d-sb:hover{border-color:#94a3b8;}
+  .d-status-btns{display:flex;gap:6px;justify-content:center;}
+  .d-sb{font-family:'Sarabun',sans-serif;font-size:14px;font-weight:400;padding:7px 16px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:#94a3b8;cursor:pointer;transition:var(--tr);display:inline-flex;align-items:center;gap:4px;}
+  .d-sb:hover{border-color:#cbd5e1;color:var(--muted);}
   .d-sb.active-p{background:var(--primary-bg);color:#15803d;border-color:var(--primary-bd);}
   .d-sb.active-l{background:var(--late-bg);color:#b45309;border-color:var(--late-bd);}
   .d-sb.active-a{background:var(--absent-bg);color:#dc2626;border-color:var(--absent-bd);}
@@ -280,14 +297,14 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
   .d-abs-cell{display:flex;align-items:center;gap:8px;min-width:150px;}
   .d-abs-bar{flex:1;height:5px;background:#f1f5f9;border-radius:99px;overflow:hidden;}
   .d-abs-fill{height:100%;border-radius:99px;}
-  .d-abs-text{font-size:11px;font-weight:800;min-width:76px;text-align:right;}
+  .d-abs-text{font-size:14px;font-weight:400;min-width:76px;text-align:right;}
 
   /* note */
   .d-note{font-family:'Sarabun',sans-serif;font-size:12px;padding:5px 10px;border-radius:8px;border:1.5px solid var(--border);color:var(--text);background:#f8fafc;transition:var(--tr);width:120px;}
   .d-note:focus{outline:none;border-color:var(--primary);background:#fff;}
 
   /* save bar */
-  .d-save-bar{position:sticky;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 -4px 20px rgba(0,0,0,.08);z-index:50;transform:translateY(100%);transition:transform .3s;}
+  .d-save-bar{position:sticky;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 -4px 20px rgba(0,0,0,.07);z-index:50;transform:translateY(100%);transition:transform .3s;}
   .d-save-bar.show{transform:translateY(0);}
   .d-save-info{font-size:14px;font-weight:600;color:var(--muted);}
   .d-save-info span{font-weight:800;color:var(--text);}
@@ -323,9 +340,9 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>
         เช็คชื่อ
       </div>
-      <button class="btn btn-outline" onclick="showSheet()" style="font-size:13px;padding:5px 11px;border-radius:10px;gap:5px;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-        เลือกวิชา
+      <button class="btn btn-outline" onclick="showRoomChooser()" style="font-size:13px;padding:5px 11px;border-radius:10px;gap:5px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        เปลี่ยนห้อง
       </button>
     </div>
     <div id="m-class-label" style="text-align:center;margin-top:3px;line-height:1.4;"></div>
@@ -388,14 +405,31 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
 
   <div class="m-card-area" id="m-card-area">
 
+    <!-- Mobile Loading overlay — ซ่อนก่อน async init เสร็จ -->
+    <div id="m-loading-overlay" style="position:absolute;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+      <div style="width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;"></div>
+      <div style="font-size:13px;color:var(--muted);">กำลังโหลด...</div>
+    </div>
+
     <!-- Empty state — ยังไม่เลือกวิชา -->
-    <div id="m-empty-state" style="display:none;position:absolute;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;">
+    <div id="m-empty-state" style="display:none;position:absolute;inset:0;z-index:50;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;">
       <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="12" cy="16" r="3"/><path d="M12 14v1M12 17v1"/></svg>
       <div style="font-size:16px;font-weight:800;color:var(--text);">เลือกวิชาก่อนเช็คชื่อ</div>
       <div style="font-size:13px;color:var(--muted);text-align:center;line-height:1.6;">กดปุ่ม "เลือกวิชา" ด้านบนขวา<br>เพื่อเลือกคาบที่จะเช็คชื่อ</div>
       <button onclick="showSheet()" style="background:var(--primary);color:#fff;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:800;border:none;border-radius:14px;padding:13px 32px;cursor:pointer;margin-top:4px;">
         เลือกวิชา ›
       </button>
+    </div>
+
+    <!-- Mobile Room Chooser -->
+    <div id="m-room-chooser" style="display:none;position:absolute;inset:0;z-index:46;background:var(--bg);overflow-y:auto;padding:16px 14px 24px;">
+      <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:2px;">เลือกห้องที่จะเช็คชื่อ</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:12px;" id="m-chooser-sub"></div>
+      <div id="m-chooser-summary" style="margin-bottom:10px;"></div>
+      <div id="m-chooser-today-label" style="font-size:10.5px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;"></div>
+      <div id="m-chooser-today" style="display:flex;flex-direction:column;gap:8px;margin-bottom:6px;"></div>
+      <div id="m-chooser-all-label" style="font-size:10.5px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin:14px 0 8px;">ห้องทั้งหมด</div>
+      <div id="m-chooser-all" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
     <div class="bg-label lft" id="bg-l"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> สาย</div>
@@ -415,7 +449,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
       <div class="done-title">เช็คชื่อเสร็จแล้ว!</div>
       <div class="done-sub" id="m-done-sub"></div>
       <div class="done-grid" id="m-done-grid"></div>
-      <button class="btn btn-primary" style="font-size:15px;padding:12px 28px;border-radius:14px" onclick="doSave()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:6px"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>บันทึก</button>
+      <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:var(--primary);background:var(--pbg);border:1.5px solid var(--pbd);padding:9px 16px;border-radius:12px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>บันทึกอัตโนมัติ</span>
       <button class="btn btn-outline" style="font-size:13px" onclick="reviewAll()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:5px"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>ทบทวน</button>
     </div>
   </div>
@@ -443,19 +477,16 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
     </div>
     <div class="d-sb-nav-section">เมนู</div>
     <div class="d-sb-link" onclick="go('index.html')">
-      <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>หน้าหลัก
-    </div>
-    <div class="d-sb-link" onclick="go('overview.html')">
-      <span class="ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>ภาพรวม
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>หน้าหลัก
     </div>
     <div class="d-sb-link active">
-      <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg></span>เช็คชื่อ
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>เช็คชื่อ
     </div>
-    <div class="d-sb-link" onclick="go('student.html?class='+(currentClass||'m31')+'&id=0')">
-      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></span>นักเรียน
+    <div class="d-sb-link" onclick="go('report.html')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>สถิติ
     </div>
-    <div class="d-sb-link" onclick="showToast('ตั้งค่า — เร็วๆ นี้')">
-      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>ตั้งค่า
+    <div class="d-sb-link" onclick="go('settings.html')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>ตั้งค่า
     </div>
     <div class="d-sb-spacer"></div>
     <div class="d-sb-date" id="d-sb-date"></div>
@@ -465,33 +496,51 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
   <div class="d-main-wrap">
 
   <nav class="d-nav">
-    <div class="d-nav-title">
-      <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#fdf2f8;border-radius:8px;margin-right:8px;vertical-align:-7px;flex-shrink:0;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#be185d" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
-      </span>เช็คชื่อ
+    <button class="d-back-btn" id="d-back-btn" onclick="goBackToChooser()" title="กลับไปเลือกห้อง" style="display:none;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      กลับ
+    </button>
+    <div style="font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>เช็คชื่อ
     </div>
     <div class="d-nav-spacer"></div>
-    <button class="btn btn-primary" onclick="doSave()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg> บันทึก</button>
-    <button class="btn btn-outline" onclick="exportCSV()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> ดาวน์โหลด</button>
+    <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--primary);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>บันทึกอัตโนมัติ</span>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> ดาวน์โหลด</button>
   </nav>
 
-  <div class="d-main">
+  <div class="d-main" style="position:relative;">
 
-    <div class="d-header">
-      <div class="d-header-left">
-        <div class="d-page-title" style="display:flex;align-items:center;gap:10px;">
-          <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:#fdf2f8;border-radius:10px;flex-shrink:0;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#be185d" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
-          </span>
-          เช็คชื่อ
+    <!-- Loading overlay — ซ่อนก่อน async init เสร็จ -->
+    <div id="d-loading-overlay" style="position:absolute;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;"></div>
+        <div style="font-size:13px;color:var(--muted);">กำลังโหลด...</div>
+      </div>
+    </div>
+
+    <!-- Desktop Empty state — ยังไม่มีวิชาเลย (ครูใหม่) -->
+    <div id="d-empty-state" style="display:none;position:absolute;inset:0;z-index:50;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px;text-align:center;">
+      <div style="width:72px;height:72px;border-radius:20px;background:#fdf2f8;display:flex;align-items:center;justify-content:center;">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#be185d" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+      </div>
+      <div style="font-size:18px;font-weight:800;color:var(--text);" id="d-empty-title">เลือกวิชาก่อนเช็คชื่อ</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.6;max-width:340px;" id="d-empty-sub">กดปุ่มด้านล่างเพื่อเลือกคาบที่จะเช็คชื่อ</div>
+      <button class="btn btn-primary" id="d-empty-btn" onclick="showSheet()" style="padding:12px 24px;font-size:15px;">เลือกวิชา ›</button>
+    </div>
+
+    <!-- Room Chooser — เลือกห้องก่อนเช็คชื่อ (แสดงทุกห้อง แบบ HiClass) -->
+    <div id="room-chooser" style="display:none;position:absolute;top:0;left:0;right:0;min-height:100%;z-index:45;background:var(--bg);padding:20px 24px 40px;">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;max-width:680px;margin-bottom:4px;">
+          <div style="font-size:20px;font-weight:800;color:var(--text);">เลือกห้องที่จะเช็คชื่อ</div>
+          <div class="d-date-pill" id="d-date-pill" onclick="openDateCal()" style="cursor:pointer;font-size:14px;font-weight:700;padding:7px 16px;border-radius:10px;display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--border);background:#fff;"></div>
         </div>
-        <div class="d-date-pill" id="d-date-pill" style="min-width:200px;text-align:left;border:none;background:transparent;font-size:15px;font-weight:800;padding:0;"></div>
-        <button class="btn btn-outline btn-sm" onclick="showBackdateSheet()" style="gap:7px;color:#92400e;border-color:#fcd34d;">
-          <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#fffbeb;border-radius:6px;flex-shrink:0;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
-          </span>
-          เช็คย้อนหลัง
-        </button>
+        <div style="font-size:13.5px;color:var(--muted);margin-bottom:14px;" id="chooser-sub">วันนี้มีคาบสอน — เลือกห้องด้านล่าง หรือเลือกห้องอื่นก็ได้</div>
+        <div id="chooser-summary" style="margin-bottom:8px;"></div>
+        <div id="chooser-today-label" style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin:16px 0 8px;"></div>
+        <div id="chooser-today" style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px;max-width:680px;"></div>
+        <div id="chooser-all-label" style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin:18px 0 8px;">ห้องทั้งหมด</div>
+        <div id="chooser-all" style="display:flex;flex-direction:column;gap:10px;max-width:680px;"></div>
       </div>
     </div>
 
@@ -503,14 +552,13 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
     </div>
 
     <div class="d-quick">
-      <span class="d-quick-label">ตั้งค่าทั้งหมด:</span>
-      <button class="d-quick-btn dqb-p" onclick="setAll('present')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><path d="M20 6L9 17l-5-5"/></svg>มาทุกคน</button>
-      <button class="d-quick-btn dqb-l" onclick="setAll('late')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>สายทุกคน</button>
-      <button class="d-quick-btn dqb-a" onclick="setAll('absent')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><path d="M18 6L6 18M6 6l12 12"/></svg>ขาดทุกคน</button>
-      <button class="d-quick-btn dqb-v" onclick="setAll('leave')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>ลาทุกคน</button>
+      <span class="d-quick-label">ตั้งทั้งหมด</span>
+      <button class="d-quick-btn dqb-p" onclick="setAll('present')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><path d="M20 6L9 17l-5-5"/></svg>มา</button>
+      <button class="d-quick-btn dqb-l" onclick="setAll('late')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>สาย</button>
+      <button class="d-quick-btn dqb-a" onclick="setAll('absent')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><path d="M18 6L6 18M6 6l12 12"/></svg>ขาด</button>
+      <button class="d-quick-btn dqb-v" onclick="setAll('leave')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>ลา</button>
       <div class="d-quick-spacer"></div>
-      <span class="d-changed" id="d-changed">● มีการเปลี่ยนแปลง</span>
-      <button class="d-quick-btn" onclick="confirmReset()" style="color:#ef4444;border-color:#fca5a5;background:#fff5f5;">ล้างการเช็ค</button>
+      <button class="d-quick-btn" onclick="confirmReset()" style="color:#ef4444;border-color:#fca5a5;background:#fff5f5;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a1 1 0 01-1 1H7a1 1 0 01-1-1V6"/><path d="M10 11v6M14 11v6"/></svg>ล้างการเช็ค</button>
     </div>
 
     <div class="d-table-wrap">
@@ -528,10 +576,10 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
         <table class="d-stu-table">
           <thead>
             <tr>
-              <th style="width:52px">เลขที่</th>
+              <th style="width:64px;white-space:nowrap;text-align:center;">เลขที่</th>
               <th>ชื่อ-นามสกุล</th>
               <th class="center">สถานะวันนี้</th>
-              <th>ขาด/ลาสะสม</th>
+              <th style="white-space:nowrap;">ขาด/ลาสะสม</th>
               <th>หมายเหตุ</th>
             </tr>
           </thead>
@@ -608,9 +656,9 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
     <span class="bn-ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>
     <span class="bn-lbl">หน้าหลัก</span>
   </button>
-  <button class="bn-item" onclick="window.location.href='overview.html?class='+currentClass">
+  <button class="bn-item" onclick="window.location.href='report.html?class='+currentClass">
     <span class="bn-ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
-    <span class="bn-lbl">ภาพรวม</span>
+    <span class="bn-lbl">สถิติ</span>
   </button>
   <button class="bn-item active">
     <span class="bn-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg></span>
@@ -620,13 +668,26 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
     <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></span>
     <span class="bn-lbl">นักเรียน</span>
   </button>
-  <button class="bn-item" onclick="showToast('ตั้งค่า — เร็วๆ นี้')">
+  <button class="bn-item" onclick="go('settings.html')">
     <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
     <span class="bn-lbl">ตั้งค่า</span>
   </button>
 </nav>
 
 <!-- TOAST -->
+<!-- ปฏิทินเลือกวันที่ -->
+<div class="sheet-ov" id="datecal-ov" onclick="if(event.target.id==='datecal-ov')closeDateCal()" style="z-index:600;">
+  <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,.18);width:min(340px,92vw);padding:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <button onclick="calNavMonth(-1)" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:16px;color:var(--muted);">‹</button>
+      <div id="datecal-month" style="font-size:15px;font-weight:800;"></div>
+      <button onclick="calNavMonth(1)" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:16px;color:var(--muted);">›</button>
+    </div>
+    <div id="datecal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;"></div>
+    <button onclick="pickDateCal(new Date().getFullYear(),new Date().getMonth(),new Date().getDate())" style="margin-top:14px;width:100%;padding:9px;border-radius:12px;background:#f5f3ff;border:1.5px solid #c4b5fd;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;color:#7c3aed;cursor:pointer;">วันนี้</button>
+  </div>
+</div>
+
 <div class="toast" id="toast-el"></div>
 
 <script src="ck-service.js"></script>
@@ -665,13 +726,23 @@ let _periodId = _params.get('period')||null;
 let _period = null; // จะ set ใน init async
 let currentClass = _params.get('class')||null; // จะ set จาก Supabase
 
-let currentDate=new Date();
+// ★ รับวันที่จาก URL (?date=YYYY-MM-DD) → วันนี้ (ไม่ใช้ sessionStorage เพื่อไม่ให้ค้างวันเก่า)
+function _parseDateParam(){
+  const ds = _params.get('date');
+  if(!ds) return new Date();
+  const parts = ds.split('-');
+  if(parts.length!==3) return new Date();
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+let currentDate=_parseDateParam();
 let todayKey=CKService.fmtKey(currentDate);
 // Mobile swipe state
 let queue=[],queuePos=0,isDone=false,undoStack=[];
 let changedRows=0;
 
 /* ── UTILS ── */
+function go(url){ window.location.href=url; }
 function fmtKey(d){return CK.fmtKey(d);}
 function fmtLong(d){
   const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -715,10 +786,59 @@ function gotoToday(){
   renderDesktopTable(); updateDesktopStats();
 }
 function updateDateDisplay(){
+  sessionStorage.setItem('ck_date', todayKey); // sync วันที่ให้หน้าอื่นรู้
   const el=document.getElementById('m-date-main');
   if(el) el.textContent=fmtLong(currentDate);
   const dp=document.getElementById('d-date-pill');
-  if(dp) dp.textContent=fmtLong(currentDate);
+  if(dp) dp.innerHTML=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>${fmtLong(currentDate)}`;
+}
+
+/* ── ปฏิทินเลือกวันที่ (desktop) ── */
+let _calView=new Date();
+function openDateCal(){
+  _calView=new Date(currentDate);
+  renderDateCal();
+  document.getElementById('datecal-ov').classList.add('show');
+}
+function closeDateCal(){ document.getElementById('datecal-ov').classList.remove('show'); }
+function calNavMonth(d){ _calView.setMonth(_calView.getMonth()+d); renderDateCal(); }
+function renderDateCal(){
+  const CAL_M=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const y=_calView.getFullYear(),mo=_calView.getMonth();
+  document.getElementById('datecal-month').textContent=`${CAL_M[mo]} ${y+543}`;
+  const first=new Date(y,mo,1).getDay(),days=new Date(y,mo+1,0).getDate(),today=new Date();
+  const DOWS=['อา','จ','อ','พ','พฤ','ศ','ส'];
+  let html=DOWS.map(d=>`<div style="font-size:10px;font-weight:700;color:#94a3b8;text-align:center;padding:2px 0 6px;">${d}</div>`).join('');
+  for(let i=0;i<first;i++) html+=`<div></div>`;
+  for(let d=1;d<=days;d++){
+    const isT=today.getFullYear()===y&&today.getMonth()===mo&&today.getDate()===d;
+    const isSel=currentDate.getFullYear()===y&&currentDate.getMonth()===mo&&currentDate.getDate()===d;
+    const isFuture=new Date(y,mo,d)>today;
+    const bg=isSel?'background:#7c3aed;color:#fff;':isT?'background:#f5f3ff;color:#7c3aed;outline:2px solid #c4b5fd;':'';
+    const dim=isFuture?'color:#cbd5e1;cursor:not-allowed;':'cursor:pointer;';
+    html+=`<div onclick="${isFuture?'':`pickDateCal(${y},${mo},${d})`}" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;border-radius:50%;${bg}${dim}">${d}</div>`;
+  }
+  document.getElementById('datecal-grid').innerHTML=html;
+}
+async function pickDateCal(y,mo,d){
+  currentDate=new Date(y,mo,d);
+  todayKey=fmtKey(currentDate);
+  closeDateCal();
+  updateDateDisplay();
+  // reload ตาม dow ใหม่ (กรณีเปลี่ยนวัน)
+  const newDow = currentDate.getDay();
+  await CKService.loadSchedules();
+  _sbTodayPeriods = await CKService.getTodayPeriods(newDow);
+  if(_period?.classId){
+    // อยู่หน้าเช็คชื่อ — reload data ห้องนั้น
+    _sbAttendCache={};
+    await loadSupabaseData(_period.classId, todayKey);
+    buildMobileQueue(); renderMobileCard(); updateMobileStats();
+    renderDesktopTable(); updateDesktopStats();
+  } else {
+    // อยู่หน้า chooser — reload check status ทุกห้อง
+    await showRoomChooser();
+  }
 }
 
 /* ── SHARED: switch class ── */
@@ -726,7 +846,7 @@ function switchClass(id){
   currentClass=id;
   document.getElementById('sheet-ov').classList.remove('show');
   const allSections = CKService.getSections();
-  document.querySelectorAll('.d-tab').forEach(t=>{
+  document.querySelectorAll('.d-class-tab[data-id]').forEach(t=>{
     const active=t.dataset.id===id;
     t.classList.toggle('active',active);
     const sec = allSections.find(c=>c.id===t.dataset.id);
@@ -828,16 +948,12 @@ function cancelSave(){
   document.getElementById('d-changed').classList.remove('show');
 }
 function updateSaveBar(){
+  // AUTOSAVE: ไม่โชว์ save bar อีกต่อไป (บันทึกทันที)
   const bar=document.getElementById('d-save-bar');
-  document.getElementById('d-save-count').textContent=changedRows;
-  if(changedRows>0) bar.classList.add('show');
-  else bar.classList.remove('show');
+  if(bar) bar.classList.remove('show');
 }
-function markChanged(){
-  changedRows++;
-  document.getElementById('d-changed').classList.add('show');
-  updateSaveBar();
-}
+// AUTOSAVE mode: บันทึกทันที — ไม่โชว์ toast/save bar (มี badge "บันทึกอัตโนมัติ" มุมขวาพอแล้ว)
+function markChanged(){}
 
 /* ── SHARED: export ── */
 function exportCSV(){
@@ -1112,22 +1228,21 @@ function renderDesktopTable(){
     };
     const stMap={present:{cls:'active-p',lbl:`${IC.present}มา`},late:{cls:'active-l',lbl:`${IC.late}สาย`},absent:{cls:'active-a',lbl:`${IC.absent}ขาด`},leave:{cls:'active-v',lbl:`${IC.leave}ลา`}};
     const btns=['present','late','absent','leave'].map(st=>
-      `<button class="d-sb ${rec&&rec.status===st?stMap[st].cls:''}" onclick="dSetStatus(${s.id},'${st}',this)">${stMap[st].lbl}</button>`
+      `<button class="d-sb ${rec&&rec.status===st?stMap[st].cls:''}" onclick="dSetStatus('${s.id}','${st}',this)">${stMap[st].lbl}</button>`
     ).join('');
 
-    const rowClass=rec?.status==='absent'?'row-absent':rec?.status==='late'?'row-late':rec?.status==='leave'?'row-leave':'';
+    const rowClass=rec?.status==='present'?'row-present':rec?.status==='absent'?'row-absent':rec?.status==='late'?'row-late':rec?.status==='leave'?'row-leave':'';
     return `<tr class="${rowClass}" id="d-row-${s.id}">
-      <td style="color:#94a3b8;font-weight:700">${s.no}</td>
+      <td style="color:#94a3b8;font-weight:700;text-align:center;">${s.no}</td>
       <td><div class="d-name-cell">
-        <div class="d-av" style="background:${s.col.bg};color:${s.col.c}">${s.fn[0]}</div>
-        <span style="font-weight:700">${s.fn} ${s.ln}</span>
+        <span style="font-weight:600">${s.fn} ${s.ln}</span>
       </div></td>
       <td class="center"><div class="d-status-btns" id="dsb-${s.id}">${btns}</div></td>
       <td><div class="d-abs-cell">
         <div class="d-abs-bar"><div class="d-abs-fill" style="width:${pct}%;background:${barColor}"></div></div>
         <div class="d-abs-text" style="color:${textColor}">${miss>=MAX_ABSENT?'เกินแล้ว!':'เหลือ '+left+' ครั้ง'}</div>
       </div></td>
-      <td><input class="d-note" placeholder="หมายเหตุ..." value="${rec?.note||''}" onchange="dSetNote(${s.id},this.value)"></td>
+      <td><input class="d-note" placeholder="หมายเหตุ..." value="${rec?.note||''}" onchange="dSetNote('${s.id}',this.value)"></td>
     </tr>`;
   }).join('');
 }
@@ -1143,7 +1258,7 @@ function dSetStatus(studentId, status, btn){
   btn.classList.add(stMap[status]);
 
   const row=document.getElementById('d-row-'+studentId);
-  row.className=status==='absent'?'row-absent':status==='late'?'row-late':status==='leave'?'row-leave':'';
+  row.className=status==='present'?'row-present':status==='absent'?'row-absent':status==='late'?'row-late':status==='leave'?'row-leave':'';
 
   updateDesktopStats(); markChanged();
 }
@@ -1173,8 +1288,8 @@ function updateDesktopStats(){
 
 /* ── RESET ── */
 function confirmReset(){
-  const cls=CLASSES.find(c=>c.id===currentClass);
-  document.getElementById('reset-sub').textContent=`ข้อมูลเช็คชื่อ ${cls.name} วันนี้จะหายทั้งหมด`;
+  const cls=CKService.getSection(currentClass);
+  document.getElementById('reset-sub').textContent=`ข้อมูลเช็คชื่อ ${cls?cls.name:''} วันนี้จะหายทั้งหมด`;
   document.getElementById('reset-ov').classList.add('show');
 }
 function closeReset(){ document.getElementById('reset-ov').classList.remove('show'); }
@@ -1205,6 +1320,8 @@ function setAll(status){
 
 /* ── DESKTOP TABS — Subject-first ── */
 function buildDesktopTabs(){
+  // เลิกใช้ class tabs แบบเก่าแล้ว — ใช้ room chooser แทน (กันไปทับแท็บเช็คชื่อ/เช็คงาน)
+  return;
   const allClasses = CKService.getSections();
   const todayClassIds = (_sbTodayPeriods||[]).map(p=>p.classId);
   const todayClasses = allClasses.filter(c=>todayClassIds.includes(c.id));
@@ -1276,6 +1393,8 @@ async function switchToPeriod(periodId){
   document.getElementById('sheet-ov').classList.remove('show');
   const emptyEl = document.getElementById('m-empty-state');
   if(emptyEl) emptyEl.style.display = 'none';
+  const dEmpty = document.getElementById('d-empty-state');
+  if(dEmpty) dEmpty.style.display = 'none';
   // โหลด students + attendance ของ section ใหม่
   await loadSupabaseData(p.classId, todayKey);
   switchClass(p.classId);
@@ -1301,6 +1420,11 @@ function showToast(msg){
    INIT
 ══════════════════════════════════════════════════════ */
 function init(){
+  // ซ่อน chooser เมื่อเข้าโหมดเช็คชื่อแล้ว
+  const _rc=document.getElementById('room-chooser'); if(_rc) _rc.style.display='none';
+  const _mrc=document.getElementById('m-room-chooser'); if(_mrc) _mrc.style.display='none';
+  // แสดงปุ่ม back (มีห้องให้กลับแล้ว)
+  const _bb=document.getElementById('d-back-btn'); if(_bb) _bb.style.display='';
   todayKey=fmtKey(currentDate);
   updateDateDisplay();
   buildDesktopTabs();
@@ -1331,6 +1455,37 @@ function init(){
   const noSubject = !_period;
   const emptyEl = document.getElementById('m-empty-state');
   if(emptyEl) emptyEl.style.display = noSubject ? 'flex' : 'none';
+
+  // Desktop empty state — แยก 2 กรณี: ฐานข้อมูลว่าง vs ยังไม่เลือกวิชา
+  const dEmpty = document.getElementById('d-empty-state');
+  if(dEmpty){
+    if(noSubject){
+      const hasSections = CKService.getSections().length > 0;
+      const hasTodayPeriods = (_sbTodayPeriods||[]).length > 0;
+      const dTitle = document.getElementById('d-empty-title');
+      const dSub   = document.getElementById('d-empty-sub');
+      const dBtn   = document.getElementById('d-empty-btn');
+      if(!hasSections){
+        // ยังไม่ import วิชา/นักเรียนเลย → ไป setup
+        if(dTitle) dTitle.textContent = 'ยังไม่มีวิชาและตารางสอน';
+        if(dSub)   dSub.textContent   = 'เพิ่มวิชาและรายชื่อนักเรียนของคุณก่อน แล้วจึงเริ่มเช็คชื่อได้';
+        if(dBtn){ dBtn.textContent = 'ไปตั้งค่าตารางสอน ›'; dBtn.setAttribute('onclick', "window.location.href='setup.html'"); }
+      } else if(!hasTodayPeriods){
+        // มีวิชาแต่วันนี้ไม่มีคาบสอน
+        if(dTitle) dTitle.textContent = 'วันนี้ไม่มีคาบสอน';
+        if(dSub)   dSub.textContent   = 'ต้องการเช็คชื่อย้อนหลัง? กดปุ่ม "เช็คย้อนหลัง" เพื่อเลือกวันอื่น';
+        if(dBtn){ dBtn.textContent = 'เช็คย้อนหลัง ›'; dBtn.setAttribute('onclick', 'showBackdateSheet()'); }
+      } else {
+        // มีคาบวันนี้แต่ยังไม่เลือก
+        if(dTitle) dTitle.textContent = 'เลือกวิชาก่อนเช็คชื่อ';
+        if(dSub)   dSub.textContent   = 'เลือกคาบที่จะเช็คชื่อจากตารางสอนวันนี้';
+        if(dBtn){ dBtn.textContent = 'เลือกวิชา ›'; dBtn.setAttribute('onclick', 'showSheet()'); }
+      }
+      dEmpty.style.display = 'flex';
+    } else {
+      dEmpty.style.display = 'none';
+    }
+  }
 
   buildMobileQueue(); renderMobileCard(); updateMobileStats();
   renderDesktopTable(); updateDesktopStats();
@@ -1398,11 +1553,20 @@ CK.bulkSetAttendancePeriod = function(periodId, dateKey, records){
     .catch(e => console.warn('bulk sync failed:', e));
 };
 
+// ซ่อน loading overlay ทั้ง desktop + mobile
+function _hideLoadingOverlay(){
+  const d=document.getElementById('d-loading-overlay');
+  const m=document.getElementById('m-loading-overlay');
+  if(d) d.style.display='none';
+  if(m) m.style.display='none';
+}
+
 // ── Auth Guard + Load Supabase Data ──
 (async function(){
   await CKService.requireAuth();
 
-  const dow = new Date().getDay();
+  // ★ ใช้ dow จาก currentDate (ซึ่งมาจาก ?date= URL param) ไม่ใช่วันนี้จริง
+  const dow = currentDate.getDay();
   todayKey = CKService.fmtKey(currentDate);
 
   // โหลด sections + schedules
@@ -1419,10 +1583,32 @@ CK.bulkSetAttendancePeriod = function(periodId, dateKey, records){
     }
   }
 
-  // ถ้ายังไม่มี period — ใช้คาบแรกของวันนี้
-  if(!_period && _sbTodayPeriods.length){
-    _period = _sbTodayPeriods[0];
-    currentClass = _period.classId;
+  // ถ้ามี ?class=xxx จาก URL (มาจากการ์ดห้อง) — เลือกห้องนั้น (ใช้คาบแรกของห้องในวันนี้ ถ้ามี)
+  const urlClass = new URLSearchParams(location.search).get('class');
+  if(!_period && urlClass){
+    const p = _sbTodayPeriods.find(p=>p.classId===urlClass);
+    if(p){ _period = p; currentClass = urlClass; }
+    else { currentClass = urlClass; _period = makeVirtualPeriod(urlClass); }
+  }
+
+  // ★ ไม่เลือกห้องอัตโนมัติแล้ว — ถ้าไม่ได้ระบุห้อง → แสดงหน้าเลือกห้อง (chooser)
+  if(!_period){
+    const sections = CKService.getSections();
+    _hideLoadingOverlay(); // ซ่อน overlay ก่อนแสดง UI
+    if(!sections.length){
+      // ครูใหม่ ไม่มีห้องเลย → empty state เดิม (ไป setup)
+      init();
+      return;
+    }
+    showRoomChooser();
+    // เซ็ตวันที่ sidebar (ใช้ currentDate จาก URL param)
+    const sbDate=document.getElementById('d-sb-date');
+    if(sbDate){
+      const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      const D=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+      sbDate.textContent=`วัน${D[currentDate.getDay()]}ที่ ${currentDate.getDate()} ${M[currentDate.getMonth()]} ${currentDate.getFullYear()+543}`;
+    }
+    return;
   }
 
   // โหลด students + attendance ของ section ที่เลือก
@@ -1430,8 +1616,170 @@ CK.bulkSetAttendancePeriod = function(periodId, dateKey, records){
     await loadSupabaseData(_period.classId, todayKey);
   }
 
+  _hideLoadingOverlay(); // ซ่อน overlay ก่อนแสดง table
   init();
 })();
+
+// สร้าง period จำลองสำหรับห้องที่ไม่มีคาบสอนวันนี้ (เช็คย้อนหลัง/เช็คนอกตาราง)
+function makeVirtualPeriod(sectionId){
+  const sec = CKService.getSection(sectionId);
+  if(!sec) return null;
+  return { periodId:'virtual-'+sectionId, classId:sectionId, subject:sec.subject,
+           name:sec.name, s:[0,0], e:[0,0], dow:new Date().getDay() };
+}
+
+// ── ROOM CHOOSER (เลือกห้องก่อนเช็คชื่อ) ──
+function roomCardHtml(sec, period, mobile, status){
+  const z = n => String(n).padStart(2,'0');
+  const lc = LEVEL_COLORS[sec.level||'junior'];
+  // คาบ+เวลา (ถ้ามีคาบวันนี้)
+  const timeStr = (period && period.s && period.s[0]!==0)
+    ? `${z(period.s[0])}:${z(period.s[1])}–${z(period.e[0])}:${z(period.e[1])}`
+    : '';
+  const sub = timeStr ? `${timeStr} · ${sec.count||0} คน` : `${sec.count||0} คน`;
+
+  // สถานะเช็กชื่อ
+  const checked = status && status.checked;
+
+  const rightBadge = checked
+    ? `<span style="font-size:11px;font-weight:800;color:#15803d;background:#f0fdf4;border:1.5px solid #86efac;padding:4px 12px;border-radius:20px;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>เช็กแล้ว
+       </span>`
+    : `<span style="font-size:11px;font-weight:800;color:#ea580c;background:#fff7ed;border:1.5px solid #fed7aa;padding:4px 12px;border-radius:20px;white-space:nowrap;flex-shrink:0;">เช็คชื่อ ›</span>`;
+
+  const cardBg    = checked ? '#fafffc' : '#fff';
+  const cardBd    = checked ? '#86efac' : 'var(--border)';
+  const iconBg    = lc.icon;
+  const iconBg2   = lc.bg || '#f1f5f9';
+  const sz        = 46;
+
+  return `<div onclick="chooseRoom('${sec.id}')"
+    style="background:${cardBg};border:1.5px solid ${cardBd};border-radius:16px;padding:13px 14px;
+           display:flex;align-items:center;gap:13px;cursor:pointer;
+           transition:all .18s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(29,158,117,.15)';this.style.transform='translateY(-1px)';this.style.borderColor='var(--primary)';this.style.background='#f0fdf9';"
+    onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,.07)';this.style.transform='';this.style.borderColor='${cardBd}';this.style.background='${cardBg}';">
+    <!-- icon -->
+    <div style="width:${sz}px;height:${sz}px;border-radius:13px;background:${iconBg};
+                display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
+        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5z"/>
+      </svg>
+    </div>
+    <!-- text -->
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:15px;font-weight:800;color:var(--text);line-height:1.3;">${sec.subject} ${sec.name}</div>
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:5px;">
+        <span style="width:7px;height:7px;border-radius:50%;background:${iconBg};display:inline-block;flex-shrink:0;"></span>
+        ${sub}
+      </div>
+    </div>
+    <div style="flex-shrink:0;margin-right:4px;">${rightBadge}</div>
+  </div>`;
+}
+
+// กลับไปหน้าเลือกห้อง (reset state ชัดเจน)
+function goBackToChooser(){
+  _period = null;
+  currentClass = null;
+  // ซ่อนปุ่ม back (อยู่ chooser = หน้าแรก)
+  const _bb=document.getElementById('d-back-btn'); if(_bb) _bb.style.display='none';
+  // scroll d-main กลับบนสุดก่อน (chooser เป็น absolute ผูกกับ scroll ของ d-main)
+  const dmain=document.querySelector('.d-main'); if(dmain) dmain.scrollTop=0;
+  const mca=document.querySelector('.m-card-area'); if(mca) mca.scrollTop=0;
+  window.scrollTo(0,0);
+  showRoomChooser();
+  const dc=document.getElementById('room-chooser'); if(dc) dc.scrollTop=0;
+  const mc=document.getElementById('m-room-chooser'); if(mc) mc.scrollTop=0;
+}
+
+async function showRoomChooser(){
+  updateDateDisplay(); // แสดงวันที่ใน topbar pill ทันที
+  const sections = CKService.getSections();
+  const todayPeriods = _sbTodayPeriods || [];
+  const todayClassIds = new Set(todayPeriods.map(p=>p.classId));
+
+  // เปิด chooser ก่อน (แสดงทันที ไม่รอ status)
+  const dc=document.getElementById('room-chooser');
+  const mc=document.getElementById('m-room-chooser');
+  if(dc) dc.style.display='block';
+  if(mc) mc.style.display='block';
+
+  // โหลดสถานะเช็กชื่อทุกห้องทีเดียว
+  let checkStatus={};
+  try{
+    checkStatus = await CKService.getCheckStatusForSections(sections.map(s=>s.id), todayKey);
+  }catch(e){ console.warn('checkStatus:',e); }
+
+  // สรุปวัน: นับเฉพาะห้องที่สอนวันนี้
+  const todaySecIds = todayPeriods.map(p=>p.classId);
+  const checkedToday = todaySecIds.filter(id=>checkStatus[id]?.checked).length;
+  const totalToday = todaySecIds.length;
+  renderDaySummary(totalToday, checkedToday);
+
+  // desktop + mobile ใช้ข้อมูลเดียวกัน
+  for(const mode of [{pfx:'',mobile:false},{pfx:'m-',mobile:true}]){
+    const todayEl=document.getElementById(mode.pfx+'chooser-today');
+    const todayLbl=document.getElementById(mode.pfx+'chooser-today-label');
+    const allEl=document.getElementById(mode.pfx+'chooser-all');
+    const allLbl=document.getElementById(mode.pfx+'chooser-all-label');
+    const sub=document.getElementById(mode.pfx+'chooser-sub');
+    if(!todayEl) continue;
+
+    // label วันที่ใช้ currentDate (ไม่ใช่วันนี้จริง)
+    const _dayLabel = fmtLong(currentDate);
+    if(todayPeriods.length){
+      todayLbl.textContent=`${_dayLabel} — มีคาบสอน`;
+      todayLbl.style.display='';
+      todayEl.innerHTML=todayPeriods.map(p=>{
+        const sec=sections.find(s=>s.id===p.classId);
+        return sec?roomCardHtml(sec,p,mode.mobile,checkStatus[sec.id]):'';
+      }).join('');
+      if(sub) sub.textContent=`เลือกห้องที่จะเช็คชื่อ`;
+    } else {
+      todayLbl.style.display='none';
+      todayEl.innerHTML='';
+      if(sub) sub.textContent=`${_dayLabel} — ไม่มีคาบในตาราง เลือกห้องที่จะเช็คชื่อด้านล่าง`;
+    }
+    // ห้องทั้งหมด (ที่ไม่ได้สอนวันนี้)
+    const others=sections.filter(s=>!todayClassIds.has(s.id));
+    allLbl.style.display = others.length?'':'none';
+    allEl.innerHTML=others.map(s=>roomCardHtml(s,null,mode.mobile,checkStatus[s.id])).join('');
+  }
+}
+
+// แถบสรุปวัน: ทั้งหมด/เช็กแล้ว/เหลือ
+function renderDaySummary(total, checked){
+  const remain=total-checked;
+  for(const pfx of ['','m-']){
+    const el=document.getElementById(pfx+'chooser-summary');
+    if(!el) continue;
+    if(total===0){ el.style.display='none'; continue; }
+    el.style.display='';
+    if(checked>=total){
+      // เช็กครบทุกห้องแล้ว
+      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:11px 16px;color:#15803d;font-weight:700;font-size:14px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+        เช็กชื่อครบทุกห้องแล้ววันนี้ 🎉</div>`;
+    } else {
+      el.innerHTML=`<div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <span style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--text);">ทั้งหมด ${total} ห้อง</span>
+        <span style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;color:#15803d;">เช็กแล้ว ${checked}</span>
+        <span style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;color:#c2410c;">เหลือ ${remain}</span>
+      </div>`;
+    }
+  }
+}
+
+async function chooseRoom(sectionId){
+  const p = (_sbTodayPeriods||[]).find(x=>x.classId===sectionId) || makeVirtualPeriod(sectionId);
+  if(!p) return;
+  _period=p; currentClass=sectionId;
+  document.getElementById('room-chooser').style.display='none';
+  const mc=document.getElementById('m-room-chooser'); if(mc) mc.style.display='none';
+  await loadSupabaseData(sectionId, todayKey);
+  init();
+}
 </script>
 </body>
 </html>

@@ -65,10 +65,10 @@ const COLS = [
    LEVEL COLORS
 ───────────────────────────────────────── */
 const LEVEL_COLORS = {
-  primary: { bg:'#fefce8', icon:'#ca8a04', border:'#fde047', text:'#854d0e' },
-  junior:  { bg:'#f0fdf4', icon:'#16a34a', border:'#86efac', text:'#15803d' },
-  senior:  { bg:'#eff6ff', icon:'#2563eb', border:'#93c5fd', text:'#1d4ed8' },
-  uni:     { bg:'#f5f3ff', icon:'#7c3aed', border:'#c4b5fd', text:'#6d28d9' },
+  primary: { bg:'#fefce8', icon:'#d99a4e', border:'#fde047', text:'#854d0e' },
+  junior:  { bg:'#f0fdf4', icon:'#6cae8f', border:'#86efac', text:'#15803d' },
+  senior:  { bg:'#eff6ff', icon:'#7b9bb5', border:'#93c5fd', text:'#1d4ed8' },
+  uni:     { bg:'#f5f3ff', icon:'#9d8ec4', border:'#c4b5fd', text:'#6d28d9' },
 };
 
 /* ─────────────────────────────────────────
@@ -95,39 +95,39 @@ const CLASSES_META = [
 ───────────────────────────────────────── */
 const TIMETABLE_MASTER = {
   1: [ // จันทร์
-    {periodId:'mon_p61_soc_0940',  dow:1, s:[9,40],  e:[10,40], subject:'สังคมศึกษา',      classId:'p61', name:'ป.6/1', dot:'#ca8a04'},
-    {periodId:'mon_m21_art_1030',  dow:1, s:[10,30], e:[11,40], subject:'ทัศนศิลป์',       classId:'m21', name:'ม.2/1', dot:'#3b82f6'},
-    {periodId:'mon_p51_hlt_1240',  dow:1, s:[12,40], e:[13,40], subject:'สุขศึกษา',        classId:'p51', name:'ป.5/1', dot:'#f59e0b'},
-    {periodId:'mon_m11_art_1340',  dow:1, s:[13,40], e:[14,40], subject:'ศิลปะ',           classId:'m11', name:'ม.1/1', dot:'#8b5cf6'},
-    {periodId:'mon_m31_hlt_1440',  dow:1, s:[14,40], e:[15,40], subject:'สุขศึกษา',        classId:'m31', name:'ม.3/1', dot:'#1d9e75'},
+    {periodId:'mon_p61_soc_0940',  dow:1, s:[9,40],  e:[10,40], subject:'สังคมศึกษา',      classId:'p61', name:'ป.6/1', dot:'#d99a4e'},
+    {periodId:'mon_m21_art_1030',  dow:1, s:[10,30], e:[11,40], subject:'ทัศนศิลป์',       classId:'m21', name:'ม.2/1', dot:'#7b9bb5'},
+    {periodId:'mon_p51_hlt_1240',  dow:1, s:[12,40], e:[13,40], subject:'สุขศึกษา',        classId:'p51', name:'ป.5/1', dot:'#d99a4e'},
+    {periodId:'mon_m11_art_1340',  dow:1, s:[13,40], e:[14,40], subject:'ศิลปะ',           classId:'m11', name:'ม.1/1', dot:'#9d8ec4'},
+    {periodId:'mon_m31_hlt_1440',  dow:1, s:[14,40], e:[15,40], subject:'สุขศึกษา',        classId:'m31', name:'ม.3/1', dot:'#4a9b94'},
   ],
   2: [ // อังคาร
-    {periodId:'tue_p11_pe_0840',   dow:2, s:[8,40],  e:[9,40],  subject:'พลศึกษา',         classId:'p11', name:'ป.1/1', dot:'#ec4899'},
-    {periodId:'tue_p21_pe_0940',   dow:2, s:[9,40],  e:[10,40], subject:'พลศึกษา',         classId:'p21', name:'ป.2/1', dot:'#f97316'},
-    {periodId:'tue_p61_soc_1030',  dow:2, s:[10,30], e:[11,40], subject:'สังคมศึกษา',      classId:'p61', name:'ป.6/1', dot:'#ca8a04'},
-    {periodId:'tue_p41_hpe_1240',  dow:2, s:[12,40], e:[13,40], subject:'สุขพลศึกษา',      classId:'p41', name:'ป.4/1', dot:'#eab308'},
-    {periodId:'tue_p61_hpe_1340',  dow:2, s:[13,40], e:[14,40], subject:'สุขพลศึกษา',      classId:'p61', name:'ป.6/1', dot:'#ca8a04'},
-    {periodId:'tue_m11_pe_1440',   dow:2, s:[14,40], e:[15,40], subject:'พลศึกษา',         classId:'m11', name:'ม.1/1', dot:'#8b5cf6'},
+    {periodId:'tue_p11_pe_0840',   dow:2, s:[8,40],  e:[9,40],  subject:'พลศึกษา',         classId:'p11', name:'ป.1/1', dot:'#d98a9e'},
+    {periodId:'tue_p21_pe_0940',   dow:2, s:[9,40],  e:[10,40], subject:'พลศึกษา',         classId:'p21', name:'ป.2/1', dot:'#d99a4e'},
+    {periodId:'tue_p61_soc_1030',  dow:2, s:[10,30], e:[11,40], subject:'สังคมศึกษา',      classId:'p61', name:'ป.6/1', dot:'#d99a4e'},
+    {periodId:'tue_p41_hpe_1240',  dow:2, s:[12,40], e:[13,40], subject:'สุขพลศึกษา',      classId:'p41', name:'ป.4/1', dot:'#d99a4e'},
+    {periodId:'tue_p61_hpe_1340',  dow:2, s:[13,40], e:[14,40], subject:'สุขพลศึกษา',      classId:'p61', name:'ป.6/1', dot:'#d99a4e'},
+    {periodId:'tue_m11_pe_1440',   dow:2, s:[14,40], e:[15,40], subject:'พลศึกษา',         classId:'m11', name:'ม.1/1', dot:'#9d8ec4'},
   ],
   3: [ // พุธ
-    {periodId:'wed_p31_pe_0940',   dow:3, s:[9,40],  e:[10,40], subject:'พลศึกษา',         classId:'p31', name:'ป.3/1', dot:'#14b8a6'},
-    {periodId:'wed_p61_his_1030',  dow:3, s:[10,30], e:[11,40], subject:'ประวัติศาสตร์',    classId:'p61', name:'ป.6/1', dot:'#ca8a04'},
-    {periodId:'wed_m11_pe_1240',   dow:3, s:[12,40], e:[13,40], subject:'พลศึกษา',         classId:'m11', name:'ม.1/1', dot:'#8b5cf6'},
-    {periodId:'wed_p51_pe_1340',   dow:3, s:[13,40], e:[14,40], subject:'พลศึกษา',         classId:'p51', name:'ป.5/1', dot:'#f59e0b'},
-    {periodId:'wed_p61_pe_1440',   dow:3, s:[14,40], e:[15,40], subject:'พลศึกษา',         classId:'p61', name:'ป.6/1', dot:'#ca8a04'},
+    {periodId:'wed_p31_pe_0940',   dow:3, s:[9,40],  e:[10,40], subject:'พลศึกษา',         classId:'p31', name:'ป.3/1', dot:'#4a9b94'},
+    {periodId:'wed_p61_his_1030',  dow:3, s:[10,30], e:[11,40], subject:'ประวัติศาสตร์',    classId:'p61', name:'ป.6/1', dot:'#d99a4e'},
+    {periodId:'wed_m11_pe_1240',   dow:3, s:[12,40], e:[13,40], subject:'พลศึกษา',         classId:'m11', name:'ม.1/1', dot:'#9d8ec4'},
+    {periodId:'wed_p51_pe_1340',   dow:3, s:[13,40], e:[14,40], subject:'พลศึกษา',         classId:'p51', name:'ป.5/1', dot:'#d99a4e'},
+    {periodId:'wed_p61_pe_1440',   dow:3, s:[14,40], e:[15,40], subject:'พลศึกษา',         classId:'p61', name:'ป.6/1', dot:'#d99a4e'},
   ],
   4: [ // พฤหัสบดี
-    {periodId:'thu_m11_hlt_0940',  dow:4, s:[9,40],  e:[10,40], subject:'สุขศึกษา',        classId:'m11', name:'ม.1/1', dot:'#8b5cf6'},
-    {periodId:'thu_m21_hlt_1030',  dow:4, s:[10,30], e:[11,40], subject:'สุขศึกษา',        classId:'m21', name:'ม.2/1', dot:'#3b82f6'},
-    {periodId:'thu_m11_art_1240',  dow:4, s:[12,40], e:[13,40], subject:'ศิลปะ',           classId:'m11', name:'ม.1/1', dot:'#8b5cf6'},
-    {periodId:'thu_m21_art_1340',  dow:4, s:[13,40], e:[14,40], subject:'ทัศนศิลป์',       classId:'m21', name:'ม.2/1', dot:'#3b82f6'},
-    {periodId:'thu_p61_sco_1440',  dow:4, s:[14,40], e:[15,40], subject:'ลูกเสือ',          classId:'p61', name:'ป.6/1', dot:'#ca8a04'},
+    {periodId:'thu_m11_hlt_0940',  dow:4, s:[9,40],  e:[10,40], subject:'สุขศึกษา',        classId:'m11', name:'ม.1/1', dot:'#9d8ec4'},
+    {periodId:'thu_m21_hlt_1030',  dow:4, s:[10,30], e:[11,40], subject:'สุขศึกษา',        classId:'m21', name:'ม.2/1', dot:'#7b9bb5'},
+    {periodId:'thu_m11_art_1240',  dow:4, s:[12,40], e:[13,40], subject:'ศิลปะ',           classId:'m11', name:'ม.1/1', dot:'#9d8ec4'},
+    {periodId:'thu_m21_art_1340',  dow:4, s:[13,40], e:[14,40], subject:'ทัศนศิลป์',       classId:'m21', name:'ม.2/1', dot:'#7b9bb5'},
+    {periodId:'thu_p61_sco_1440',  dow:4, s:[14,40], e:[15,40], subject:'ลูกเสือ',          classId:'p61', name:'ป.6/1', dot:'#d99a4e'},
   ],
   5: [ // ศุกร์
-    {periodId:'fri_p61_anti_1030', dow:5, s:[10,30], e:[11,40], subject:'ป้องกันทุจริต',   classId:'p61', name:'ป.6/1', dot:'#ca8a04'},
-    {periodId:'fri_p41_hpe_1240',  dow:5, s:[12,40], e:[13,40], subject:'สุขพลศึกษา',      classId:'p41', name:'ป.4/1', dot:'#eab308'},
-    {periodId:'fri_m21_pe_1340',   dow:5, s:[13,40], e:[14,40], subject:'พลศึกษา',         classId:'m21', name:'ม.2/1', dot:'#3b82f6'},
-    {periodId:'fri_p61_pray_1440', dow:5, s:[14,40], e:[15,40], subject:'สวดมนต์',          classId:'p61', name:'ป.6/1', dot:'#ca8a04'},
+    {periodId:'fri_p61_anti_1030', dow:5, s:[10,30], e:[11,40], subject:'ป้องกันทุจริต',   classId:'p61', name:'ป.6/1', dot:'#d99a4e'},
+    {periodId:'fri_p41_hpe_1240',  dow:5, s:[12,40], e:[13,40], subject:'สุขพลศึกษา',      classId:'p41', name:'ป.4/1', dot:'#d99a4e'},
+    {periodId:'fri_m21_pe_1340',   dow:5, s:[13,40], e:[14,40], subject:'พลศึกษา',         classId:'m21', name:'ม.2/1', dot:'#7b9bb5'},
+    {periodId:'fri_p61_pray_1440', dow:5, s:[14,40], e:[15,40], subject:'สวดมนต์',          classId:'p61', name:'ป.6/1', dot:'#d99a4e'},
   ],
 };
 

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เริ่มต้นใช้งาน — ClassKru</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#5b6675;--border:#e8edf2;
+  --sh:0 1px 4px rgba(0,0,0,.06);--sh-md:0 6px 24px rgba(0,0,0,.10);
+  --tr:all .18s cubic-bezier(.4,0,.2,1);
+}
+html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
+.btn{font-family:'Sarabun',sans-serif;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:var(--tr);border-radius:12px;}
+.btn:active{transform:scale(.97);}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:var(--primary);color:#fff;font-size:16px;padding:14px 24px;box-shadow:0 4px 14px rgba(29,158,117,.3);}
+.btn-primary:hover:not(:disabled){background:var(--pk);}
+.btn-ghost{background:transparent;color:var(--muted);font-size:14px;padding:10px 18px;}
+.btn-ghost:hover{color:var(--text);}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+.wrap{max-width:680px;margin:0 auto;padding:28px 20px 60px;min-height:100dvh;display:flex;flex-direction:column;}
+.brand{text-align:center;margin-bottom:8px;}
+.brand img{height:60px;}
+.head{text-align:center;margin-bottom:26px;}
+.head h1{font-size:24px;font-weight:800;margin-bottom:6px;}
+.head p{font-size:14px;color:var(--muted);}
+
+/* progress dots */
+.steps{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:26px;}
+.step-dot{width:9px;height:9px;border-radius:50%;background:#cbd5e1;transition:var(--tr);}
+.step-dot.active{background:var(--primary);width:26px;border-radius:5px;}
+
+.panel{animation:fadeUp .3s ease;}
+
+/* ── dropzone ── */
+.dropzone{border:2.5px dashed var(--pbd);border-radius:20px;background:var(--pbg);padding:40px 24px;text-align:center;cursor:pointer;transition:var(--tr);}
+.dropzone:hover,.dropzone.drag{border-color:var(--primary);background:#e7f9f0;}
+.dropzone .ic{width:72px;height:72px;border-radius:20px;background:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:var(--sh);}
+.dropzone .ic svg{width:36px;height:36px;stroke:var(--primary);stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.dropzone h3{font-size:17px;font-weight:800;margin-bottom:6px;}
+.dropzone p{font-size:13px;color:var(--muted);line-height:1.6;}
+.dz-formats{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+.dz-tag{font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:#fff;border:1.5px solid var(--border);color:var(--muted);}
+.dz-tag.soon{opacity:.6;}
+
+.file-list{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
+.file-item{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;animation:fadeUp .25s ease;}
+.file-ic{width:36px;height:36px;border-radius:10px;background:var(--pbg);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.file-ic svg{width:18px;height:18px;stroke:var(--primary);stroke-width:1.8;fill:none;stroke-linecap:round;}
+.file-meta{flex:1;min-width:0;}
+.file-name{font-size:13.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-sub{font-size:11.5px;color:var(--muted);}
+.file-del{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;color:#94a3b8;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.file-del:hover{border-color:#fca5a5;color:#dc2626;}
+
+/* ── processing ── */
+.processing{text-align:center;padding:50px 20px;}
+.spinner{width:48px;height:48px;border:4px solid var(--pbd);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px;}
+.processing h3{font-size:17px;font-weight:800;margin-bottom:6px;}
+.processing p{font-size:13px;color:var(--muted);}
+
+/* ── preview ── */
+.pv-section{margin-bottom:22px;}
+.pv-label{font-size:12px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.pv-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--sh);}
+.pv-row{display:flex;align-items:center;gap:13px;padding:13px 16px;border-bottom:1px solid #f1f5f9;}
+.pv-row:last-child{border-bottom:none;}
+.pv-dot{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pv-dot svg{width:20px;height:20px;stroke:#fff;stroke-width:1.8;fill:none;stroke-linecap:round;}
+.pv-info{flex:1;min-width:0;}
+.pv-name{font-size:14.5px;font-weight:800;}
+.pv-meta{font-size:12px;color:var(--muted);margin-top:1px;}
+.pv-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0;}
+.pv-badge.ok{background:var(--pbg);color:#15803d;}
+.pv-badge.warn{background:#fffbeb;color:#b45309;}
+
+.match-room{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.conf{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;}
+.conf.high{background:var(--pbg);color:#15803d;}
+.conf.medium{background:#fffbeb;color:#b45309;}
+.conf.none{background:#fef2f2;color:#dc2626;}
+.room-select{font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;padding:6px 10px;border:1.5px solid #fcd34d;border-radius:9px;background:#fffbeb;color:#92400e;cursor:pointer;}
+
+.notice{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#1e40af;display:flex;gap:10px;align-items:flex-start;margin-bottom:16px;}
+.notice svg{width:18px;height:18px;stroke:#2563eb;stroke-width:2;fill:none;flex-shrink:0;margin-top:1px;}
+
+.actions{display:flex;gap:12px;margin-top:24px;}
+.actions .btn{flex:1;}
+
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:rgba(15,23,42,.88);color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:22px;white-space:nowrap;z-index:9999;transition:transform .25s;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+.skip-link{text-align:center;margin-top:18px;}
+.skip-link a{font-size:13px;color:var(--muted);text-decoration:underline;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><img src="classkru-logo.png" alt="ClassKru"></div>
+  <div class="head">
+    <h1 id="head-title">เริ่มต้นใช้งาน</h1>
+    <p id="head-sub">โยนไฟล์ที่มี แล้วระบบจัดการให้</p>
+  </div>
+  <div class="steps">
+    <div class="step-dot active" id="dot-0"></div>
+    <div class="step-dot" id="dot-1"></div>
+    <div class="step-dot" id="dot-2"></div>
+  </div>
+
+  <!-- ── PANEL 1: UPLOAD ── -->
+  <div class="panel" id="panel-upload">
+    <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+      <div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+      <h3>โยนไฟล์มาที่นี่</h3>
+      <p>ตารางสอน และ รายชื่อนักเรียน<br>ใส่พร้อมกันได้เลย ไม่ต้องเรียงลำดับ</p>
+      <div class="dz-formats">
+        <span class="dz-tag">Excel (.xlsx)</span>
+        <span class="dz-tag">CSV</span>
+        <span class="dz-tag soon">รูป / PDF · เร็วๆ นี้</span>
+      </div>
+    </div>
+    <input type="file" id="file-input" accept=".xlsx,.csv" multiple style="display:none" onchange="handleFiles(this.files)">
+
+    <div class="file-list" id="file-list"></div>
+
+    <div class="actions" id="upload-actions" style="display:none;">
+      <button class="btn btn-ghost" onclick="document.getElementById('file-input').click()" style="flex:0 0 auto;">+ เพิ่มไฟล์</button>
+      <button class="btn btn-primary" onclick="startProcess()" style="flex:1;">ถัดไป — ให้ระบบช่วยจัด ›</button>
+    </div>
+
+    <div class="skip-link">
+      <a onclick="go('setup.html')">ข้ามไปกรอกเอง</a>
+      <span style="color:#cbd5e1;margin:0 8px;">·</span>
+      <a onclick="go('index.html')">ดูแอปก่อน</a>
+    </div>
+  </div>
+
+  <!-- ── PANEL 2: PROCESSING ── -->
+  <div class="panel" id="panel-processing" style="display:none;">
+    <div class="processing">
+      <div class="spinner"></div>
+      <h3 id="proc-title">กำลังจัดข้อมูลการสอนของคุณ…</h3>
+      <p id="proc-sub">ระบบกำลังช่วยอ่านไฟล์และจัดห้องเรียนให้</p>
+    </div>
+  </div>
+
+  <!-- ── PANEL 3: PREVIEW ── -->
+  <div class="panel" id="panel-preview" style="display:none;">
+    <div class="notice">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <div>ตรวจดูให้ถูกต้องก่อนสร้าง — แก้ได้ถ้าระบบอ่านพลาด <b>ยังไม่บันทึก</b>จนกว่าจะกดยืนยัน</div>
+    </div>
+
+    <div class="pv-section">
+      <div class="pv-label">วิชา / ห้องเรียน ที่พบ <span id="sec-count" style="color:var(--primary)"></span></div>
+      <div class="pv-card" id="pv-sections"></div>
+    </div>
+
+    <div class="pv-section" id="pv-roster-section">
+      <div class="pv-label">รายชื่อนักเรียน — จับคู่ห้อง</div>
+      <div class="pv-card" id="pv-matches"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-ghost" onclick="backToUpload()" style="flex:0 0 auto;">‹ ย้อนกลับ</button>
+      <button class="btn btn-primary" id="confirm-btn" onclick="confirmCreate()" style="flex:1;">ถูกต้อง — สร้างเลย ✓</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast-el"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="ck-service.js"></script>
+<script src="ck-import.js"></script>
+<script>
+function go(u){location.href=u;}
+function showToast(m){const t=document.getElementById('toast-el');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1900);}
+function setStep(n){[0,1,2].forEach(i=>document.getElementById('dot-'+i).classList.toggle('active',i<=n));}
+
+let _files=[];        // {name, rows}
+let _result=null;     // ผลจาก CKImport.process
+
+// ── drag & drop ──
+const dz=document.getElementById('dropzone');
+['dragover','dragenter'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.add('drag');}));
+['dragleave','drop'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.remove('drag');}));
+dz.addEventListener('drop',ev=>{ if(ev.dataTransfer.files.length) handleFiles(ev.dataTransfer.files); });
+
+async function handleFiles(fileList){
+  for(const file of fileList){
+    const ext=file.name.split('.').pop().toLowerCase();
+    if(!['xlsx','csv'].includes(ext)){ showToast('รองรับเฉพาะ Excel/CSV'); continue; }
+    if(_files.some(f=>f.name===file.name)){ showToast('ไฟล์นี้เพิ่มแล้ว'); continue; }
+    try{
+      const sheets=await readFile(file);
+      _files.push({name:file.name, sheets});
+    }catch(e){ console.error(e); showToast('อ่านไฟล์ '+file.name+' ไม่ได้'); }
+  }
+  renderFileList();
+}
+
+// อ่านทุก sheet → [{sheetName, rows}]
+function readFile(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      try{
+        const wb=XLSX.read(e.target.result,{type:'array'});
+        const sheets=wb.SheetNames.map(sn=>({
+          sheetName:sn,
+          rows:XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:false,defval:''})
+        }));
+        res(sheets);
+      }catch(err){ rej(err); }
+    };
+    r.onerror=rej;
+    r.readAsArrayBuffer(file);
+  });
+}
+
+function renderFileList(){
+  const list=document.getElementById('file-list');
+  list.innerHTML=_files.map((f,i)=>{
+    const type=CKImport.classifyFile(f.name,f);
+    const nSheets=(f.sheets||[]).length;
+    const sheetNote=nSheets>1?` · ${nSheets} ห้อง`:'';
+    const label=(type==='timetable'?'ตารางสอน':type==='roster'?'รายชื่อนักเรียน':'ไม่ทราบประเภท')+sheetNote;
+    const ic=type==='timetable'
+      ? `<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`
+      : `<svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>`;
+    return `<div class="file-item">
+      <div class="file-ic">${ic}</div>
+      <div class="file-meta"><div class="file-name">${f.name}</div><div class="file-sub">${label}</div></div>
+      <button class="file-del" onclick="removeFile(${i})">✕</button>
+    </div>`;
+  }).join('');
+  document.getElementById('upload-actions').style.display=_files.length?'flex':'none';
+}
+function removeFile(i){_files.splice(i,1);renderFileList();}
+
+function showPanel(id){
+  ['upload','processing','preview'].forEach(p=>document.getElementById('panel-'+p).style.display=p===id?'':'none');
+}
+
+async function startProcess(){
+  setStep(1);
+  showPanel('processing');
+  document.getElementById('head-title').textContent='กำลังจัดข้อมูล';
+  document.getElementById('head-sub').textContent='อีกสักครู่…';
+  // หน่วงนิดให้ครูรู้สึกว่าระบบทำงาน (UX)
+  await new Promise(r=>setTimeout(r,900));
+  try{
+    _result=CKImport.process(_files);
+  }catch(e){ console.error(e); showToast('ประมวลผลไม่สำเร็จ'); showPanel('upload'); setStep(0); return; }
+
+  if(!_result.timetableFound){
+    showToast('ไม่พบไฟล์ตารางสอน — เพิ่มตารางสอนก่อน');
+    showPanel('upload'); setStep(0); return;
+  }
+  renderPreview();
+  setStep(2);
+  showPanel('preview');
+  document.getElementById('head-title').textContent='ตรวจสอบข้อมูล';
+  document.getElementById('head-sub').textContent='ระบบจัดให้แล้ว — ดูความถูกต้องก่อนสร้าง';
+}
+
+const SUBJ_SVG=`<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>`;
+const COLORS={primary:'#ca8a04',junior:'#16a34a',senior:'#2563eb'};
+
+function renderPreview(){
+  const r=_result;
+  // sections
+  document.getElementById('sec-count').textContent=`(${r.sections.length} ห้อง)`;
+  document.getElementById('pv-sections').innerHTML=r.sections.map((s,si)=>{
+    const color=COLORS[s.level]||COLORS.junior;
+    const badge=s.hasRoster
+      ? `<span class="pv-badge ok">นักเรียน ${s.studentCount} คน</span>`
+      : `<span class="pv-badge warn">ยังไม่มีรายชื่อ</span>`;
+    // ห้องที่สร้างจากรายชื่อ → ยังไม่มีวิชา ให้ครูกรอก
+    const nameHtml = s.needsSubject
+      ? `<input class="subj-input" data-si="${si}" value="${s.subject||''}" placeholder="ใส่ชื่อวิชา…" oninput="updateSubject(${si},this.value)" style="font-family:'Sarabun',sans-serif;font-size:14.5px;font-weight:800;border:1.5px solid #fcd34d;border-radius:8px;padding:4px 8px;background:#fffbeb;width:130px;"> <span style="font-weight:800;">${s.room}</span>`
+      : `${s.subject} ${s.room}`;
+    const meta = s.needsSubject ? 'เติมชื่อวิชาให้ห้องนี้' : `${s.periods} คาบ/สัปดาห์`;
+    return `<div class="pv-row">
+      <div class="pv-dot" style="background:${color}">${SUBJ_SVG}</div>
+      <div class="pv-info"><div class="pv-name">${nameHtml}</div><div class="pv-meta">${meta}</div></div>
+      ${badge}
+    </div>`;
+  }).join('');
+
+  // matches (รายชื่อ)
+  const roomOptions=r.sections.map(s=>`<option value="${s.normRoom}">${s.subject} ${s.room}</option>`).join('');
+  if(!r.matches.length){
+    document.getElementById('pv-roster-section').style.display='none';
+  }else{
+    document.getElementById('pv-roster-section').style.display='';
+    document.getElementById('pv-matches').innerHTML=r.matches.map((m,i)=>{
+      const confLabel=m.confidence==='high'?'🟢 จับคู่แน่นอน':m.confidence==='medium'?'🟡 โปรดยืนยัน':'🔴 เลือกห้อง';
+      const right = m.confidence==='high'
+        ? `<span class="conf high">${confLabel}</span>`
+        : `<select class="room-select" data-i="${i}" onchange="updateMatch(${i},this.value)">
+             <option value="">— เลือกห้อง —</option>${roomOptions}
+           </select>`;
+      const sel = m.matchedRoom||'';
+      return `<div class="pv-row">
+        <div class="pv-dot" style="background:#64748b"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" fill="none" stroke="#fff" stroke-width="1.8"/></svg></div>
+        <div class="pv-info"><div class="pv-name">${m.name}</div><div class="pv-meta">${m.count} คน ${m.matchedRoom?'→ '+CKImport.roomDisplay(m.matchedRoom):''}</div></div>
+        <div class="match-room" data-sel="${sel}">${right}</div>
+      </div>`;
+    }).join('');
+    // set dropdown ให้ตรงกับ medium ที่เดาได้
+    r.matches.forEach((m,i)=>{
+      if(m.confidence!=='high' && m.matchedRoom){
+        const sel=document.querySelector(`select[data-i="${i}"]`);
+        if(sel) sel.value=m.matchedRoom;
+      }
+    });
+  }
+}
+
+function updateMatch(i,room){
+  _result.matches[i].matchedRoom=room||null;
+  _result.matches[i].confidence=room?'medium':'none';
+  // อัปเดต count ใน section
+  const counts={};
+  _result.matches.forEach(m=>{ if(m.matchedRoom) counts[m.matchedRoom]=(counts[m.matchedRoom]||0)+m.count; });
+  _result.sections.forEach(s=>{ s.studentCount=counts[s.normRoom]||0; s.hasRoster=!!counts[s.normRoom]; });
+  renderPreview();
+}
+
+// ครูเติมชื่อวิชาให้ห้องที่สร้างจากรายชื่อ (ไม่ re-render กัน input หลุด focus)
+function updateSubject(si,val){
+  if(_result.sections[si]) _result.sections[si].subject=val.trim();
+}
+
+function backToUpload(){ setStep(0); showPanel('upload');
+  document.getElementById('head-title').textContent='เริ่มต้นใช้งาน';
+  document.getElementById('head-sub').textContent='โยนไฟล์ที่มี แล้วระบบจัดการให้';
+}
+
+async function confirmCreate(){
+  if(!window.CKService){ showToast('ระบบยังไม่พร้อม'); return; }
+  // ตรวจ auth ก่อน save
+  let user=null;
+  try{ user=await CKService.requireAuth(); }catch(e){}
+  if(!user){ showToast('กรุณาเข้าสู่ระบบก่อน'); setTimeout(()=>go('login.html'),1200); return; }
+
+  // เตือนถ้ามีห้องที่ยังไม่ได้กรอกวิชา (สร้างจากรายชื่อ)
+  const noSubject=_result.sections.filter(s=>s.needsSubject && !s.subject);
+  if(noSubject.length){
+    if(!confirm(`มี ${noSubject.length} ห้องที่ยังไม่ได้ใส่ชื่อวิชา จะใช้ "ยังไม่ระบุ" ไปก่อน แก้ทีหลังได้?`)) return;
+    noSubject.forEach(s=>s.subject='ยังไม่ระบุ');
+  }
+
+  // เตือนถ้ามีไฟล์ที่ยังไม่จับคู่
+  const unmatched=_result.matches.filter(m=>!m.matchedRoom);
+  if(unmatched.length){
+    if(!confirm(`มี ${unmatched.length} รายการที่ยังไม่ได้เลือกห้อง จะข้ามและสร้างเฉพาะที่จับคู่แล้ว?`)) return;
+  }
+
+  // เข้าสู่ panel processing พร้อม progress
+  setStep(2);
+  showPanel('processing');
+  document.getElementById('head-title').textContent='กำลังสร้างข้อมูล';
+  document.getElementById('head-sub').textContent='บันทึกห้องเรียนและรายชื่อของคุณ…';
+  document.getElementById('proc-title').textContent='กำลังบันทึกข้อมูล…';
+
+  const procSub=document.getElementById('proc-sub');
+  try{
+    const res=await CKService.importFromOnboard(_result, (s,t,label)=>{
+      procSub.textContent=label || `กำลังบันทึก ${s}/${t}`;
+    });
+
+    if(res.ok || res.created.sections>0){
+      // สำเร็จ (ทั้งหมด หรือบางส่วน)
+      showSuccess(res.created, res.errors);
+    } else {
+      console.error('import errors:', res.errors);
+      showToast('บันทึกไม่สำเร็จ: '+(res.errors[0]||res.error||'unknown'));
+      showPanel('preview'); setStep(2);
+    }
+  }catch(e){
+    console.error(e);
+    showToast('เกิดข้อผิดพลาดระหว่างบันทึก');
+    showPanel('preview'); setStep(2);
+  }
+}
+
+function showSuccess(created, errors){
+  document.getElementById('head-title').textContent='เสร็จเรียบร้อย';
+  document.getElementById('head-sub').textContent='พร้อมเริ่มใช้งาน ClassKru แล้ว';
+  const warnHtml = (errors && errors.length)
+    ? `<div class="notice" style="background:#fffbeb;border-color:#fcd34d;color:#92400e;margin-top:14px;text-align:left;">
+         <svg viewBox="0 0 24 24" stroke="#d97706"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+         <div>มีบางรายการที่ข้ามไป (${errors.length}) — เพิ่มภายหลังได้จากเมนูตั้งค่า</div>
+       </div>`
+    : '';
+  document.getElementById('panel-processing').innerHTML=`
+    <div class="processing">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--pbg);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h3>สร้างข้อมูลเรียบร้อย</h3>
+      <p style="margin-top:8px;">${created.sections} ห้องเรียน · ${created.schedules} คาบ · นักเรียน ${created.students} คน</p>
+      ${warnHtml}
+      <button class="btn btn-primary" onclick="go('index.html')" style="margin-top:24px;width:100%;">เริ่มใช้งาน ›</button>
+    </div>`;
+  showPanel('processing');
+}
+</script>
+</body>
+</html>

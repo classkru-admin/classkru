@@ -12,7 +12,7 @@
   --late:#f59e0b;--lbg:#fffbeb;--lbd:#fcd34d;
   --absent:#ef4444;--abg:#fef2f2;--abd:#fca5a5;
   --leave:#6366f1;--vbg:#eef2ff;--vbd:#a5b4fc;
-  --bg:#f0f4f8;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#5b6675;--border:#e8edf2;
   --sh:0 1px 4px rgba(0,0,0,.07);--sh-md:0 4px 14px rgba(0,0,0,.10);
   --tr:all .18s cubic-bezier(.4,0,.2,1);
   --sidebar:260px;
@@ -201,7 +201,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
     <div class="sb-link" onclick="window.location.href='index.html'">
       <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>หน้าหลัก
     </div>
-    <div class="sb-link" onclick="window.location.href='overview.html?class='+currentClass">
+    <div class="sb-link" onclick="window.location.href='report.html?class='+currentClass">
       <span class="ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>ภาพรวมการเข้าเรียน
     </div>
     <div class="sb-link" onclick="window.location.href='attendance.html?class='+currentClass">
@@ -210,7 +210,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
     <div class="sb-link" onclick="window.location.href='student.html?class='+currentClass+'&id=0'">
       <span class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></span>นักเรียน
     </div>
-    <div class="sb-link" onclick="toast('ตั้งค่า — เร็วๆ นี้')">
+    <div class="sb-link" onclick="window.location.href='settings.html'">
       <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>ตั้งค่า
     </div>
     <div class="sb-spacer"></div>
@@ -270,7 +270,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
           <div class="panel-head">
             <div class="panel-title"><span class="panel-dot" style="background:#1d9e75"></span>การเข้าเรียนวันนี้</div>
             <div style="display:flex;gap:6px;">
-              <button class="btn-ghost" onclick="window.location.href='overview.html?class='+currentClass" style="font-size:11px;">รายงาน →</button>
+              <button class="btn-ghost" onclick="window.location.href='report.html?class='+currentClass" style="font-size:11px;">รายงาน →</button>
               <button class="btn-ghost" onclick="window.location.href='attendance.html?class='+currentClass">เช็คชื่อ →</button>
             </div>
           </div>
@@ -342,7 +342,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
     <span class="bn-ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>
     <span class="bn-lbl">หน้าหลัก</span>
   </button>
-  <button class="bn-item" onclick="window.location.href='overview.html?class='+currentClass">
+  <button class="bn-item" onclick="window.location.href='report.html?class='+currentClass">
     <span class="bn-ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
     <span class="bn-lbl">ภาพรวม</span>
   </button>
@@ -354,7 +354,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
     <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg></span>
     <span class="bn-lbl">นักเรียน</span>
   </button>
-  <button class="bn-item" onclick="toast('ตั้งค่า — เร็วๆ นี้')">
+  <button class="bn-item" onclick="window.location.href='settings.html'">
     <span class="bn-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
     <span class="bn-lbl">ตั้งค่า</span>
   </button>

@@ -9,10 +9,11 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
-  --bg:#f0f4f8;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#5b6675;--border:#e8edf2;
   --sh:0 1px 4px rgba(0,0,0,.07);
   --tr:all .18s cubic-bezier(.4,0,.2,1);
   --safe-bottom:env(safe-area-inset-bottom,0px);
+  --sidebar-w:200px;
 }
 html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:rgba(15,23,42,.88);color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:22px;white-space:nowrap;z-index:9999;transition:transform .25s;pointer-events:none;}
@@ -223,13 +224,13 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
   .d-app{display:flex;height:100vh;overflow:hidden;}
 
   /* SIDEBAR */
-  .d-sidebar{width:240px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;}
-  .d-sb-logo{height:80px;display:flex;justify-content:center;align-items:center;border-bottom:1px solid var(--border);}
+  .d-sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;}
+  .d-sb-logo{padding:0;border-bottom:1px solid var(--border);display:flex;justify-content:center;align-items:center;height:96px;}
   .d-sb-sec{padding:14px 16px 4px;font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;}
   .d-sb-link{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);border-left:3px solid transparent;text-decoration:none;}
   .d-sb-link:hover{background:#f8fafc;color:var(--text);}
   .d-sb-link.active{background:var(--pbg);color:var(--primary);border-left-color:var(--primary);}
-  .d-sb-link svg{width:17px;height:17px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;transition:stroke .15s;}
+  .d-sb-link svg{width:18px;height:18px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;transition:stroke .15s;}
   .d-sb-link.active svg,.d-sb-link:hover svg{stroke:var(--primary);}
   .d-sb-spacer{flex:1;}
   .d-sb-date{padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600;}
@@ -238,7 +239,7 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
   .d-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 
   /* TOPBAR DESKTOP */
-  .d-topbar{background:var(--card);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0;box-shadow:var(--sh);}
+  .d-topbar{background:#fff;border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 28px;gap:12px;flex-shrink:0;box-shadow:var(--sh);}
   .d-topbar-title{font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px;flex:1;}
   .d-topbar-class{display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 14px;border-radius:10px;border:1.5px solid var(--border);background:#fff;transition:var(--tr);}
   .d-topbar-class:hover{border-color:var(--primary);background:var(--pbg);}
@@ -375,19 +376,15 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
     <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
     <span>หน้าหลัก</span>
   </button>
-  <button class="bn active">
+  <button class="bn active" onclick="go('report.html')">
     <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-    <span>ภาพรวม</span>
+    <span>สถิติ</span>
   </button>
-  <button class="bn" onclick="go('attendance.html'+(currentClass?'?class='+currentClass:''))">
+  <button class="bn" onclick="go('attendance.html')">
     <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>
     <span>เช็คชื่อ</span>
   </button>
-  <button class="bn" onclick="go('student.html?class=m31&id=0')">
-    <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>
-    <span>นักเรียน</span>
-  </button>
-  <button class="bn" onclick="showToast('ตั้งค่า — เร็วๆ นี้')">
+  <button class="bn" onclick="go('settings.html')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     <span>ตั้งค่า</span>
   </button>
@@ -407,16 +404,13 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
     <a class="d-sb-link" onclick="go('index.html')">
       <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>หน้าหลัก
     </a>
-    <a class="d-sb-link active">
-      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>ภาพรวม
-    </a>
     <a class="d-sb-link" onclick="go('attendance.html')">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>เช็คชื่อ
     </a>
-    <a class="d-sb-link" onclick="go('student.html?class=m31&id=0')">
-      <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>นักเรียน
+    <a class="d-sb-link active" onclick="go('report.html')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>สถิติ
     </a>
-    <a class="d-sb-link" onclick="showToast('ตั้งค่า — เร็วๆ นี้')">
+    <a class="d-sb-link" onclick="go('settings.html')">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>ตั้งค่า
     </a>
     <div class="d-sb-spacer"></div>
@@ -432,9 +426,6 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         ภาพรวมการเข้าเรียน
       </div>
-      <button onclick="CKService.signOut()" title="ออกจากระบบ" style="width:36px;height:36px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      </button>
     </div>
 
     <!-- Tab bar -->
@@ -585,7 +576,7 @@ async function renderToday(){
 
   el.innerHTML=cardsData.map(({p,cls,present,absent,late,leave,total,pct,barColor,isNow,isChecked,lc})=>{
 
-    return `<div style="background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1.5px solid ${isNow?'var(--primary)':'var(--border)'};cursor:pointer;margin-bottom:0;" onclick="go('attendance.html?period=${p.periodId}')">
+    return `<div style="background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1.5px solid ${isNow?'var(--primary)':'var(--border)'};cursor:pointer;margin-bottom:0;" onclick="go('attendance.html?period=${p.periodId}&date=${CK.fmtKey(viewDate)}')">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <div style="width:8px;height:8px;border-radius:50%;background:${lc.icon};flex-shrink:0;"></div>
@@ -628,7 +619,7 @@ async function renderTodayTimetable(periods, current, checked, highlightClassId)
       const _grade=_ttCls?.grade||_ttCls?.name||'';
       const _level=_ttCls?.level||(_grade.startsWith('ป.')?'primary':'junior');
       const _ttLc=CK.LEVEL_COLORS[_level]||CK.LEVEL_COLORS['junior'];
-      return `<div class="tt-row ${isNow?'tt-now':''}" style="${opacity}cursor:pointer;" onclick="go('attendance.html?period=${p.periodId}')">
+      return `<div class="tt-row ${isNow?'tt-now':''}" style="${opacity}cursor:pointer;" onclick="go('attendance.html?period=${p.periodId}&date=${CK.fmtKey(viewDate)}')">
         <div class="tt-time">${pad(p.s[0])}:${pad(p.s[1])}\n${pad(p.e[0])}:${pad(p.e[1])}</div>
         <div class="tt-dot" style="background:${_ttLc.icon}"></div>
         <div class="tt-info">
@@ -1000,9 +991,10 @@ function calNav(dir){
   if(calViewM>11){calViewM=0;calViewY++;}
   renderCal();
 }
-function calToday(){viewDate=new Date();closeCal();renderToday();}
+function calToday(){viewDate=new Date();sessionStorage.setItem('ck_date',CK.fmtKey(viewDate));closeCal();renderToday();}
 function calPick(y,m,d){
   viewDate=new Date(y,m,d);renderCal();
+  sessionStorage.setItem('ck_date',CK.fmtKey(viewDate));
   setTimeout(()=>{closeCal();renderToday();},160);
 }
 function renderCal(){
@@ -1150,7 +1142,7 @@ function buildDToday(){
       const isChecked = CK.isPeriodChecked(p.periodId, key);
       const _dLc = CK.LEVEL_COLORS[cls?.level||'junior'];
 
-      html += `<div style="background:var(--card);border-radius:16px;padding:14px 16px;box-shadow:var(--sh);border:1.5px solid var(--border);cursor:pointer;" onclick="go('attendance.html?period=${p.periodId}')">
+      html += `<div style="background:var(--card);border-radius:16px;padding:14px 16px;box-shadow:var(--sh);border:1.5px solid var(--border);cursor:pointer;" onclick="go('attendance.html?period=${p.periodId}&date=${CK.fmtKey(viewDate)}')">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="width:8px;height:8px;border-radius:50%;background:${_dLc.icon};flex-shrink:0;"></div>

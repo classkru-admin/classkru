@@ -9,10 +9,10 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
-  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e8edf2;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#5b6675;--border:#e8edf2;
   --sh:0 1px 4px rgba(0,0,0,.06);--sh-md:0 4px 16px rgba(0,0,0,.10);
   --tr:all .18s cubic-bezier(.4,0,.2,1);
-  --sidebar-w:260px;
+  --sidebar-w:200px;
 }
 html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
 .btn{font-family:'Sarabun',sans-serif;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:var(--tr);border-radius:12px;}
@@ -46,18 +46,60 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
 
 /* ══ MOBILE ══ */
 .m-wrap{display:flex;flex-direction:column;min-height:100dvh;max-width:480px;margin:0 auto;}
-.m-topbar{background:#fff;border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;padding:0 16px;justify-content:space-between;flex-shrink:0;box-shadow:var(--sh);}
+.m-topbar{background:#fff;border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;padding:0 16px;justify-content:space-between;flex-shrink:0;box-shadow:var(--sh);}
 .m-topbar-left{display:flex;align-items:center;gap:10px;}
 .m-notif-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:none;position:relative;}
 .m-notif-dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid #fff;}
-.m-scroll{flex:1;overflow-y:auto;padding:10px 12px 70px;display:flex;flex-direction:column;gap:8px;}
-.m-bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--border);height:60px;display:flex;z-index:100;box-shadow:0 -1px 0 rgba(0,0,0,.06);padding-bottom:env(safe-area-inset-bottom,0);}
+.m-scroll{flex:1;overflow-y:auto;padding:14px 14px 80px;display:flex;flex-direction:column;gap:12px;}
+.m-bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--border);height:62px;display:flex;z-index:100;box-shadow:0 -2px 12px rgba(0,0,0,.06);padding-bottom:env(safe-area-inset-bottom,0);}
 .m-bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:'Sarabun',sans-serif;padding:6px 0 4px;}
 .m-bn:active{opacity:.6;}
-.m-bn svg{width:24px;height:24px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-.m-bn span{font-size:10px;font-weight:600;color:#9ca3af;}
+.m-bn svg{width:22px;height:22px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.m-bn span{font-size:9px;font-weight:600;color:#9ca3af;}
 .m-bn.active svg{stroke:var(--primary);}
 .m-bn.active span{color:var(--primary);font-weight:700;}
+/* Mobile greeting */
+.m-greeting{padding:4px 0 8px;}
+.m-greet-name{font-size:20px;font-weight:800;color:var(--text);}
+.m-greet-sub{font-size:13px;color:var(--muted);margin-top:2px;font-weight:500;}
+/* Quick summary card */
+.m-summary-card{background:linear-gradient(135deg,var(--primary) 0%,#16a97e 100%);border-radius:20px;padding:18px;color:#fff;box-shadow:0 6px 20px rgba(29,158,117,.28);}
+.m-summary-title{font-size:12px;font-weight:700;opacity:.8;margin-bottom:10px;letter-spacing:.02em;}
+.m-summary-stats{display:flex;gap:0;justify-content:space-between;}
+.m-stat{text-align:center;flex:1;}
+.m-stat-num{font-size:26px;font-weight:800;line-height:1;}
+.m-stat-lbl{font-size:10px;font-weight:600;opacity:.75;margin-top:3px;}
+.m-stat-divider{width:1px;background:rgba(255,255,255,.2);margin:4px 0;}
+.m-summary-bar-wrap{margin-top:12px;}
+.m-summary-bar-lbl{display:flex;justify-content:space-between;font-size:11px;font-weight:700;opacity:.85;margin-bottom:5px;}
+.m-summary-bar{height:5px;background:rgba(255,255,255,.25);border-radius:3px;overflow:hidden;}
+.m-summary-bar-fill{height:100%;background:#fff;border-radius:3px;transition:width .5s ease;}
+/* Today card */
+.m-today-card{background:#fff;border-radius:18px;border:1.5px solid var(--border);overflow:hidden;box-shadow:var(--sh);}
+.m-today-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;}
+.m-today-title{font-size:13px;font-weight:800;color:var(--text);}
+.m-today-tag{font-size:10px;font-weight:700;background:var(--pbg);color:var(--primary);padding:3px 10px;border-radius:20px;}
+.m-period-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid #f5f7fa;cursor:pointer;transition:background .15s;}
+.m-period-row:active{background:#f8fafc;}
+.m-period-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.m-period-time{font-size:11px;font-weight:700;color:var(--muted);width:42px;flex-shrink:0;line-height:1.4;}
+.m-period-info{flex:1;}
+.m-period-subj{font-size:13px;font-weight:800;color:var(--text);}
+.m-period-room{font-size:11px;color:var(--muted);margin-top:1px;}
+.m-period-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;flex-shrink:0;}
+.m-badge-now{background:var(--primary);color:#fff;}
+.m-badge-done{background:var(--pbg);color:#15803d;}
+/* Next class CTA */
+.m-next-cta-card{background:#fff;border-radius:18px;border:1.5px solid var(--pbd);box-shadow:0 2px 12px rgba(29,158,117,.1);overflow:hidden;}
+.m-next-cta-top{background:var(--pbg);padding:12px 14px;}
+.m-next-cta-lbl{font-size:10px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.04em;}
+.m-next-cta-name{font-size:17px;font-weight:800;color:var(--text);margin-top:2px;}
+.m-next-cta-room{font-size:12px;color:var(--muted);margin-top:1px;}
+.m-next-cta-btn{display:block;width:calc(100% - 28px);margin:12px 14px;padding:13px;background:var(--primary);color:#fff;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:800;border:none;border-radius:14px;cursor:pointer;text-align:center;box-shadow:0 3px 10px rgba(29,158,117,.3);}
+.m-next-cta-btn:active{transform:scale(.97);}
+/* Alert row */
+.m-alert-row{display:flex;align-items:center;gap:10px;background:#fff7ed;border:1.5px solid #fed7aa;border-radius:14px;padding:11px 14px;cursor:pointer;}
+.m-alert-row:active{opacity:.8;}
 
 /* ══ DESKTOP ══ */
 .d-wrap{display:none;}
@@ -86,6 +128,12 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
 .date-day{font-size:12px;font-weight:600;color:var(--muted);}
 .date-main{font-size:22px;font-weight:800;color:var(--text);line-height:1.1;margin-top:1px;display:flex;align-items:center;gap:6px;}
 .date-year{font-size:11px;color:var(--muted);margin-top:1px;}
+.date-click-area{cursor:pointer;user-select:none;display:inline-block;padding:6px 10px;border-radius:12px;border:1.5px solid transparent;transition:border-color .15s,box-shadow .15s,background .15s;margin:-6px -10px;}
+.date-click-area:hover{border-color:var(--border);background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08);}
+.cal-icon-wrap{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:#f5f3ff;transition:background .15s;}
+.cal-icon-wrap svg{stroke:#7c3aed;}
+.date-click-area:hover .cal-icon-wrap{background:#ede9fe;}
+.date-click-area:hover .cal-icon-wrap svg{stroke:#6d28d9;}
 .now-pill{background:var(--pbg);border:1.5px solid var(--pbd);border-radius:12px;padding:8px 14px;text-align:center;flex-shrink:0;}
 .now-pill-lbl{font-size:9px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.05em;}
 .now-pill-val{font-size:14px;font-weight:800;color:var(--pk);margin-top:2px;}
@@ -142,19 +190,19 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
 .cal-popup.show{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:all;}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .cal-nav{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:var(--tr);}
-.cal-nav:hover{background:var(--pbg);border-color:var(--primary);color:var(--primary);}
+.cal-nav:hover{background:#f5f3ff;border-color:#7c3aed;color:#7c3aed;}
 .cal-month{font-size:15px;font-weight:800;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
 .cal-dow{font-size:10px;font-weight:700;color:#94a3b8;text-align:center;padding:2px 0 6px;}
 .cal-day{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;border-radius:50%;cursor:pointer;transition:var(--tr);color:var(--text);}
-.cal-day:hover{background:var(--pbg);color:var(--primary);}
+.cal-day:hover{background:#f5f3ff;color:#7c3aed;}
 .cal-day.other{color:#cbd5e1;}
-.cal-day.today{background:var(--primary);color:#fff;font-weight:800;}
-.cal-day.selected:not(.today){background:var(--pbg);color:var(--primary);font-weight:800;outline:2px solid var(--pbd);}
+.cal-day.today{background:#7c3aed;color:#fff;font-weight:800;}
+.cal-day.selected:not(.today){background:#f5f3ff;color:#7c3aed;font-weight:800;outline:2px solid #c4b5fd;}
 .cal-day.weekend{color:#94a3b8;}
 .cal-day.weekend.today{color:#fff;}
-.cal-today-btn{margin-top:14px;width:100%;padding:9px;border-radius:12px;background:var(--pbg);border:1.5px solid var(--pbd);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;color:var(--primary);cursor:pointer;transition:var(--tr);}
-.cal-today-btn:hover{background:var(--primary);color:#fff;}
+.cal-today-btn{margin-top:14px;width:100%;padding:9px;border-radius:12px;background:#f5f3ff;border:1.5px solid #c4b5fd;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;color:#7c3aed;cursor:pointer;transition:var(--tr);}
+.cal-today-btn:hover{background:#7c3aed;color:#fff;}
 
 /* bottom sheet */
 .bs-ov{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;}
@@ -182,11 +230,11 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
 <div class="m-wrap">
   <div class="m-topbar">
     <div class="m-topbar-left">
-      <img src="classkru-logo.png" alt="ClassKru" style="height:44px;width:auto;">
+      <img src="classkru-logo.png" alt="ClassKru" style="height:40px;width:auto;">
     </div>
     <button class="m-notif-btn" onclick="openNotif()">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-      <span class="m-notif-dot" id="m-notif-dot"></span>
+      <span class="m-notif-dot" id="m-notif-dot" style="display:none;"></span>
     </button>
   </div>
   <div class="m-scroll" id="m-content">
@@ -200,19 +248,21 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
       <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V10.5z"/><path d="M9 21V13h6v8"/></svg>
       <span>หน้าหลัก</span>
     </button>
-    <button class="m-bn" onclick="setMNav(this);go('overview.html')">
+    <button class="m-bn" onclick="go('schedule.html')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
+      <span>ตารางสอน</span>
+    </button>
+    <button class="m-bn" onclick="go('attendance.html'+(sessionStorage.getItem('ck_date')?'?date='+sessionStorage.getItem('ck_date'):''))" style="position:relative;">
+      <div style="position:absolute;top:-14px;width:50px;height:50px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(29,158,117,.4);border:3px solid #fff;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>
+      </div>
+      <span style="margin-top:22px;">เช็คชื่อ</span>
+    </button>
+    <button class="m-bn" onclick="go('report.html')">
       <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      <span>ภาพรวม</span>
+      <span>รายงาน</span>
     </button>
-    <button class="m-bn" onclick="setMNav(this);go('attendance.html')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>
-      <span>เช็คชื่อ</span>
-    </button>
-    <button class="m-bn" onclick="setMNav(this);go('student.html?class=m31&id=0')">
-      <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>
-      <span>นักเรียน</span>
-    </button>
-    <button class="m-bn" onclick="go('setup.html')">
+    <button class="m-bn" onclick="go('settings.html')">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       <span>ตั้งค่า</span>
     </button>
@@ -229,16 +279,13 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
     <div class="d-sb-link active">
       <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>หน้าหลัก
     </div>
-    <div class="d-sb-link" onclick="go('overview.html')">
-      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>ภาพรวม
-    </div>
-    <div class="d-sb-link" onclick="go('attendance.html')">
+    <div class="d-sb-link" onclick="go('attendance.html'+(sessionStorage.getItem('ck_date')?'?date='+sessionStorage.getItem('ck_date'):''))">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>เช็คชื่อ
     </div>
-    <div class="d-sb-link" onclick="go('student.html?class=m31&id=0')">
-      <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>นักเรียน
+    <div class="d-sb-link" onclick="go('report.html')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>สถิติ
     </div>
-    <div class="d-sb-link" onclick="go('setup.html')">
+    <div class="d-sb-link" onclick="go('settings.html')">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>ตั้งค่า
     </div>
     <div class="d-sb-spacer"></div>
@@ -250,9 +297,6 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);colo
       <button style="width:36px;height:36px;border-radius:50%;background:transparent;border:none;cursor:pointer;position:relative;" onclick="openNotif()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
         <span id="d-notif-dot" style="position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid #fff;display:none;"></span>
-      </button>
-      <button onclick="CKService.signOut()" title="ออกจากระบบ" style="width:36px;height:36px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       </button>
     </div>
     <div class="d-scroll">
@@ -336,6 +380,125 @@ function closeNotif(){document.getElementById('notif-panel').classList.remove('o
 
 function minsUntil(s){return s[0]*60+s[1]-hm(now());}
 
+// ── Mobile content builder (spec-compliant) ──
+function buildMobileContent(d, periods, checkedIds){
+  const isToday = CK.fmtKey(d)===CK.fmtKey(now());
+  const dow = d.getDay();
+  const dateKey = CK.fmtKey(d);
+  const t = isToday ? hm(now()) : -1;
+  const current = isToday ? periods.find(p=>t>=p.s[0]*60+p.s[1]&&t<p.e[0]*60+p.e[1])||null : null;
+  const next = isToday ? periods.find(p=>p.s[0]*60+p.s[1]>t&&!checkedIds.includes(p.periodId))||null : null;
+  const unchecked = isToday ? periods.filter(p=>!checkedIds.includes(p.periodId)) : [];
+
+  // greeting
+  const greetWord = now().getHours()<12 ? 'สวัสดีตอนเช้า' : now().getHours()<17 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น';
+  const teacherName = _teacherName || 'คุณครู';
+  let html = `<div class="m-greeting">
+    <div class="m-greet-name">${greetWord} ครู${teacherName} 👋</div>
+    <div class="m-greet-sub">วัน${DAYS[dow]}ที่ ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()+543} · ${periods.length} คาบ</div>
+  </div>`;
+
+  // quick summary card (เฉพาะวันที่มีตารางสอน)
+  if(periods.length > 0 && isToday){
+    const doneCount = checkedIds.length;
+    const pct = periods.length ? Math.round(doneCount/periods.length*100) : 0;
+    // รวมสถิติเช็คชื่อทุกคาบวันนี้
+    html += `<div class="m-summary-card">
+      <div class="m-summary-title">ภาพรวมวันนี้</div>
+      <div class="m-summary-stats">
+        <div class="m-stat">
+          <div class="m-stat-num">${periods.length}</div>
+          <div class="m-stat-lbl">คาบทั้งหมด</div>
+        </div>
+        <div class="m-stat-divider"></div>
+        <div class="m-stat">
+          <div class="m-stat-num">${doneCount}</div>
+          <div class="m-stat-lbl">เช็คแล้ว</div>
+        </div>
+        <div class="m-stat-divider"></div>
+        <div class="m-stat">
+          <div class="m-stat-num">${unchecked.length}</div>
+          <div class="m-stat-lbl">รอเช็ค</div>
+        </div>
+      </div>
+      <div class="m-summary-bar-wrap">
+        <div class="m-summary-bar-lbl"><span>ความคืบหน้า</span><span>${pct}%</span></div>
+        <div class="m-summary-bar"><div class="m-summary-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+    </div>`;
+  }
+
+  // คาบถัดไป / คาบปัจจุบัน CTA
+  if(isToday && dow!==0 && dow!==6){
+    const target = current || next;
+    if(target){
+      const checked = checkedIds.includes(target.periodId);
+      const isCurrent = !!current;
+      const cls = _sections.find(c=>c.id===target.classId);
+      const mins = !isCurrent ? minsUntil(target.s) : 0;
+      const timeLbl = isCurrent ? 'กำลังสอนอยู่' : mins<=60 ? `อีก ${mins} นาที` : `${pad(target.s[0])}:${pad(target.s[1])} น.`;
+      html += `<div class="m-next-cta-card">
+        <div class="m-next-cta-top">
+          <div class="m-next-cta-lbl">${isCurrent ? '🟢 คาบปัจจุบัน' : '⏰ คาบถัดไป'} · ${timeLbl}</div>
+          <div class="m-next-cta-name">${target.subject} ${target.name}</div>
+          <div class="m-next-cta-room">นักเรียน ${cls?.count||'—'} คน</div>
+        </div>
+        ${checked
+          ? `<div style="padding:12px 14px;font-size:13px;font-weight:700;color:#15803d;display:flex;align-items:center;gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>เช็คชื่อแล้ว</div>`
+          : `<button class="m-next-cta-btn" onclick="go('attendance.html?period=${target.periodId}&date=${dateKey}')">เช็คชื่อเลย →</button>`
+        }
+      </div>`;
+    } else if(periods.length > 0){
+      html += `<div style="background:#f0fdf4;border:1.5px solid var(--pbd);border-radius:16px;padding:16px;text-align:center;">
+        <div style="font-size:24px;margin-bottom:6px;">✅</div>
+        <div style="font-size:14px;font-weight:800;color:var(--primary);">เสร็จสิ้นทุกคาบแล้ว</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">ดีมากครับ/ค่ะ!</div>
+      </div>`;
+    }
+  }
+
+  // alert ยังไม่เช็คชื่อ
+  if(unchecked.length > 0 && !current){
+    html += `<div class="m-alert-row" onclick="openUncheckedSheet()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:800;color:#9a3412;">ยังไม่ได้เช็คชื่อ</div>
+        <div style="font-size:11px;color:#c2410c;margin-top:1px;">${unchecked.length} คาบรอการเช็คชื่อ</div>
+      </div>
+      <span style="font-size:16px;color:#ea580c;">›</span>
+    </div>`;
+  }
+
+  // ตารางสอนวันนี้
+  html += `<div class="m-today-card">
+    <div class="m-today-header">
+      <div class="m-today-title">ตารางสอนวันนี้</div>
+      <div class="m-today-tag">${periods.length} คาบ</div>
+    </div>`;
+  if(!periods.length){
+    html += `<div style="padding:20px;text-align:center;font-size:13px;color:var(--muted);">วันหยุด — ไม่มีคาบสอน 🎉</div>`;
+  } else {
+    html += periods.map(p=>{
+      const isNow = current&&current.periodId===p.periodId;
+      const done = checkedIds.includes(p.periodId);
+      const _cls = _sections.find(c=>c.id===p.classId);
+      const dotColor = _cls?.color || '#1d9e75';
+      return `<div class="m-period-row" onclick="go('attendance.html?period=${p.periodId}&date=${dateKey}')">
+        <div class="m-period-dot" style="background:${dotColor}${isNow?'':'88'};${isNow?'width:10px;height:10px;':''};"></div>
+        <div class="m-period-time">${pad(p.s[0])}:${pad(p.s[1])}<br>${pad(p.e[0])}:${pad(p.e[1])}</div>
+        <div class="m-period-info">
+          <div class="m-period-subj">${p.subject}</div>
+          <div class="m-period-room">${p.name}</div>
+        </div>
+        ${isNow ? '<span class="m-period-badge m-badge-now">กำลังสอน</span>' : done ? '<span class="m-period-badge m-badge-done">✓ เช็คแล้ว</span>' : ''}
+      </div>`;
+    }).join('');
+  }
+  html += `</div>`;
+  return html;
+}
+
+// ── Desktop content builder (เดิม) ──
 function buildContent(overrideDate, overridePeriods, overrideChecked){
   const d=overrideDate||now();
   const isToday=CK.fmtKey(d)===CK.fmtKey(now());
@@ -343,17 +506,18 @@ function buildContent(overrideDate, overridePeriods, overrideChecked){
   const dateKey=CK.fmtKey(d);
   const periods=overridePeriods||_periods||[];
   const checkedIds=overrideChecked||_checkedIds||[];
-  // current/next ใช้ได้เฉพาะวันนี้เท่านั้น
   const t=isToday?hm(now()):-1;
   const current=isToday?periods.find(p=>t>=p.s[0]*60+p.s[1]&&t<p.e[0]*60+p.e[1])||null:null;
   const next=isToday?periods.find(p=>p.s[0]*60+p.s[1]>t)||null:null;
   const dayLabel={1:'วันจันทร์',2:'วันอังคาร',3:'วันพุธ',4:'วันพฤหัสบดี',5:'วันศุกร์'};
 
   let html=`<div class="date-row" style="margin-bottom:16px">
-    <div onclick="openCalendar()" style="cursor:pointer;user-select:none;">
+    <div onclick="openCalendar()" class="date-click-area">
       <div class="date-day">วัน${DAYS[dow]}</div>
       <div class="date-main">${d.getDate()} ${MONTHS[d.getMonth()]}
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span class="cal-icon-wrap">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" style="display:block"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </span>
       </div>
       <div class="date-year">พ.ศ. ${d.getFullYear()+543}</div>
     </div>
@@ -363,18 +527,15 @@ function buildContent(overrideDate, overridePeriods, overrideChecked){
           <div class="now-pill-val">${current?current.subject:'ว่าง'}</div>
           ${current?`<div style="font-size:10px;font-weight:700;color:var(--pk);margin-top:1px;">${current.name}</div>`:''}
         </div>`
-      : `<div class="now-pill" style="background:#f8fafc;border-color:var(--border);">
+      : `<div class="now-pill" style="background:#f8fafc;border-color:var(--border);min-width:90px;text-align:right;">
           <div class="now-pill-lbl" style="color:var(--muted);">วันที่เลือก</div>
-          <div class="now-pill-val" style="color:var(--text);font-size:13px;">${DAYS[dow].slice(0,3)}.</div>
+          <div class="now-pill-val" style="color:var(--text);font-size:15px;">วัน${DAYS[dow]}</div>
         </div>`
     }
   </div>`;
 
-  // next/current class card — แสดงเฉพาะวันนี้
   if(!isToday){
-    // วันอื่น — ไม่แสดง next card
   } else if(dow===0||dow===6){
-    // วันหยุด — ไม่แสดง card
   } else if(current){
     const checked=checkedIds.includes(current.periodId);
     const cls=_sections.find(c=>c.id===current.classId)||CK.CLASSES?.find(c=>c.id===current.classId);
@@ -392,7 +553,7 @@ function buildContent(overrideDate, overridePeriods, overrideChecked){
         </div>
         ${checked
           ?'<div style="text-align:center;font-size:13px;font-weight:700;color:var(--primary);padding:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><path d="M20 6L9 17l-5-5"/></svg>เช็คชื่อแล้ว</div>'
-          :`<button class="next-cta" onclick="go('attendance.html?period=${current.periodId}')">เช็คชื่อเลย ›</button>`}
+          :`<button class="next-cta" onclick="go('attendance.html?period=${current.periodId}&date=${dateKey}')">เช็คชื่อเลย ›</button>`}
       </div>
     </div>`;
   } else if(next){
@@ -411,14 +572,13 @@ function buildContent(overrideDate, overridePeriods, overrideChecked){
             <div class="next-sub">นักเรียน ${cls?.count||'—'} คน</div>
           </div>
         </div>
-        <button class="next-cta" onclick="go('attendance.html?period=${next.periodId}')">เช็คชื่อเลย ›</button>
+        <button class="next-cta" onclick="go('attendance.html?period=${next.periodId}&date=${dateKey}')">เช็คชื่อเลย ›</button>
       </div>
     </div>`;
   } else if(periods.length>0){
     html+=`<div class="next-card" style="margin-bottom:14px"><div class="no-next">✅ เสร็จสิ้นทุกคาบแล้ววันนี้</div></div>`;
   }
 
-  // pending — แสดงเฉพาะวันนี้
   const unchecked=isToday?periods.filter(p=>!checkedIds.includes(p.periodId)):[];
   if(unchecked.length>0){
     html+=`<div class="pending-list" style="margin-bottom:14px">
@@ -435,7 +595,6 @@ function buildContent(overrideDate, overridePeriods, overrideChecked){
     </div>`;
   }
 
-  // timetable
   html+=`<div class="tt-wrap">
     <div class="tt-head">
       <div class="tt-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:5px"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>ตารางสอนวันนี้</div>
@@ -449,7 +608,7 @@ function buildContent(overrideDate, overridePeriods, overrideChecked){
       const done=checkedIds.includes(p.periodId);
       const _cls=_sections.find(c=>c.id===p.classId)||CK.CLASSES?.find(c=>c.id===p.classId);
       const _lc=CK.LEVEL_COLORS[_cls?.level||gradeLevel(_cls?.grade||'')||'junior'];
-      return `<div class="tt-row${isNow?' now':''}" onclick="go('attendance.html?period=${p.periodId}')">
+      return `<div class="tt-row${isNow?' now':''}" onclick="go('attendance.html?period=${p.periodId}&date=${dateKey}')">
         <div class="tt-time">${pad(p.s[0])}:${pad(p.s[1])}\n${pad(p.e[0])}:${pad(p.e[1])}</div>
         <div class="tt-dot" style="background:${_lc.icon}"></div>
         <div class="tt-info">
@@ -461,7 +620,6 @@ function buildContent(overrideDate, overridePeriods, overrideChecked){
     }).join('');
   }
   html+=`</div>`;
-
   return html;
 }
 
@@ -474,24 +632,30 @@ async function renderForDate(date){
     const checked = await CKService.isPeriodChecked(p.classId, dateKey);
     if(checked) checkedIds.push(p.periodId);
   }
-  const html=buildContent(date, periods, checkedIds);
-  document.getElementById('m-content').innerHTML=html;
-  document.getElementById('d-content').innerHTML=html;
+  const mc = document.getElementById('m-content');
+  const dc = document.getElementById('d-content');
+  if(mc) mc.innerHTML = buildMobileContent(date, periods, checkedIds);
+  if(dc) dc.innerHTML = buildContent(date, periods, checkedIds);
   const sb=document.getElementById('d-date-sb');
   if(sb) sb.textContent=fmtThai(date);
 }
 
 function render(){
-  const html=buildContent();
-  const d=now();
-  document.getElementById('m-content').innerHTML=html;
-  document.getElementById('d-content').innerHTML=html;
+  const d = now();
+  const periods = _periods||[];
+  const checkedIds = _checkedIds||[];
+  const mc = document.getElementById('m-content');
+  const dc = document.getElementById('d-content');
+  if(mc) mc.innerHTML = buildMobileContent(d, periods, checkedIds);
+  if(dc) dc.innerHTML = buildContent(d, periods, checkedIds);
   const sb=document.getElementById('d-date-sb');
   if(sb) sb.textContent=fmtThai(d);
   // notif dots
   const show=NOTIFS.length>0;
-  document.getElementById('m-notif-dot').style.display=show?'block':'none';
-  document.getElementById('d-notif-dot').style.display=show?'block':'none';
+  const mDot=document.getElementById('m-notif-dot');
+  const dDot=document.getElementById('d-notif-dot');
+  if(mDot) mDot.style.display=show?'block':'none';
+  if(dDot) dDot.style.display=show?'block':'none';
   // notif list
   document.getElementById('notif-list').innerHTML=NOTIFS.map(n=>`
     <div class="ni ni-${n.type}">
@@ -512,7 +676,7 @@ function openUncheckedSheet(){
     list.innerHTML=unchecked.map(p=>{
       const cls=_sections.find(c=>c.id===p.classId)||CK.CLASSES?.find(c=>c.id===p.classId);
       const lc=CK.LEVEL_COLORS[cls?.level||gradeLevel(cls?.grade||'')||'junior'];
-      return `<div class="bs-item" onclick="closeUncheckedSheet();go('attendance.html?period=${p.periodId}')">
+      return `<div class="bs-item" onclick="closeUncheckedSheet();go('attendance.html?period=${p.periodId}&date=${CK.fmtKey(calSelected)}')">
         <div class="bs-item-dot" style="background:${lc.icon}"></div>
         <div class="bs-item-info">
           <div class="bs-item-name">${p.subject} — ${p.name}</div>
@@ -535,8 +699,8 @@ let calViewDate=new Date(),calSelected=new Date();
 function openCalendar(){calViewDate=new Date(calSelected);renderCal();document.getElementById('cal-ov').classList.add('show');document.getElementById('cal-popup').classList.add('show');}
 function closeCalendar(){document.getElementById('cal-ov').classList.remove('show');document.getElementById('cal-popup').classList.remove('show');}
 function calNav(dir){calViewDate.setMonth(calViewDate.getMonth()+dir);renderCal();}
-function calGoToday(){calSelected=new Date();calViewDate=new Date();renderCal();setTimeout(()=>{closeCalendar();render();},200);}
-function calPickDay(y,m,d){calSelected=new Date(y,m,d);renderCal();setTimeout(()=>{closeCalendar();renderForDate(calSelected);},200);}
+function calGoToday(){calSelected=new Date();calViewDate=new Date();renderCal();sessionStorage.setItem('ck_date',CK.fmtKey(calSelected));setTimeout(()=>{closeCalendar();render();},200);}
+function calPickDay(y,m,d){calSelected=new Date(y,m,d);renderCal();sessionStorage.setItem('ck_date',CK.fmtKey(calSelected));setTimeout(()=>{closeCalendar();renderForDate(calSelected);},200);}
 function renderCal(){
   const y=calViewDate.getFullYear(),mo=calViewDate.getMonth();
   document.getElementById('cal-month-lbl').textContent=`${CAL_MONTHS[mo]} ${y+543}`;
@@ -555,9 +719,10 @@ function renderCal(){
 }
 
 // ── State (loaded from Supabase) ──
-let _periods = [];    // today's schedule from DB
-let _sections = [];   // all course_sections
-let _checkedIds = []; // checked period ids today
+let _periods = [];       // today's schedule from DB
+let _sections = [];      // all course_sections
+let _checkedIds = [];    // checked period ids today
+let _teacherName = '';   // teacher display name
 
 function gradeLevel(grade){
   if(!grade) return 'junior';
@@ -575,13 +740,34 @@ function getLevelColors(level){
 (async function(){
   await CKService.requireAuth();
 
+  // ดึงชื่อครู
+  try{
+    const meta = await CKService.getTeacherMeta();
+    if(meta?.display_name) _teacherName = meta.display_name;
+  }catch(e){}
+
   // โหลดข้อมูลจาก Supabase
   const dow = now().getDay();
   const dateKey = CK.fmtKey(now());
 
-  // load schedules + sections
-  await CKService.loadSchedules();
+  // load sections ก่อน — ถ้าครูใหม่ (ไม่มีวิชา) แสดง welcome ทันที ไม่ต้องเสียเวลาโหลดต่อ
   _sections = await CKService.loadSections();
+  if(!_sections.length){
+    const wh = welcomeHtml();
+    const mc = document.getElementById('m-content');
+    const dc = document.getElementById('d-content');
+    if(mc) mc.innerHTML = wh;
+    if(dc) dc.innerHTML = wh;
+    const sb=document.getElementById('d-date-sb');
+    if(sb) sb.textContent=fmtThai(now());
+    // notif dots ปิดไว้สำหรับครูใหม่
+    document.getElementById('m-notif-dot').style.display='none';
+    document.getElementById('d-notif-dot').style.display='none';
+    return;
+  }
+
+  // มีวิชาแล้ว → โหลดตารางสอน + เช็คชื่อ
+  await CKService.loadSchedules();
   _periods = await CKService.getTodayPeriods(dow);
 
   // ตรวจ checked periods จาก attendance_sessions
@@ -592,27 +778,50 @@ function getLevelColors(level){
   }
 
   render();
+})();
 
-  // ถ้ายังว่างอยู่ → แสดง empty state ให้ไป setup
-  if(!_periods.length){
-    const emptyHtml = `
-      <div style="margin-top:32px;text-align:center;padding:24px;">
-        <div style="width:64px;height:64px;border-radius:16px;background:var(--pbg);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+/* หน้าต้อนรับครูใหม่ — แสดงเมื่อยังไม่มีวิชาในระบบ */
+function welcomeHtml(){
+  return `
+    <div style="padding:8px 0 24px;">
+      <div style="font-size:22px;font-weight:800;color:var(--text);">สวัสดีครับ คุณครู 👋</div>
+      <div style="font-size:14px;color:var(--muted);margin-top:4px;">เริ่มต้นใช้งาน ClassKru ใน 1 นาที</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0;">
+        <div style="background:var(--primary);border-radius:16px;padding:16px;color:#fff;box-shadow:0 4px 16px rgba(29,158,117,.25);">
+          <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          </div>
+          <div style="font-size:13px;font-weight:600;opacity:.85;">วิชาทั้งหมด</div>
+          <div style="font-size:28px;font-weight:800;line-height:1.1;">0</div>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--sh);">
+          <div style="width:38px;height:38px;border-radius:10px;background:var(--pbg);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:var(--muted);">นักเรียน</div>
+          <div style="font-size:28px;font-weight:800;line-height:1.1;color:var(--text);">0</div>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:20px;text-align:center;box-shadow:var(--sh);">
+        <div style="width:64px;height:64px;border-radius:18px;background:var(--pbg);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
         </div>
-        <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:8px;">ยังไม่มีตารางสอน</div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">เพิ่มวิชาและตารางสอนของคุณก่อนเริ่มใช้งาน</div>
-        <button onclick="go('setup.html')" class="btn btn-primary" style="margin:0 auto;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-          ตั้งค่าตารางสอน
+        <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;">ยังไม่มีวิชาและตารางสอน</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;">เพิ่มวิชา ตารางสอน และรายชื่อนักเรียน<br>เพื่อเริ่มเช็คชื่อและดูภาพรวม</div>
+        <button onclick="go('onboard.html')" class="btn btn-primary" style="margin:0 auto;width:100%;justify-content:center;padding:13px;font-size:15px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          โยนไฟล์ — ให้ระบบจัดให้
         </button>
-      </div>`;
-    const mc = document.getElementById('m-content');
-    const dc = document.getElementById('d-content');
-    if(mc) mc.innerHTML += emptyHtml;
-    if(dc) dc.innerHTML += emptyHtml;
-  }
-})();
+      </div>
+
+      <div style="margin-top:14px;display:flex;align-items:center;gap:8px;justify-content:center;font-size:12px;color:var(--muted);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+        นำเข้าจาก Excel ได้ในไม่กี่คลิก
+      </div>
+    </div>`;
+}
 </script>
 </body>
 </html>

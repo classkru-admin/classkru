@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ตั้งค่า — ClassKru</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#5b6675;--border:#e8edf2;
+  --sh:0 1px 4px rgba(0,0,0,.06);--sh-md:0 4px 16px rgba(0,0,0,.10);
+  --tr:all .18s cubic-bezier(.4,0,.2,1);
+  --sidebar-w:200px;
+}
+html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
+.btn{font-family:'Sarabun',sans-serif;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:var(--tr);border-radius:12px;}
+.btn:active{transform:scale(.96);}
+.btn-primary{background:var(--primary);color:#fff;font-size:15px;padding:10px 20px;}
+.btn-primary:hover{background:var(--pk);}
+
+/* toast */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:rgba(15,23,42,.88);color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:22px;white-space:nowrap;z-index:9999;transition:transform .25s cubic-bezier(.4,0,.2,1);pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ══ SETTINGS CONTENT (shared mobile+desktop) ══ */
+.set-section{margin-bottom:22px;}
+.set-section-label{font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;padding:0 4px 8px;}
+.set-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--sh);}
+.set-item{display:flex;align-items:center;gap:14px;padding:15px 16px;cursor:pointer;transition:var(--tr);border-bottom:1px solid #f1f5f9;}
+.set-item:last-child{border-bottom:none;}
+.set-item:hover{background:#f8fafc;}
+.set-item:active{background:#f1f5f9;}
+.set-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.set-ico svg{width:20px;height:20px;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.set-ico.green{background:var(--pbg);}.set-ico.green svg{stroke:var(--primary);}
+.set-ico.blue{background:#eff6ff;}.set-ico.blue svg{stroke:#2563eb;}
+.set-ico.amber{background:#fffbeb;}.set-ico.amber svg{stroke:#d97706;}
+.set-ico.violet{background:#f5f3ff;}.set-ico.violet svg{stroke:#7c3aed;}
+.set-ico.slate{background:#f1f5f9;}.set-ico.slate svg{stroke:#475569;}
+.set-ico.red{background:#fef2f2;}.set-ico.red svg{stroke:#dc2626;}
+.set-info{flex:1;min-width:0;}
+.set-title{font-size:14.5px;font-weight:700;color:var(--text);}
+.set-sub{font-size:12px;color:var(--muted);margin-top:1px;}
+.set-arrow{color:#cbd5e1;flex-shrink:0;}
+.set-arrow svg{width:18px;height:18px;stroke:#cbd5e1;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.set-item.danger .set-title{color:#dc2626;}
+.set-item.danger:hover{background:#fef2f2;}
+
+/* profile header card */
+.prof-card{background:linear-gradient(135deg,var(--primary),#15a085);border-radius:18px;padding:20px;color:#fff;display:flex;align-items:center;gap:14px;margin-bottom:22px;box-shadow:0 6px 20px rgba(29,158,117,.28);}
+.prof-avatar{width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0;}
+.prof-meta{flex:1;min-width:0;}
+.prof-name{font-size:17px;font-weight:800;line-height:1.2;}
+.prof-email{font-size:12.5px;opacity:.85;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ══ MOBILE ══ */
+.m-wrap{display:flex;flex-direction:column;min-height:100dvh;max-width:480px;margin:0 auto;}
+.m-topbar{background:#fff;border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;box-shadow:var(--sh);position:sticky;top:0;z-index:50;}
+.m-back{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.m-back svg{width:18px;height:18px;stroke:var(--text);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.m-title{font-size:16px;font-weight:800;}
+.m-scroll{flex:1;overflow-y:auto;padding:16px 14px 80px;}
+.m-bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--border);height:60px;display:flex;z-index:100;box-shadow:0 -1px 0 rgba(0,0,0,.06);padding-bottom:env(safe-area-inset-bottom,0);}
+.m-bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:'Sarabun',sans-serif;padding:6px 0 4px;}
+.m-bn:active{opacity:.6;}
+.m-bn svg{width:24px;height:24px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.m-bn span{font-size:10px;font-weight:600;color:#9ca3af;}
+.m-bn.active svg{stroke:var(--primary);}
+.m-bn.active span{color:var(--primary);font-weight:700;}
+
+/* ══ DESKTOP ══ */
+.d-wrap{display:none;}
+@media(min-width:768px){
+  .m-wrap{display:none;}
+  .d-wrap{display:flex;height:100vh;overflow:hidden;}
+  .d-sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;}
+  .d-sb-logo{padding:0;border-bottom:1px solid var(--border);display:flex;justify-content:center;align-items:center;height:96px;}
+  .d-sb-sec{padding:14px 16px 4px;font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;}
+  .d-sb-link{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);border-left:3px solid transparent;}
+  .d-sb-link:hover{background:#f8fafc;color:var(--text);}
+  .d-sb-link.active{background:var(--pbg);color:var(--primary);border-left-color:var(--primary);}
+  .d-sb-link svg{width:18px;height:18px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;transition:stroke .15s;}
+  .d-sb-link.active svg,.d-sb-link:hover svg{stroke:var(--primary);}
+  .d-sb-spacer{flex:1;}
+  .d-sb-date{padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600;}
+  .d-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .d-topbar{background:#fff;border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 28px;gap:12px;flex-shrink:0;box-shadow:var(--sh);}
+  .d-topbar-title{font-size:16px;font-weight:800;flex:1;display:flex;align-items:center;gap:8px;}
+  .d-scroll{flex:1;overflow-y:auto;padding:28px 48px 40px;}
+  .d-content{max-width:680px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ MOBILE ══ -->
+<div class="m-wrap">
+  <div class="m-topbar">
+    <button class="m-back" onclick="go('index.html')">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <div class="m-title">ตั้งค่า</div>
+  </div>
+  <div class="m-scroll" id="m-content"></div>
+  <nav class="m-bottom-nav">
+    <button class="m-bn" onclick="go('index.html')">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+      <span>หน้าหลัก</span>
+    </button>
+    <button class="m-bn" onclick="go('schedule.html')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+      <span>ตารางสอน</span>
+    </button>
+    <button class="m-bn" style="position:relative;" onclick="go('attendance.html')">
+      <div style="position:absolute;top:-14px;width:50px;height:50px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(29,158,117,.4);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <span style="margin-top:22px;color:var(--primary);font-weight:700;">เช็คชื่อ</span>
+    </button>
+    <button class="m-bn" onclick="go('report.html')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>สถิติ</span>
+    </button>
+    <button class="m-bn active">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span>ตั้งค่า</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ══ DESKTOP ══ -->
+<div class="d-wrap">
+  <aside class="d-sidebar">
+    <div class="d-sb-logo">
+      <img src="classkru-logo.png" alt="ClassKru" style="height:68px;width:auto;">
+    </div>
+    <div class="d-sb-sec">เมนู</div>
+    <div class="d-sb-link" onclick="go('index.html')">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>หน้าหลัก
+    </div>
+    <div class="d-sb-link" onclick="go('attendance.html')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>เช็คชื่อ
+    </div>
+    <div class="d-sb-link" onclick="go('report.html')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>สถิติ
+    </div>
+    <div class="d-sb-link active">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>ตั้งค่า
+    </div>
+    <div class="d-sb-spacer"></div>
+    <div class="d-sb-date" id="d-date-sb"></div>
+  </aside>
+  <div class="d-main">
+    <div class="d-topbar">
+      <div class="d-topbar-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        ตั้งค่า
+      </div>
+    </div>
+    <div class="d-scroll">
+      <div class="d-content" id="d-content"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast-el"></div>
+<script src="ck-service.js"></script>
+<script>
+function go(url){ window.location.href=url; }
+function showToast(msg){
+  const t=document.getElementById('toast-el');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+const ICONS={
+  user:`<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 016-6h4a6 6 0 016 6v1"/></svg>`,
+  book:`<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>`,
+  upload_users:`<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>`,
+  calendar:`<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
+  help:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>`,
+  logout:`<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
+  arrow:`<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>`,
+};
+
+// โครงสร้างเมนูตั้งค่า
+const SECTIONS=[
+  {
+    label:'จัดการข้อมูลการสอน',
+    items:[
+      {ico:'book', cls:'green', title:'วิชา / ห้องเรียน', sub:'เพิ่ม แก้ไข หรือลบวิชาที่สอน', go:()=>go('subjects.html')},
+      {ico:'upload_users', cls:'blue', title:'รายชื่อนักเรียน', sub:'นำเข้าจาก Excel หรือกรอกเอง', go:()=>go('setup.html?step=2')},
+      {ico:'calendar', cls:'amber', title:'ตารางเรียน', sub:'กำหนดคาบสอนรายสัปดาห์', go:()=>go('schedule.html')},
+    ]
+  },
+  {
+    label:'ข้อมูล & ระบบ',
+    items:[
+      {ico:'help', cls:'violet', title:'แจ้งปัญหา', sub:'พบข้อผิดพลาดหรือมีข้อเสนอแนะ', go:()=>reportProblem()},
+    ]
+  },
+  {
+    label:'บัญชี',
+    items:[
+      {ico:'logout', cls:'red', title:'ออกจากระบบ', sub:'', danger:true, go:()=>doSignOut()},
+    ]
+  },
+];
+
+function reportProblem(){
+  const email='supakit.pay.wallet@gmail.com';
+  window.location.href=`mailto:${email}?subject=${encodeURIComponent('[ClassKru] แจ้งปัญหา')}&body=${encodeURIComponent('อธิบายปัญหาที่พบ:\n\n')}`;
+}
+function doSignOut(){
+  if(confirm('ออกจากระบบ ClassKru?')){
+    if(window.CKService&&CKService.signOut) CKService.signOut();
+    else go('login.html');
+  }
+}
+
+function buildHtml(profile){
+  const name=profile?.name||'คุณครู';
+  const email=profile?.email||'';
+  const initial=(name.trim()[0]||'ค');
+  let html=`
+    <div class="prof-card">
+      <div class="prof-avatar">${initial}</div>
+      <div class="prof-meta">
+        <div class="prof-name">${name}</div>
+        <div class="prof-email">${email||'แตะเพื่อแก้ไขข้อมูลส่วนตัว'}</div>
+      </div>
+    </div>
+
+    <div class="set-section">
+      <div class="set-section-label">ข้อมูลส่วนตัว</div>
+      <div class="set-card">
+        <div class="set-item" onclick="go('setup.html?step=1')">
+          <div class="set-ico slate">${ICONS.user}</div>
+          <div class="set-info">
+            <div class="set-title">ข้อมูลส่วนตัว</div>
+            <div class="set-sub">ชื่อ-นามสกุล และโรงเรียน</div>
+          </div>
+          <div class="set-arrow">${ICONS.arrow}</div>
+        </div>
+      </div>
+    </div>`;
+
+  SECTIONS.forEach((sec,si)=>{
+    html+=`<div class="set-section"><div class="set-section-label">${sec.label}</div><div class="set-card">`;
+    sec.items.forEach((it,ii)=>{
+      html+=`<div class="set-item${it.danger?' danger':''}" data-s="${si}" data-i="${ii}">
+        <div class="set-ico ${it.cls}">${ICONS[it.ico]}</div>
+        <div class="set-info">
+          <div class="set-title">${it.title}</div>
+          ${it.sub?`<div class="set-sub">${it.sub}</div>`:''}
+        </div>
+        <div class="set-arrow">${ICONS.arrow}</div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+
+  html+=`<div style="text-align:center;font-size:11px;color:#94a3b8;font-weight:600;padding:8px 0 4px;">ClassKru · เวอร์ชัน 1.0</div>`;
+  return html;
+}
+
+function bindItems(){
+  document.querySelectorAll('.set-item[data-s]').forEach(el=>{
+    const s=+el.dataset.s, i=+el.dataset.i;
+    el.onclick=SECTIONS[s].items[i].go;
+  });
+}
+
+(async function(){
+  let profile=null;
+  try{
+    if(window.CKService){
+      const user=await CKService.requireAuth();
+      if(user){
+        profile={ name:user.user_metadata?.display_name||'', email:user.email||'' };
+        // ดึง display_name จาก users table ถ้ามี
+        try{
+          const sess=await CKService.getSession();
+          if(sess&&!profile.name) profile.name=sess.user.email?.split('@')[0]||'คุณครู';
+        }catch(e){}
+      }
+    }
+  }catch(e){ console.warn('auth:',e); }
+
+  const html=buildHtml(profile);
+  const mc=document.getElementById('m-content');
+  const dc=document.getElementById('d-content');
+  if(mc) mc.innerHTML=html;
+  if(dc) dc.innerHTML=html;
+  bindItems();
+
+  const sb=document.getElementById('d-date-sb');
+  if(sb){
+    const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    const D=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+    const n=new Date();
+    sb.textContent=`วัน${D[n.getDay()]}ที่ ${n.getDate()} ${M[n.getMonth()]} ${n.getFullYear()+543}`;
+  }
+})();
+</script>
+</body>
+</html>

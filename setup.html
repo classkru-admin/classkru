@@ -9,7 +9,7 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
-  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#5b6675;--border:#e8edf2;
   --sh:0 1px 4px rgba(0,0,0,.07);--sh-md:0 4px 20px rgba(0,0,0,.10);
 }
 html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
@@ -23,10 +23,10 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
 
 /* ── Card ── */
 .card{background:#fff;border-radius:20px;border:1px solid var(--border);box-shadow:var(--sh-md);width:100%;max-width:620px;}
-.card-head{padding:28px 32px 0;}
+.card-head{padding:32px 32px 0;text-align:center;}
 .card-body{padding:24px 32px 32px;}
-.card-title{font-size:19px;font-weight:800;margin-bottom:4px;}
-.card-sub{font-size:13px;color:var(--muted);}
+.card-title{font-size:22px;font-weight:800;margin-bottom:6px;}
+.card-sub{font-size:13px;color:var(--muted);line-height:1.6;}
 
 /* ── Step indicator ── */
 .step-bar{display:flex;align-items:center;width:100%;max-width:620px;margin-bottom:28px;}
@@ -144,39 +144,82 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
   .card-body{padding:16px 20px 24px;}
   .summary-grid{grid-template-columns:1fr 1fr;}
 }
+
+/* ── Desktop layout ── */
+:root{--sidebar-w:200px;}
+.d-wrap{display:none;}
+@media(min-width:768px){
+  .page{display:none;}
+  .d-wrap{display:flex;height:100vh;overflow:hidden;}
+  .d-sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;}
+  .d-sb-logo{border-bottom:1px solid var(--border);display:flex;justify-content:center;align-items:center;height:96px;}
+  .d-sb-sec{padding:14px 16px 4px;font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;}
+  .d-sb-link{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;font-weight:600;color:#5b6675;cursor:pointer;transition:all .18s;border-left:3px solid transparent;}
+  .d-sb-link:hover{background:#f8fafc;color:#0f172a;}
+  .d-sb-link.active{background:#f0fdf4;color:#1d9e75;border-left-color:#1d9e75;}
+  .d-sb-link svg{width:18px;height:18px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;transition:stroke .15s;}
+  .d-sb-link.active svg,.d-sb-link:hover svg{stroke:#1d9e75;}
+  .d-sb-spacer{flex:1;}
+  .d-sb-date{padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:#5b6675;font-weight:600;}
+  .d-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+  .d-topbar{background:#fff;border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 28px;gap:12px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+  .d-topbar-title{font-size:16px;font-weight:800;flex:1;display:flex;align-items:center;gap:8px;}
+  .d-scroll{flex:1;overflow-y:auto;padding:40px 48px;}
+  .d-inner{max-width:620px;margin:0 auto;display:flex;flex-direction:column;align-items:center;}
+}
 </style>
 </head>
 <body>
 
+<!-- ══ DESKTOP ══ -->
+<div class="d-wrap">
+  <aside class="d-sidebar">
+    <div class="d-sb-logo">
+      <img src="classkru-logo.png" alt="ClassKru" style="height:68px;width:auto;">
+    </div>
+    <div class="d-sb-sec">เมนู</div>
+    <div class="d-sb-link" onclick="location.href='index.html'">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>หน้าหลัก
+    </div>
+    <div class="d-sb-link" onclick="location.href='attendance.html'">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>เช็คชื่อ
+    </div>
+    <div class="d-sb-link" onclick="location.href='report.html'">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>สถิติ
+    </div>
+    <div class="d-sb-link active">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>ตั้งค่า
+    </div>
+    <div class="d-sb-spacer"></div>
+    <div class="d-sb-date" id="d-date-sb"></div>
+  </aside>
+  <div class="d-main">
+    <div class="d-topbar">
+      <button onclick="location.href='settings.html'" style="display:flex;align-items:center;gap:6px;color:#64748b;cursor:pointer;background:#f8fafc;border:none;padding:7px 14px;border-radius:20px;font-size:14px;font-weight:700;font-family:'Sarabun',sans-serif;transition:all .18s;flex-shrink:0;" onmouseover="this.style.background='#fef3c7';this.style.color='#92400e'" onmouseout="this.style.background='#f8fafc';this.style.color='#64748b'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> กลับ
+      </button>
+      <div class="d-topbar-title">นำเข้ารายชื่อนักเรียน</div>
+    </div>
+    <div class="d-scroll">
+      <div class="d-inner" id="d-setup-inner">
+        <!-- step bar + cards จะถูก clone มาใส่ที่นี่โดย JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="page">
   <div class="header">
     <img src="classkru-logo.png" alt="ClassKru" onerror="this.style.display='none'">
-    <h1>ตั้งค่าบัญชีครู</h1>
+    <h1>นำเข้ารายชื่อนักเรียน</h1>
     <p>ทำแค่ครั้งเดียว ใช้ได้ตลอด</p>
     <div id="back-to-home" style="display:none;margin-top:14px;">
-      <button class="btn btn-ghost" style="font-size:13px;padding:8px 18px;" onclick="location.href='index.html'">
-        ← กลับหน้าหลัก
+      <button class="btn btn-ghost" style="font-size:13px;padding:8px 18px;" onclick="location.href='settings.html'">
+        ← กลับไปหน้าการตั้งค่า
       </button>
     </div>
   </div>
 
-  <!-- Step bar -->
-  <div class="step-bar" id="step-bar">
-    <div class="step-item">
-      <div class="step-dot active" id="sd-1">1</div>
-      <div class="step-lbl active" id="sl-1">ข้อมูลครู</div>
-    </div>
-    <div class="step-line" id="sline-1"></div>
-    <div class="step-item">
-      <div class="step-dot" id="sd-2">2</div>
-      <div class="step-lbl" id="sl-2">นำเข้าข้อมูล</div>
-    </div>
-    <div class="step-line" id="sline-2"></div>
-    <div class="step-item">
-      <div class="step-dot" id="sd-3">3</div>
-      <div class="step-lbl" id="sl-3">ยืนยัน</div>
-    </div>
-  </div>
 
   <!-- ── STEP 1: ข้อมูลครู ── -->
   <div class="card" id="step-1">
@@ -203,97 +246,58 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
   <!-- ── STEP 2: Import ── -->
   <div class="card" id="step-2" style="display:none;">
     <div class="card-head">
-      <div class="card-title">นำเข้าข้อมูลห้องเรียน</div>
+      <div class="card-title">นำเข้ารายชื่อนักเรียน</div>
       <div class="card-sub">อัพโหลดไฟล์ Excel/CSV หรือรูปภาพรายชื่อนักเรียน</div>
     </div>
     <div class="card-body">
 
       <!-- Mode tabs -->
       <div class="mode-tabs">
-        <button class="mode-tab active" id="tab-manual" onclick="switchMode('manual')">✏️ กรอกเอง</button>
-        <button class="mode-tab" id="tab-excel" onclick="switchMode('excel')">📊 Excel</button>
+        <button class="mode-tab active" id="tab-excel" onclick="switchMode('excel')">📊 Excel</button>
         <button class="mode-tab" id="tab-image" onclick="switchMode('image')">📷 รูปภาพ</button>
+        <button class="mode-tab" id="tab-manual" onclick="switchMode('manual')">✏️ กรอกเอง</button>
         <button class="mode-tab" id="tab-template" onclick="switchMode('template')">📋 Template</button>
       </div>
 
       <!-- MODE: Manual -->
-      <div id="mode-manual">
-        <div class="alert alert-info" style="margin-bottom:16px;">
-          <div class="alert-icon">✏️</div>
-          <div>เพิ่มวิชา+ตาราง แล้วกรอกรายชื่อนักเรียนแต่ละห้อง</div>
-        </div>
+      <div id="mode-manual" style="display:none;">
+        <div style="background:#f8fafc;border:1.5px dashed var(--border);border-radius:14px;padding:16px;">
+          <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:12px;">➕ เพิ่มนักเรียน</div>
 
-        <!-- Section list -->
-        <div id="manual-sections-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
-
-        <!-- Add section form -->
-        <div id="manual-add-section" style="background:#f8fafc;border:1.5px dashed var(--border);border-radius:14px;padding:16px;">
-          <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:12px;">➕ เพิ่มวิชา-ห้องเรียน</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
-            <div>
-              <label class="form-label">วิชา</label>
-              <input type="text" class="form-input" id="m-subject" placeholder="สุขศึกษา">
-            </div>
-            <div>
-              <label class="form-label">ระดับชั้น</label>
-              <select class="form-input" id="m-grade">
-                <option value="">เลือก...</option>
-                <optgroup label="ประถม">
-                  <option>ป.1</option><option>ป.2</option><option>ป.3</option>
-                  <option>ป.4</option><option>ป.5</option><option>ป.6</option>
-                </optgroup>
-                <optgroup label="มัธยม">
-                  <option>ม.1</option><option>ม.2</option><option>ม.3</option>
-                  <option>ม.4</option><option>ม.5</option><option>ม.6</option>
-                </optgroup>
-              </select>
-            </div>
-            <div>
-              <label class="form-label">ห้อง</label>
-              <input type="text" class="form-input" id="m-room" placeholder="1" style="max-width:80px;">
+          <!-- เลือกห้องเรียน -->
+          <div style="margin-bottom:12px;">
+            <label class="form-label">ห้องเรียน</label>
+            <select class="form-input" id="m-section-select">
+              <option value="">— เลือกห้อง —</option>
+            </select>
+            <div id="m-no-sections-hint" style="display:none;font-size:12px;color:var(--muted);margin-top:6px;">
+              ยังไม่มีห้อง — <a href="subjects.html" style="color:var(--primary);font-weight:700;">สร้างห้องเรียนก่อน</a>
             </div>
           </div>
-          <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px;">ตารางสอน (เพิ่มได้หลายคาบ)</div>
-          <div id="m-schedules-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 32px;gap:8px;align-items:end;">
-            <div>
-              <label class="form-label">วัน</label>
-              <select class="form-input" id="m-day">
-                <option value="1">จันทร์</option>
-                <option value="2">อังคาร</option>
-                <option value="3">พุธ</option>
-                <option value="4">พฤหัสบดี</option>
-                <option value="5">ศุกร์</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-label">เริ่ม</label>
-              <input type="time" class="form-input" id="m-start" value="08:30">
-            </div>
-            <div>
-              <label class="form-label">สิ้นสุด</label>
-              <input type="time" class="form-input" id="m-end" value="09:30">
-            </div>
-            <button onclick="addManualSchedule()" style="height:42px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:18px;cursor:pointer;font-weight:800;">+</button>
-          </div>
 
-          <div style="font-size:13px;font-weight:700;color:var(--muted);margin:14px 0 8px;">รายชื่อนักเรียน</div>
-          <div style="display:flex;gap:8px;margin-bottom:8px;">
-            <input type="text" class="form-input" id="m-students-raw" placeholder="วางรายชื่อ 1 คน/บรรทัด หรือ: 1 สมชาย ใจดี" style="flex:1;">
-            <button onclick="parseManualStudents()" class="btn btn-outline" style="white-space:nowrap;">วิเคราะห์</button>
+          <!-- รายชื่อ -->
+          <div style="margin-bottom:8px;">
+            <label class="form-label">รายชื่อนักเรียน</label>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">วางทีเดียวได้เลย 1 คน/บรรทัด · รองรับรูปแบบ: <code>1 สมชาย ใจดี</code> หรือ <code>สมชาย ใจดี</code></div>
+            <textarea class="form-input" id="m-students-raw" rows="6" placeholder="1 สมชาย ใจดี&#10;2 สมหญิง ดีมาก&#10;3 ประหยัด มีสุข" style="resize:vertical;font-size:13px;"></textarea>
           </div>
           <div id="m-students-preview" style="font-size:12px;color:var(--muted);margin-bottom:10px;"></div>
 
-          <button onclick="addManualSection()" class="btn btn-primary" style="width:100%;justify-content:center;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            เพิ่มวิชานี้
-          </button>
+          <div style="display:flex;gap:8px;">
+            <button onclick="parseManualStudents()" class="btn btn-outline" style="flex:1;">วิเคราะห์รายชื่อ</button>
+            <button onclick="addManualSection()" class="btn btn-primary" style="flex:2;justify-content:center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              บันทึกนักเรียน
+            </button>
+          </div>
           <div id="msg-manual" style="margin-top:8px;"></div>
         </div>
+        <!-- Section list (แสดงห้องที่เพิ่มแล้ว) -->
+        <div id="manual-sections-list" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;"></div>
       </div>
 
       <!-- MODE: Excel/CSV -->
-      <div id="mode-excel" style="display:none;">
+      <div id="mode-excel">
         <input type="file" id="file-excel" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleExcelFile(event)">
         <div class="drop-zone" id="dz-excel"
           onclick="document.getElementById('file-excel').click()"
@@ -416,10 +420,8 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
 
       <div id="msg-s2"></div>
       <div class="btn-row">
-        <button class="btn btn-ghost" onclick="goStep(1)">← ย้อนกลับ</button>
-        <button class="btn btn-primary" id="btn-s2" onclick="goToMapping()" style="display:none;">วิเคราะห์ข้อมูล →</button>
+<button class="btn btn-primary" id="btn-s2" onclick="goToMapping()" style="display:none;">วิเคราะห์ข้อมูล →</button>
       </div>
-      <div class="skip-link"><a onclick="skipImport()">ข้ามก่อน ตั้งค่าทีหลัง</a></div>
     </div>
   </div>
 
@@ -499,7 +501,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
 // STATE
 // ════════════════════════════════════════
 let currentStep = 1;
-let currentMode = 'manual';
+let currentMode = 'excel';
 let _user = null;
 let _rawRows = [];          // parsed rows from file
 let _rawHeaders = [];       // column headers
@@ -555,6 +557,26 @@ const COL_HINTS = {
 // ════════════════════════════════════════
 // AUTH
 // ════════════════════════════════════════
+// ย้าย step content เข้า desktop wrapper ถ้าหน้าจอใหญ่
+if(window.innerWidth >= 768){
+  const inner = document.getElementById('d-setup-inner');
+  const page = document.querySelector('.page');
+  if(inner && page){
+    [...page.children].forEach(el => {
+      if(el.classList.contains('header')) { el.style.display='none'; }
+      inner.appendChild(el);
+    });
+  }
+  // deep-link ต้องทำหลัง DOM move เสร็จ ไม่งั้น goStep ไม่เจอ element
+  const _p = new URLSearchParams(location.search);
+  const _sp = _p.get('step');
+  if(_sp) goStep(isNaN(_sp) ? _sp : parseInt(_sp));
+  // date sidebar
+  const now = new Date();
+  const dsb = document.getElementById('d-date-sb');
+  if(dsb) dsb.textContent = now.toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
 (async function(){
   _user = await CKService.requireAuth();
   if(!_user) return;
@@ -565,6 +587,30 @@ const COL_HINTS = {
   const existing = await CKService.loadSections();
   if(existing && existing.length > 0){
     document.getElementById('back-to-home').style.display = '';
+  }
+
+  // populate dropdown ห้องเรียนสำหรับ manual mode
+  const _secs = CKService.getSections() || [];
+  const _secSel = document.getElementById('m-section-select');
+  if(_secSel){
+    if(_secs.length){
+      _secs.forEach(s=>{
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.subject||s.name||''} ${s.grade||''}${s.room ? '/'+s.room : ''}`.trim();
+        _secSel.appendChild(opt);
+      });
+    } else {
+      _secSel.disabled = true;
+      document.getElementById('m-no-sections-hint').style.display = '';
+    }
+  }
+
+  // deep-link สำหรับ mobile (desktop จัดการแล้วก่อน async)
+  if(window.innerWidth < 768){
+    const params = new URLSearchParams(location.search);
+    const stepParam = params.get('step');
+    if(stepParam === '2') goStep(2);
   }
 })();
 
@@ -692,28 +738,30 @@ function parseManualStudents(){
   document.getElementById('m-students-raw').dataset.parsed = JSON.stringify(students);
 }
 
+
 function addManualSection(){
-  const subject = document.getElementById('m-subject').value.trim();
-  const grade   = document.getElementById('m-grade').value;
-  const room    = document.getElementById('m-room').value.trim() || '1';
-  if(!subject){ showAlert('msg-manual','กรุณากรอกชื่อวิชา','error'); return; }
-  if(!grade){   showAlert('msg-manual','กรุณาเลือกระดับชั้น','error'); return; }
+  const sel = document.getElementById('m-section-select');
+  const sectionId = sel?.value || '';
+  if(!sectionId){ showAlert('msg-manual','กรุณาเลือกห้องเรียน','error'); return; }
+  const allSecs = CKService.getSections() || [];
+  const secObj = allSecs.find(s=>s.id===sectionId) || {};
+  const subject = secObj.subject || secObj.name || '';
+  const grade   = secObj.grade || '';
+  const room    = secObj.room || '';
 
   const rawEl = document.getElementById('m-students-raw');
   let students = [];
   try{ students = JSON.parse(rawEl.dataset.parsed||'[]'); } catch(e){}
-  // ถ้ายังไม่ parse ลองทำตอนนี้
   if(!students.length && rawEl.value.trim()){
     parseManualStudents();
     try{ students = JSON.parse(rawEl.dataset.parsed||'[]'); } catch(e){}
   }
+  if(!students.length){ showAlert('msg-manual','กรุณากรอกรายชื่อนักเรียนอย่างน้อย 1 คน','error'); return; }
 
-  _manualSections.push({ subject, grade, room, schedules:[..._manualSchedules], students });
+  _manualSections.push({ subject, grade, room, sectionId, schedules:[..._manualSchedules], students });
 
   // reset form
-  document.getElementById('m-subject').value = '';
-  document.getElementById('m-grade').value = '';
-  document.getElementById('m-room').value = '';
+  if(sel) sel.value = '';
   document.getElementById('m-students-raw').value = '';
   document.getElementById('m-students-raw').dataset.parsed = '';
   document.getElementById('m-students-preview').innerHTML = '';

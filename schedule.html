@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ตารางเรียน — ClassKru</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --primary:#1d9e75;--pk:#0f6e56;--pbg:#f0fdf4;--pbd:#86efac;
+  --bg:#f5f7fa;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e8edf2;
+  --sh:0 1px 4px rgba(0,0,0,.06);--sh-md:0 4px 16px rgba(0,0,0,.10);
+  --tr:all .18s cubic-bezier(.4,0,.2,1);
+  --sidebar-w:200px;
+}
+html,body{height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);}
+
+/* ── Toast ── */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:rgba(15,23,42,.88);color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:22px;white-space:nowrap;z-index:9999;transition:transform .25s cubic-bezier(.4,0,.2,1);pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── Modal Overlay ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:200;display:none;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:#fff;border-radius:20px;padding:24px;width:340px;max-width:90vw;box-shadow:var(--sh-md);}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:16px;color:var(--text);}
+.modal-row{margin-bottom:14px;}
+.modal-label{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;}
+.modal-select,.modal-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Sarabun',sans-serif;font-size:14px;color:var(--text);background:#fff;outline:none;transition:var(--tr);}
+.modal-select:focus,.modal-input:focus{border-color:var(--primary);}
+.dur-btn{font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;background:#fff;color:var(--muted);cursor:pointer;transition:var(--tr);}
+.dur-btn:hover{border-color:var(--primary);color:var(--primary);}
+.dur-btn.active{border-color:var(--primary);background:var(--pbg);color:var(--pk);}
+.modal-btns{display:flex;gap:8px;margin-top:18px;}
+.btn{font-family:'Sarabun',sans-serif;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:var(--tr);border-radius:12px;font-size:14px;}
+.btn:active{transform:scale(.96);}
+.btn-primary{background:var(--primary);color:#fff;padding:10px 20px;flex:1;justify-content:center;}
+.btn-primary:hover{background:var(--pk);}
+.btn-ghost{background:#f1f5f9;color:var(--muted);padding:10px 16px;}
+.btn-ghost:hover{background:#e2e8f0;}
+.btn-danger{background:#fef2f2;color:#dc2626;padding:10px 14px;}
+.btn-danger:hover{background:#fee2e2;}
+
+/* ── MOBILE ── */
+.m-wrap{display:flex;flex-direction:column;min-height:100dvh;max-width:480px;margin:0 auto;}
+.m-topbar{background:#fff;border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;box-shadow:var(--sh);position:sticky;top:0;z-index:50;}
+.m-back{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.m-back svg{width:18px;height:18px;stroke:var(--text);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.m-title{font-size:16px;font-weight:800;flex:1;}
+.m-scroll{flex:1;overflow-y:auto;padding:12px 14px 80px;}
+.m-bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--border);height:60px;display:flex;z-index:100;box-shadow:0 -1px 0 rgba(0,0,0,.06);padding-bottom:env(safe-area-inset-bottom,0);}
+.m-bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:'Sarabun',sans-serif;padding:6px 0 4px;}
+.m-bn svg{width:24px;height:24px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.m-bn span{font-size:10px;font-weight:600;color:#9ca3af;}
+.m-bn.active svg{stroke:var(--primary);}
+.m-bn.active span{color:var(--primary);font-weight:700;}
+
+/* Mobile schedule */
+.m-day-block{background:#fff;border:1.5px solid var(--border);border-radius:16px;margin-bottom:10px;overflow:hidden;}
+.m-day-head{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafbfc;}
+.m-day-name{font-size:14px;font-weight:800;color:var(--text);}
+.m-day-count{font-size:12px;color:var(--muted);font-weight:400;}
+.m-period-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f8fafc;}
+.m-period-row:last-child{border-bottom:none;}
+.m-period-num{font-size:12px;font-weight:700;color:var(--muted);width:36px;flex-shrink:0;}
+.m-class-card{flex:1;background:var(--pbg);border:1px solid var(--pbd);border-radius:10px;padding:8px 10px;cursor:pointer;transition:var(--tr);}
+.m-class-card:hover{border-color:var(--primary);}
+.m-class-room{font-size:13px;font-weight:800;color:var(--pk);}
+.m-class-subj{font-size:12px;font-weight:400;color:var(--primary);margin-top:1px;}
+.m-add-btn{width:36px;height:36px;border-radius:10px;border:1.5px dashed var(--border);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:var(--tr);flex-shrink:0;}
+.m-add-btn:hover{border-color:var(--primary);color:var(--primary);}
+.m-add-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;}
+
+/* ── DESKTOP ── */
+.d-wrap{display:none;}
+@media(min-width:768px){
+  .m-wrap{display:none;}
+  .d-wrap{display:flex;height:100vh;overflow:hidden;}
+  .d-sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;}
+  .d-sb-logo{padding:0;border-bottom:1px solid var(--border);display:flex;justify-content:center;align-items:center;height:96px;}
+  .d-sb-sec{padding:14px 16px 4px;font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;}
+  .d-sb-link{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);border-left:3px solid transparent;}
+  .d-sb-link:hover{background:#f8fafc;color:var(--text);}
+  .d-sb-link.active{background:var(--pbg);color:var(--primary);border-left-color:var(--primary);}
+  .d-sb-link svg{width:18px;height:18px;stroke:#9ca3af;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;transition:stroke .15s;}
+  .d-sb-link.active svg,.d-sb-link:hover svg{stroke:var(--primary);}
+  .d-sb-spacer{flex:1;}
+  .d-sb-date{padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600;}
+  .d-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .d-topbar{background:#fff;border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 28px;gap:12px;flex-shrink:0;box-shadow:var(--sh);}
+  .d-topbar-back{display:flex;align-items:center;gap:6px;color:#64748b;cursor:pointer;background:#f8fafc;border:none;padding:7px 14px;border-radius:20px;font-size:14px;font-weight:700;font-family:'Sarabun',sans-serif;transition:var(--tr);flex-shrink:0;}
+  .d-topbar-back:hover{color:#92400e;background:#fef3c7;}
+  .d-topbar-title{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;flex:1;}
+  .d-topbar-title svg{width:18px;height:18px;stroke:var(--primary);stroke-width:2;fill:none;stroke-linecap:round;}
+  .d-scroll{flex:1;overflow-y:auto;padding:28px 32px 40px;}
+
+  /* Desktop grid */
+  .sched-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;}
+  .sched-h1{font-size:16px;font-weight:800;color:var(--text);}
+  .sched-sub{font-size:13px;font-weight:400;color:var(--muted);margin-top:3px;}
+  .btn-add-period{background:var(--primary);color:#fff;border:none;border-radius:20px;padding:8px 18px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:var(--tr);}
+  .btn-add-period:hover{background:var(--pk);}
+  .btn-add-period svg{width:14px;height:14px;stroke:#fff;stroke-width:2.5;fill:none;stroke-linecap:round;}
+
+  .grid-wrap{background:#fff;border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--sh);}
+  .grid-scroll{overflow-x:auto;}
+  .grid-table{border-collapse:collapse;min-width:100%;}
+  /* Header คาบ */
+  .grid-table th{padding:8px 6px;text-align:center;font-size:11px;font-weight:800;color:var(--muted);background:#fafbfc;border-bottom:1.5px solid var(--border);white-space:nowrap;}
+  .grid-table th.day-head-col{width:72px;min-width:72px;text-align:center;border-right:1.5px solid var(--border);}
+  .grid-table th.period-head-col{min-width:90px;width:90px;}
+  .period-num{font-size:11px;font-weight:800;color:var(--text);}
+  .period-time{font-size:10px;font-weight:400;color:#94a3b8;margin-top:1px;}
+  /* วันซ้าย */
+  .grid-table td.day-cell{background:#fafbfc;text-align:center;font-size:13px;font-weight:800;color:var(--text);border-right:1.5px solid var(--border);padding:10px 6px;white-space:nowrap;vertical-align:middle;}
+  /* slot */
+  .grid-table td.slot-td{border:1px solid #f1f5f9;vertical-align:middle;padding:5px;height:60px;}
+  .class-tag{background:var(--pbg);border:1px solid var(--pbd);border-radius:8px;padding:5px 7px;cursor:pointer;transition:var(--tr);height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;}
+  .class-tag:hover{border-color:var(--primary);box-shadow:0 2px 8px rgba(29,158,117,.12);}
+  .class-tag .ct-subj{font-size:12px;font-weight:800;color:var(--pk);}
+  .class-tag .ct-room{font-size:12px;font-weight:400;color:var(--primary);}
+  .class-tag.blue{background:#eff6ff;border-color:#bfdbfe;}
+  .class-tag.blue .ct-subj{color:#1e40af;}
+  .class-tag.blue .ct-room{color:#2563eb;}
+  .class-tag.amber{background:#fffbeb;border-color:#fde68a;}
+  .class-tag.amber .ct-subj{color:#92400e;}
+  .class-tag.amber .ct-room{color:#d97706;}
+  .class-tag.violet{background:#f5f3ff;border-color:#ddd6fe;}
+  .class-tag.violet .ct-subj{color:#5b21b6;}
+  .class-tag.violet .ct-room{color:#7c3aed;}
+  .empty-td{cursor:pointer;transition:var(--tr);}
+  .empty-td:hover{background:#f8fafc;}
+  .empty-inner{width:100%;height:50px;display:flex;align-items:center;justify-content:center;}
+  .empty-inner svg{width:16px;height:16px;stroke:#d1d5db;stroke-width:1.8;fill:none;stroke-linecap:round;transition:stroke .15s;}
+  .empty-td:hover .empty-inner svg{stroke:var(--primary);}
+  .period-settings{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1.5px solid var(--border);background:#fafbfc;}
+  .period-settings-label{font-size:12px;font-weight:700;color:var(--muted);}
+  .btn-manage-periods{background:#fdf2f8;border:1.5px solid #f0abcf;border-radius:10px;padding:6px 14px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;color:#be185d;cursor:pointer;transition:var(--tr);}
+  .btn-manage-periods:hover{background:#fce7f3;border-color:#ec4899;color:#9d174d;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ MOBILE ══ -->
+<div class="m-wrap">
+  <div class="m-topbar">
+    <button class="m-back" onclick="go('settings.html')">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <div class="m-title">ตารางเรียน</div>
+    <button class="btn btn-primary" style="padding:7px 14px;font-size:13px;border-radius:12px;" onclick="openAddModal(null,null)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      เพิ่ม
+    </button>
+  </div>
+  <div class="m-scroll" id="m-sched"></div>
+  <nav class="m-bottom-nav">
+    <button class="m-bn" onclick="go('index.html')">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+      <span>หน้าหลัก</span>
+    </button>
+    <button class="m-bn active">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+      <span>ตารางสอน</span>
+    </button>
+    <button class="m-bn" style="position:relative;" onclick="go('attendance.html')">
+      <div style="position:absolute;top:-14px;width:50px;height:50px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(29,158,117,.4);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <span style="margin-top:22px;color:var(--primary);font-weight:700;">เช็คชื่อ</span>
+    </button>
+    <button class="m-bn" onclick="go('report.html')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>สถิติ</span>
+    </button>
+    <button class="m-bn" onclick="go('settings.html')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span>ตั้งค่า</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ══ DESKTOP ══ -->
+<div class="d-wrap">
+  <aside class="d-sidebar">
+    <div class="d-sb-logo">
+      <img src="classkru-logo.png" alt="ClassKru" style="height:68px;width:auto;">
+    </div>
+    <div class="d-sb-sec">เมนู</div>
+    <div class="d-sb-link" onclick="go('index.html')">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>หน้าหลัก
+    </div>
+    <div class="d-sb-link" onclick="go('attendance.html')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>เช็คชื่อ
+    </div>
+    <div class="d-sb-link" onclick="go('report.html')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>สถิติ
+    </div>
+    <div class="d-sb-link active">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>ตั้งค่า
+    </div>
+    <div class="d-sb-spacer"></div>
+    <div class="d-sb-date" id="d-date-sb"></div>
+  </aside>
+  <div class="d-main">
+    <div class="d-topbar">
+      <button class="d-topbar-back" onclick="go('settings.html')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        กลับ
+      </button>
+      <div class="d-topbar-title">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        ตารางเรียน
+      </div>
+    </div>
+    <div class="d-scroll">
+      <div class="sched-header">
+        <div>
+          <div class="sched-h1">ตารางเรียนประจำสัปดาห์</div>
+          <div class="sched-sub">คลิกช่องว่างเพื่อเพิ่มคาบ · คลิกการ์ดเพื่อแก้ไข</div>
+        </div>
+      </div>
+      <div class="grid-wrap">
+        <div class="grid-scroll"><table class="grid-table" id="d-grid"></table></div>
+        <div class="period-settings">
+          <span class="period-settings-label">จำนวนคาบ: <span id="period-count-lbl">8 คาบ</span></span>
+          <button class="btn-manage-periods" onclick="openPeriodSettings()">จัดการคาบ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Modal เพิ่ม/แก้ไขคาบ ══ -->
+<div class="modal-overlay" id="modal-add">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">เพิ่มคาบเรียน</div>
+    <div class="modal-context" id="modal-context" style="font-size:13px;color:var(--muted);margin-bottom:14px;font-weight:700;"></div>
+    <input type="hidden" id="m-day">
+    <input type="hidden" id="m-period">
+    <div class="modal-row">
+      <div class="modal-label">วิชา</div>
+      <select class="modal-select" id="m-subject" onchange="filterRooms()">
+        <option value="">— เลือกวิชา —</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <div class="modal-label">ห้องเรียน</div>
+      <select class="modal-select" id="m-section">
+        <option value="">— เลือกห้อง —</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-danger" id="btn-delete" onclick="deleteSlot()" style="display:none;">ลบ</button>
+      <button class="btn btn-primary" onclick="saveSlot()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Modal จัดการคาบ ══ -->
+<div class="modal-overlay" id="modal-periods">
+  <div class="modal" style="width:360px;">
+    <div class="modal-title">ตั้งค่าคาบเรียน</div>
+
+    <div class="modal-row">
+      <div class="modal-label">เวลาเริ่มคาบแรก</div>
+      <input class="modal-input" type="time" id="ps-start" value="08:00">
+    </div>
+
+    <div class="modal-row">
+      <div class="modal-label">ความยาวแต่ละคาบ (นาที)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="dur-btn" data-min="45" onclick="selectDur(this)">45 นาที</button>
+        <button class="dur-btn" data-min="50" onclick="selectDur(this)">50 นาที</button>
+        <button class="dur-btn active" data-min="55" onclick="selectDur(this)">55 นาที</button>
+        <button class="dur-btn" data-min="60" onclick="selectDur(this)">60 นาที</button>
+        <button class="dur-btn" data-min="custom" onclick="selectDur(this)">กำหนดเอง</button>
+      </div>
+      <input class="modal-input" type="number" id="ps-custom-min" min="10" max="180" placeholder="นาที" style="margin-top:8px;display:none;">
+    </div>
+
+    <div class="modal-row">
+      <div class="modal-label">พักระหว่างคาบ (นาที)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="dur-btn active" data-brk="0" onclick="selectBrk(this)">ไม่มี</button>
+        <button class="dur-btn" data-brk="5" onclick="selectBrk(this)">5 นาที</button>
+        <button class="dur-btn" data-brk="10" onclick="selectBrk(this)">10 นาที</button>
+      </div>
+    </div>
+
+    <div class="modal-row">
+      <div class="modal-label">จำนวนคาบต่อวัน</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button onclick="changePeriodCount(-1)" style="width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);">−</button>
+        <span id="ps-count" style="font-size:18px;font-weight:800;min-width:28px;text-align:center;">8</span>
+        <button onclick="changePeriodCount(1)" style="width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);">+</button>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div id="ps-preview" style="background:#f8fafc;border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:4px;">
+      <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:6px;">ตัวอย่าง</div>
+      <div id="ps-preview-list" style="font-size:13px;color:var(--text);line-height:1.8;"></div>
+    </div>
+
+    <div class="modal-btns" style="margin-top:14px;">
+      <button class="btn btn-ghost" onclick="closePeriodSettings()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="savePeriods()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast-el"></div>
+<script src="ck-service.js"></script>
+<script>
+function go(url){window.location.href=url;}
+function showToast(msg){
+  const t=document.getElementById('toast-el');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+const DAYS=['จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์'];
+const TAG_COLORS=['','blue','amber','violet',''];
+const SK_SCHEDULE='ck_schedule_v1';   // { slots:[{day,period,sectionId}], periods:[{label,time}] }
+
+let _schedule={slots:[],periods:[]};
+let _sections=[];
+let _editKey=null; // 'day-period' ถ้าแก้, null ถ้าเพิ่มใหม่
+
+/* ── Default periods ── */
+const DEFAULT_PERIODS=[
+  {label:'คาบ 1',time:'08:00–08:50'},
+  {label:'คาบ 2',time:'09:00–09:50'},
+  {label:'คาบ 3',time:'10:00–10:50'},
+  {label:'คาบ 4',time:'11:00–11:50'},
+  {label:'คาบ 5',time:'13:00–13:50'},
+  {label:'คาบ 6',time:'14:00–14:50'},
+  {label:'คาบ 7',time:'15:00–15:50'},
+  {label:'คาบ 8',time:'16:00–16:50'},
+];
+
+/* ── Load / Save ── */
+function loadSchedule(){
+  try{
+    const raw=localStorage.getItem(SK_SCHEDULE);
+    if(raw) _schedule=JSON.parse(raw);
+  }catch(e){}
+  if(!_schedule.periods||!_schedule.periods.length) _schedule.periods=[...DEFAULT_PERIODS];
+  if(!_schedule.slots) _schedule.slots=[];
+}
+function saveSchedule(){
+  localStorage.setItem(SK_SCHEDULE,JSON.stringify(_schedule));
+}
+function getSlot(day,period){
+  return _schedule.slots.find(s=>s.day===day&&s.period===period)||null;
+}
+function getSectionColor(sectionId){
+  const idx=_sections.findIndex(s=>s.id===sectionId);
+  return TAG_COLORS[idx%TAG_COLORS.length]||'';
+}
+
+/* ── Render Desktop Grid — วันซ้าย คาบบน ── */
+function renderDesktop(){
+  const periods=_schedule.periods;
+  document.getElementById('period-count-lbl').textContent=`${periods.length} คาบ`;
+  // header row: วัน/เวลา + คาบ 1..N
+  let html=`<thead><tr>
+    <th class="day-head-col">วัน / เวลา</th>
+    ${periods.map((p,pi)=>`<th class="period-head-col">
+      <div class="period-num">${p.label}</div>
+      <div class="period-time">${p.time||''}</div>
+    </th>`).join('')}
+  </tr></thead><tbody>`;
+  // แถวละ 1 วัน
+  DAYS.forEach((day,di)=>{
+    html+=`<tr><td class="day-cell">${day}</td>`;
+    periods.forEach((p,pi)=>{
+      const slot=getSlot(di,pi);
+      if(slot){
+        const sec=_sections.find(s=>s.id===slot.sectionId);
+        const col=getSectionColor(slot.sectionId);
+        const bg=sec&&sec.color?sec.color:'#1d9e75';
+        const bgLight=bg+'22';
+        html+=`<td class="slot-td"><div class="class-tag" style="background:${bgLight};border-color:${bg}55;" onclick="openAddModal(${di},${pi})">
+          <div class="ct-subj" style="color:${bg};filter:brightness(.7);">${sec?sec.subject||'':''}</div>
+          <div class="ct-room" style="color:${bg};">${sec?sec.name:'—'}</div>
+        </div></td>`;
+      } else {
+        html+=`<td class="empty-td slot-td" onclick="openAddModal(${di},${pi})"><div class="empty-inner"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div></td>`;
+      }
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody>`;
+  document.getElementById('d-grid').innerHTML=html;
+}
+
+/* ── Render Mobile ── */
+function renderMobile(){
+  const periods=_schedule.periods;
+  const today = new Date().getDay(); // 0=sun,1=mon...
+  const todayDi = today >= 1 && today <= 5 ? today - 1 : -1; // map to DAYS index
+  let html='';
+  DAYS.forEach((day,di)=>{
+    const daySlots=_schedule.slots.filter(s=>s.day===di);
+    const isToday = di === todayDi;
+    html+=`<div class="m-day-block"${isToday?' style="border-color:var(--pbd);box-shadow:0 0 0 2px rgba(29,158,117,.12);"':''}>
+      <div class="m-day-head"${isToday?' style="background:var(--pbg);"':''}>
+        <div class="m-day-name" style="${isToday?'color:var(--primary);':''}">${day}${isToday?' <span style="font-size:10px;font-weight:600;color:var(--primary);background:#d1fae5;border-radius:8px;padding:1px 6px;margin-left:4px;">วันนี้</span>':''}</div>
+        <div class="m-day-count">${daySlots.length ? daySlots.length+' คาบ' : 'ว่าง'}</div>
+      </div>`;
+    let hasAny = false;
+    periods.forEach((p,pi)=>{
+      const slot=getSlot(di,pi);
+      if(slot){
+        hasAny = true;
+        const sec=_sections.find(s=>s.id===slot.sectionId);
+        html+=`<div class="m-period-row">
+          <div style="width:52px;flex-shrink:0;">
+            <div class="m-period-num">${p.label}</div>
+            ${p.time?`<div style="font-size:10px;color:#cbd5e1;font-weight:400;margin-top:1px;">${p.time.split('–')[0]||p.time}</div>`:''}
+          </div>
+          <div class="m-class-card" onclick="openAddModal(${di},${pi})">
+            <div class="m-class-room">${sec?sec.name:'—'}</div>
+            <div class="m-class-subj">${sec?sec.subject||'':''}</div>
+          </div>
+        </div>`;
+      }
+    });
+    if(!hasAny){
+      html+=`<div style="padding:12px 14px;font-size:12px;color:var(--muted);text-align:center;">ไม่มีคาบเรียน — <button onclick="openAddModal(${di},null)" style="border:none;background:none;color:var(--primary);font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;cursor:pointer;padding:0;">+ เพิ่มคาบ</button></div>`;
+    } else {
+      html+=`<div class="m-period-row" style="padding:8px 14px;">
+        <button class="m-add-btn" onclick="openAddModal(${di},null)" style="flex:none;">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <span style="font-size:12px;color:var(--muted);margin-left:6px;">เพิ่มคาบ</span>
+      </div>`;
+    }
+    html+=`</div>`;
+  });
+  document.getElementById('m-sched').innerHTML=html||'<div style="text-align:center;padding:40px;color:var(--muted);font-size:14px;">ยังไม่มีตารางเรียน</div>';
+}
+
+function renderAll(){
+  renderDesktop();
+  renderMobile();
+}
+
+/* ── Modal เพิ่ม/แก้ ── */
+function openAddModal(day,period){
+  _editKey=(day!==null&&period!==null)?`${day}-${period}`:null;
+  const existing=(_editKey)?getSlot(day,period):null;
+
+  document.getElementById('modal-title').textContent=existing?'แก้ไขคาบเรียน':'เพิ่มคาบเรียน';
+  document.getElementById('btn-delete').style.display=existing?'':'none';
+
+  // แสดง วัน + คาบ เป็น context label
+  const dayName=DAYS[day]||'';
+  const periodObj=_schedule.periods[period];
+  const periodLabel=periodObj?`${periodObj.label}${periodObj.time?' · '+periodObj.time:''}`:'';
+  document.getElementById('modal-context').textContent=`${dayName}  ·  ${periodLabel}`;
+
+  // store as hidden values
+  document.getElementById('m-day').value=day;
+  document.getElementById('m-period').value=period;
+
+  // วิชา dropdown
+  const subjects=[...new Set(_sections.map(s=>s.subject||s.name))];
+  const mSubj=document.getElementById('m-subject');
+  mSubj.innerHTML='<option value="">— เลือกวิชา —</option>'+
+    subjects.map(s=>`<option value="${s}">${s}</option>`).join('');
+
+  // ห้องเรียน dropdown (cascade)
+  const mSec=document.getElementById('m-section');
+  mSec.innerHTML='<option value="">— เลือกห้อง —</option>';
+
+  if(existing){
+    const sec=_sections.find(s=>s.id===existing.sectionId);
+    if(sec){
+      const subj=sec.subject||sec.name;
+      mSubj.value=subj;
+      // populate rooms for this subject
+      mSec.innerHTML='<option value="">— เลือกห้อง —</option>'+
+        _sections.filter(s=>(s.subject||s.name)===subj)
+          .map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+      mSec.value=existing.sectionId;
+    }
+  }
+
+  document.getElementById('modal-add').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modal-add').classList.remove('show');
+  _editKey=null;
+}
+function filterRooms(){
+  const subj=document.getElementById('m-subject').value;
+  const mSec=document.getElementById('m-section');
+  if(!subj){
+    mSec.innerHTML='<option value="">— เลือกห้อง —</option>';
+    return;
+  }
+  const rooms=_sections.filter(s=>(s.subject||s.name)===subj);
+  mSec.innerHTML='<option value="">— เลือกห้อง —</option>'+
+    rooms.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  if(rooms.length===1) mSec.value=rooms[0].id; // auto-select ถ้ามีห้องเดียว
+}
+function saveSlot(){
+  const day=parseInt(document.getElementById('m-day').value);
+  const period=parseInt(document.getElementById('m-period').value);
+  const sectionId=document.getElementById('m-section').value;
+  if(!document.getElementById('m-subject').value){showToast('กรุณาเลือกวิชา');return;}
+  if(!sectionId){showToast('กรุณาเลือกห้องเรียน');return;}
+
+  // ลบ slot เดิมถ้ามี
+  _schedule.slots=_schedule.slots.filter(s=>!(s.day===day&&s.period===period));
+  _schedule.slots.push({day,period,sectionId});
+  saveSchedule();
+  renderAll();
+  closeModal();
+  showToast('บันทึกแล้ว ✓');
+}
+function deleteSlot(){
+  if(!_editKey)return;
+  const [day,period]=_editKey.split('-').map(Number);
+  _schedule.slots=_schedule.slots.filter(s=>!(s.day===day&&s.period===period));
+  saveSchedule();
+  renderAll();
+  closeModal();
+  showToast('ลบคาบแล้ว');
+}
+
+/* ── Modal จัดการคาบ ── */
+let _psConfig={dur:55,brk:0,count:8,start:'08:00'};
+
+function selectDur(btn){
+  document.querySelectorAll('.dur-btn[data-min]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const customInput=document.getElementById('ps-custom-min');
+  if(btn.dataset.min==='custom'){
+    customInput.style.display='block';
+    customInput.addEventListener('input',updatePreview);
+  } else {
+    customInput.style.display='none';
+    _psConfig.dur=parseInt(btn.dataset.min);
+    updatePreview();
+  }
+}
+function selectBrk(btn){
+  document.querySelectorAll('.dur-btn[data-brk]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _psConfig.brk=parseInt(btn.dataset.brk);
+  updatePreview();
+}
+function changePeriodCount(delta){
+  _psConfig.count=Math.min(12,Math.max(1,_psConfig.count+delta));
+  document.getElementById('ps-count').textContent=_psConfig.count;
+  updatePreview();
+}
+function updatePreview(){
+  const startStr=document.getElementById('ps-start').value||'08:00';
+  const customInput=document.getElementById('ps-custom-min');
+  const activeBtn=document.querySelector('.dur-btn[data-min].active');
+  let dur=_psConfig.dur;
+  if(activeBtn&&activeBtn.dataset.min==='custom') dur=parseInt(customInput.value)||50;
+  _psConfig.dur=dur;
+  _psConfig.start=startStr;
+
+  const [sh,sm]=startStr.split(':').map(Number);
+  let cur=sh*60+sm;
+  let html='';
+  for(let i=0;i<_psConfig.count;i++){
+    const s=`${String(Math.floor(cur/60)).padStart(2,'0')}:${String(cur%60).padStart(2,'0')}`;
+    cur+=dur;
+    const e=`${String(Math.floor(cur/60)).padStart(2,'0')}:${String(cur%60).padStart(2,'0')}`;
+    html+=`<div><span style="font-weight:700;">คาบ ${i+1}</span> &nbsp;${s}–${e}</div>`;
+    cur+=_psConfig.brk;
+  }
+  document.getElementById('ps-preview-list').innerHTML=html;
+}
+function openPeriodSettings(){
+  // sync state จาก periods ที่มีอยู่
+  _psConfig.count=_schedule.periods.length||8;
+  document.getElementById('ps-count').textContent=_psConfig.count;
+  document.getElementById('ps-start').value=_psConfig.start;
+  document.getElementById('ps-start').addEventListener('input',updatePreview);
+  updatePreview();
+  document.getElementById('modal-periods').classList.add('show');
+}
+function savePeriods(){
+  const startStr=document.getElementById('ps-start').value||'08:00';
+  const customInput=document.getElementById('ps-custom-min');
+  const activeBtn=document.querySelector('.dur-btn[data-min].active');
+  let dur=_psConfig.dur;
+  if(activeBtn&&activeBtn.dataset.min==='custom') dur=parseInt(customInput.value)||50;
+
+  const [sh,sm]=startStr.split(':').map(Number);
+  let cur=sh*60+sm;
+  _schedule.periods=[];
+  for(let i=0;i<_psConfig.count;i++){
+    const s=`${String(Math.floor(cur/60)).padStart(2,'0')}:${String(cur%60).padStart(2,'0')}`;
+    cur+=dur;
+    const e=`${String(Math.floor(cur/60)).padStart(2,'0')}:${String(cur%60).padStart(2,'0')}`;
+    _schedule.periods.push({label:`คาบ ${i+1}`,time:`${s}–${e}`});
+    cur+=_psConfig.brk;
+  }
+  const maxP=_schedule.periods.length-1;
+  _schedule.slots=_schedule.slots.filter(s=>s.period<=maxP);
+  saveSchedule();
+  renderAll();
+  closePeriodSettings();
+  showToast('บันทึกคาบแล้ว ✓');
+}
+function closePeriodSettings(){
+  document.getElementById('modal-periods').classList.remove('show');
+}
+
+/* ── Date sidebar ── */
+function setDate(){
+  const el=document.getElementById('d-date-sb');
+  if(!el)return;
+  const d=new Date();
+  const days=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+  const months=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  el.textContent=`${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()+543}`;
+}
+
+/* ── Init ── */
+async function init(){
+  loadSchedule();
+  setDate();
+
+  // โหลด sections จาก CKService
+  try{
+    if(window.CKService){
+      await CKService.requireAuth();
+      await CKService.loadSections();
+      _sections=CKService.getSections()||[];
+    }
+  }catch(e){
+    // demo data ถ้าไม่มี auth
+    _sections=[
+      {id:'s1',name:'ม.3/1',subject:'วิทยาศาสตร์'},
+      {id:'s2',name:'ม.3/2',subject:'วิทยาศาสตร์'},
+      {id:'s3',name:'ม.3/3',subject:'วิทยาศาสตร์'},
+    ];
+  }
+  renderAll();
+}
+
+// ปิด modal เมื่อคลิก overlay
+document.getElementById('modal-add').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('modal-periods').addEventListener('click',function(e){if(e.target===this)closePeriodSettings();});
+
+init();
+</script>
+</body>
+</html>
